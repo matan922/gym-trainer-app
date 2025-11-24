@@ -1,15 +1,13 @@
 import express from 'express';
 import { deleteWorkout, getWorkout, getWorkouts, postWorkout, putWorkout } from '../controller/workoutController';
-import exerciseRoutes from './exerciseRoutes';
+import { authenticateToken } from '../middlewares/authMiddleware';
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/', getWorkouts)
-router.get('/:workoutId', getWorkout)
-router.post('/', postWorkout)
-router.put('/:workoutId', putWorkout)
-router.delete('/:workoutId', deleteWorkout)
-
-router.use("/:workoutId/exercises", exerciseRoutes);
+router.get('/', authenticateToken, getWorkouts)
+router.get('/:workoutId', authenticateToken, getWorkout)
+router.post('/', authenticateToken, postWorkout)
+router.put('/:workoutId', authenticateToken, putWorkout)
+router.delete('/:workoutId', authenticateToken, deleteWorkout)
 
 export default router;

@@ -1,0 +1,130 @@
+import type { NextFunction, Request, Response } from "express";
+import Trainer from "../models/Trainer";
+import bcrypt from "bcryptjs";
+import jwt, { type JwtPayload } from 'jsonwebtoken'
+import { generateAccessToken, generateRefreshToken } from "../helper/genAccessToken";
+import RefreshToken from "../models/RefreshToken";
+
+
+export const register = async (req: Request, res: Response) => {
+    try {
+        const existing = await Trainer.findOne({ email: req.body.email })
+
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Email already taken" })
+        }
+
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        const newTrainer = new Trainer({ firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email, password: hashedPassword })
+        await newTrainer.save()
+
+        res.status(200).json({ success: true, newTrainer })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "something went wrong" })
+    }
+}
+
+// Login function that creates access and refresh tokens for the client
+export const login = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Missing data" })
+        }
+        const trainer = await Trainer.findOne({ email: email }).exec()
+
+        if (!trainer) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials (no trainer)' })
+        }
+
+        if (await bcrypt.compare(password, trainer.password)) {
+            const accessToken = generateAccessToken({ id: trainer._id })
+            const refreshToken = generateRefreshToken({ id: trainer.id })
+            await RefreshToken.deleteOne({ trainerId: trainer._id }) // Delete refresh token if already existing for trainer
+
+            // store in httponly cookie
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                sameSite: "lax", // development
+                secure: false, // development
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                path: '/'
+            })
+
+            await RefreshToken.create({
+                token: refreshToken,
+                trainerId: trainer._id,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            })
+
+            const { password: _, ...trainerData } = trainer.toObject()
+            res.json({ trainer: trainerData, accessToken, refreshToken })
+        } else {
+            res.status(401).json({ success: false, message: "Invalid credentials" })
+        }
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+
+// used to generate a new access token from the refresh token sent from logging in
+export const generateNewAccessToken = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) {
+        return res.status(401).json({ success: false, message: "No token found (in cookie)" })
+    }
+
+    const tokenExisting = await RefreshToken.findOne({ token: refreshToken }).exec()
+    if (!tokenExisting) {
+        return res.status(401).json({ success: false, message: "No token found (in db)" })
+    }
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, async (err: any, payload: any) => {
+        if (err) return res.status(403).json({ success: false, message: "Invalid token" })
+
+        const accessToken = generateAccessToken({ id: payload.id })
+        const newRefreshToken = generateRefreshToken({ id: payload.id })
+
+        await RefreshToken.findOneAndUpdate(
+            { token: refreshToken },
+            {
+                token: newRefreshToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            }
+        )
+
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
+        })
+
+        res.json({ accessToken })
+    })
+}
+
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const refreshToken = req.cookies.refreshToken
+        if (refreshToken) {
+            await RefreshToken.deleteOne({ token: refreshToken })
+        }
+
+        res.clearCookie('refreshToken')
+        return res.sendStatus(204)
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "Logout failed" })
+    }
+}
+
+// test
+export const testAuthorized = async (req: Request, res: Response) => {
+    console.log("USER DATA = ", req.user)
+    return res.sendStatus(200)
+}
+

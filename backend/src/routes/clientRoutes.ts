@@ -1,16 +1,17 @@
 import express from 'express';
 import { deleteClient, getClient, getClients, postClient, putClient } from '../controller/clientController';
 import workoutRoutes from './workoutRoutes';
+import { authenticateToken } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
-router.get("/", getClients)
-router.get("/:id", getClient)
-router.post("/", postClient)
-router.put("/:id", putClient)
-router.delete("/:id", deleteClient)
+router.get("/", authenticateToken, getClients)
+router.get("/:clientId", authenticateToken, getClient)
+router.post("/", authenticateToken, postClient)
+router.put("/:clientId", authenticateToken, putClient)
+router.delete("/:clientId", authenticateToken, deleteClient)
 
-router.use("/:id/workouts", workoutRoutes);
-
+// Nest workout routes under clients
+router.use("/:clientId/workouts", workoutRoutes)
 
 export default router;

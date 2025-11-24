@@ -1,30 +1,38 @@
 import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import { connectDB } from "./config/db";
 import mongoose from "mongoose";
-import Client from "./models/Client";
+import dotenv from 'dotenv';
+dotenv.config()
+
+import { connectDB } from "./config/db";
+import cors from "cors";
 import clientRoutes from "./routes/clientRoutes";
+import authRoutes from "./routes/authRoutes";
+import cookieParser from "cookie-parser";
+
 connectDB();
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend URL
+    credentials: true // Allow cookies to be sent
+}))
+app.use(cookieParser())
 
 app.use('/clients', clientRoutes)
+app.use('/auth', authRoutes)
 
 app.get("/health", (req, res) => {
     res.json({ health: "Success" });
 });
 
 
-const PORT = 5000;
 
 mongoose.connection.once('open', () => {
     console.log("Connected to MongoDB")
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
 
 })
 
