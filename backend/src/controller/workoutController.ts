@@ -49,7 +49,6 @@ export const postWorkout = async (req: Request, res: Response) => {
         const user = req.user
         const { clientId } = req.params;
         const workoutData = req.body;
-        console.log(workoutData)
 
         const client = await Client.findOne({ _id: clientId, trainerId: user?.id })
         if (!client) {

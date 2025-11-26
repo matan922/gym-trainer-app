@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
+import EditWorkoutModal from "../components/client/EditWorkoutModal"
+import NewWorkoutModal from "../components/client/NewWorkoutModal"
 import {
-	fetchClient,
-	postWorkout,
 	deleteWorkout,
+	getClient,
+	postWorkout,
 	putWorkout,
 } from "../services/api"
 import type { Client, Workout } from "../types/clientTypes"
-import NewWorkoutModal from "../components/client/NewWorkoutModal"
-import EditWorkoutModal from "../components/client/EditWorkoutModal"
 
 const ClientWorkoutsPage = () => {
 	const { id } = useParams()
@@ -23,13 +23,12 @@ const ClientWorkoutsPage = () => {
 		const getClientData = async () => {
 			try {
 				if (id) {
-					const response = await fetchClient(id)
+					const response = await getClient(id)
 					setClient(response.data.client)
 					setWorkouts(response.data.workouts)
 				}
 			} catch (error) {
 				console.error("Error fetching client:", error)
-				navigate("/")
 			}
 		}
 
@@ -75,8 +74,11 @@ const ClientWorkoutsPage = () => {
 					workoutData,
 					workoutData._id,
 				)
-				console.log(response)
-				setWorkouts([...workouts, response])
+				setWorkouts(
+					workouts.map((workout) =>
+						workout._id === response._id ? response : workout,
+					),
+				)
 				setIsEditOpen(false)
 			}
 		} catch (error) {

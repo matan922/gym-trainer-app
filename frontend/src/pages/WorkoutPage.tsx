@@ -16,7 +16,6 @@ const WorkoutPage = () => {
 				}
 			} catch (error) {
 				console.log("INTERCEPTOR!!! ", error)
-				navigate("/")
 			}
 		}
 
@@ -26,8 +25,8 @@ const WorkoutPage = () => {
 	return (
 		<div>
 			<div>
-				{workout?.exercises?.map((res) => (
-					<div>{res.name}</div>
+				{workout?.exercises?.map((res, index) => (
+					<div key={index}>{res.name}</div>
 				))}
 			</div>
 		</div>

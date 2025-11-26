@@ -54,6 +54,7 @@ const EditWorkoutModal = ({
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
+		console.log("EDIT = ",workout)
 		onWorkoutSubmit(workout)
 	}
 

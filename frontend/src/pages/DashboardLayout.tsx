@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router"
-import { logout } from "../../services/api"
-import { useAuthStore } from "../../store/authStore"
+import { logout } from "../services/api"
+import { useAuthStore } from "../store/authStore"
 
 function DashboardLayout() {
 	const navigate = useNavigate()
@@ -18,18 +18,18 @@ function DashboardLayout() {
 		setHamburgerOpen(!hamburgerOpen)
 	}
 
-const handleLogout = async () => {
-    try {
-        if (confirm("אישור התנתקות")) {
-            await logout()
-            clearToken()
-            setHamburgerOpen(false)
-            navigate("/")
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
+	const handleLogout = async () => {
+		try {
+			if (confirm("אישור התנתקות")) {
+				await logout()
+				clearToken()
+				setHamburgerOpen(false)
+				navigate("/")
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
 	return (
 		<div className="sm:grid sm:grid-cols-[280px_1fr] min-h-screen">
@@ -78,25 +78,15 @@ const handleLogout = async () => {
 						</g>
 					</svg>
 				</button>
-				<div className="relative">
-					<svg
-						className="absolute top-1/2 -translate-y-1/2 right-1 h-4 w-5 fill-gray-400"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 512 512"
-					>
-						<path d="m495,466.1l-110.1-110.1c31.1-37.7 48-84.6 48-134 0-56.4-21.9-109.3-61.8-149.2-39.8-39.9-92.8-61.8-149.1-61.8-56.3,0-109.3,21.9-149.2,61.8-39.9,39.8-61.8,92.8-61.8,149.2 0,56.3 21.9,109.3 61.8,149.2 39.8,39.8 92.8,61.8 149.2,61.8 49.5,0 96.4-16.9 134-48l110.1,110c8,8 20.9,8 28.9,0 8-8 8-20.9 0-28.9zm-393.3-123.9c-32.2-32.1-49.9-74.8-49.9-120.2 0-45.4 17.7-88.2 49.8-120.3 32.1-32.1 74.8-49.8 120.3-49.8 45.4,0 88.2,17.7 120.3,49.8 32.1,32.1 49.8,74.8 49.8,120.3 0,45.4-17.7,88.2-49.8,120.3-32.1,32.1-74.9,49.8-120.3,49.8-45.4,0-88.1-17.7-120.2-49.9z" />
-					</svg>
-					<input
-						placeholder="חיפוש"
-						className="placeholder:text-gray-400 text-white w-full bg-gray-600 rounded-sm pr-7 py-1"
-					/>
-				</div>
 				<button
 					type="button"
 					onClick={() => handleNavigation("/dashboard")}
 					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
 				>
 					מתאמנים
+				</button>
+				<button onClick={() => handleNavigation("/dashboard/new-session")} className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700">
+					קביעת אימון
 				</button>
 				<button
 					type="button"

@@ -6,7 +6,6 @@ import { useNavigate } from "react-router"
 
 function AddClientPage() {
 	const [clientData, setClientData] = useState<Client>({
-		_id: null,
 		firstName: "",
 		lastName: "",
 		age: 0,

@@ -2,12 +2,12 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config()
-
 import { connectDB } from "./config/db";
 import cors from "cors";
 import clientRoutes from "./routes/clientRoutes";
 import authRoutes from "./routes/authRoutes";
 import cookieParser from "cookie-parser";
+import sessionRoutes from "./routes/sessionRoutes";
 
 connectDB();
 
@@ -23,6 +23,7 @@ app.use(cookieParser())
 
 app.use('/clients', clientRoutes)
 app.use('/auth', authRoutes)
+app.use('/sessions', sessionRoutes)
 
 app.get("/health", (req, res) => {
     res.json({ health: "Success" });

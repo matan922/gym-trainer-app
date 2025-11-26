@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import ClientEdit from "../components/client/ClientEdit"
-import { fetchClient, putClient } from "../services/api"
-import type { Client } from "../types/clientTypes"
 import DeleteClientButton from "../components/client/DeleteClientButton"
+import { getClient, putClient } from "../services/api"
+import type { Client } from "../types/clientTypes"
 
 const ClientDetailsPage = () => {
 	const [client, setClient] = useState<Client | null>(null)
@@ -15,12 +15,11 @@ const ClientDetailsPage = () => {
 		const getClientData = async () => {
 			try {
 				if (id) {
-					const response = await fetchClient(id)
+					const response = await getClient(id)
 					setClient(response.data.client)
 				}
 			} catch (error) {
 				console.error("Error fetching client:", error)
-				navigate("/")
 			}
 		}
 

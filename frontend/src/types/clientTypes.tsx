@@ -1,3 +1,8 @@
+export interface AuthenticatedTrainer {
+	firstName: string;
+	lastName: string;
+}
+
 export interface Client {
 	_id?: string;
 	firstName: string;
