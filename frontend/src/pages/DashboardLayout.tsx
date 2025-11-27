@@ -83,6 +83,13 @@ function DashboardLayout() {
 					onClick={() => handleNavigation("/dashboard")}
 					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
 				>
+					לוח ראשי
+				</button>
+				<button
+					type="button"
+					onClick={() => handleNavigation("/dashboard/clients")}
+					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
+				>
 					מתאמנים
 				</button>
 				<button onClick={() => handleNavigation("/dashboard/new-session")} className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700">

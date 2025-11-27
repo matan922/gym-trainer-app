@@ -50,3 +50,13 @@ export interface Exercise {
 // 	reps: number;
 // 	rest: number;
 // }
+
+export interface Session {
+	trainerId: string
+	clientId: string
+	sessionDate: Date
+	startTime: Date
+	endTime: Date | null
+	sessionType: string
+	status: string
+}

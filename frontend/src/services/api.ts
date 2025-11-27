@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from "axios"
 import dayjs from "dayjs"
 import { jwtDecode } from "jwt-decode"
 import { useAuthStore } from "../store/authStore"
-import type { Client, Workout } from "../types/clientTypes"
+import type { Client, Session, Workout } from "../types/clientTypes"
 
 const API_BASE_URL = "http://localhost:5000"
 const api = axios.create({
@@ -68,7 +68,7 @@ api.interceptors.response.use(
 	},
 )
 
-// ---------------- CLIENT DATA FETCH ----------------
+// ---------------- CLIENT DATA ----------------
 export const getClients = async () => {
 	const response = await api.get<Client[]>(`/clients`)
 	return response
@@ -99,7 +99,7 @@ export const deleteClient = async (id: string) => {
 	return response
 }
 
-// ---------------- WORKOUTS DATA FETCH ----------------
+// ---------------- WORKOUTS DATA ----------------
 
 export const getWorkouts = async (clientId: string) => {
 	const response = await api.get<Workout[]>(`/clients/${clientId}/workouts`)
@@ -139,6 +139,45 @@ export const deleteWorkout = async (clientId: string, workoutId: string) => {
 	)
 	return response
 }
+// ---------------- SESSIONS DATA ----------------
+
+export const getSessions = async () => {
+	try {
+		const response = await api.get('/sessions')
+		console.log(response)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				return error.response.data
+			}
+			return { success: false, message: "Cannot connect to server" }
+		}
+		return { success: false, message: "Something went wrong" }
+	}
+}
+
+export const postSessions = async (sessionData: Session) => {
+	try {
+		const response = await api.post('/sessions', sessionData)
+		console.log(response)
+		return response.data
+	}
+	catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				// Server responded with error
+				return error.response.data
+			}
+			// Network error
+			return { success: false, message: "Cannot connect to server" }
+		}
+		// Unexpected error
+		return { success: false, message: "Something went wrong" }
+	}
+}
+
+
 
 // ---------------- AUTHENTICATION ----------------
 

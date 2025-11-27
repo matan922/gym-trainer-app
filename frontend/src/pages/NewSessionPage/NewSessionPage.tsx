@@ -2,24 +2,16 @@ import TextField from "@mui/material/TextField"
 import dayjs, { Dayjs } from "dayjs"
 import React, { useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
-import { getClients } from "../../services/api"
-import type { Client } from "../../types/clientTypes"
+import { getClients, postSessions } from "../../services/api"
+import type { Client, Session } from "../../types/clientTypes"
 import "react-datepicker/dist/react-datepicker.css"
 import { CacheProvider } from "@emotion/react"
 import Autocomplete from "@mui/material/Autocomplete"
 import { ThemeProvider } from "@mui/material/styles"
 import { useAuthStore } from "../../store/authStore"
 import { rtlCache, theme } from "./theme"
+import { useNavigate } from "react-router"
 
-export interface Session {
-	trainerId: string
-	clientId: string
-	sessionDate: Date
-	startTime: Date
-	endTime: Date | null
-	sessionType: string
-	status: string
-}
 
 const NewSessionPage = () => {
 	const [clients, setClients] = useState<Client[]>([])
@@ -28,17 +20,9 @@ const NewSessionPage = () => {
 	const [endTime, setEndTime] = useState<Date | null>(null)
 	const [oneHourCheckbox, setOneHourCheckbox] = useState<boolean>(false)
 	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+	const navigate = useNavigate()
 	const token = useAuthStore((state) => state.token)
 
-	const [sessionData, setSessionData] = useState<Session>({
-		trainerId: "",
-		clientId: "",
-		sessionDate: new Date(),
-		startTime: new Date(),
-		endTime: new Date(),
-		sessionType: "",
-		status: "",
-	})
 
 	useEffect(() => {
 		const getClientsData = async () => {
@@ -57,7 +41,7 @@ const NewSessionPage = () => {
 		setOneHourCheckbox(!oneHourCheckbox)
 	}
 
-	const handleNewSessionSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleNewSessionSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		if (!token || !selectedClient?._id) return null
 		const trainerId = token
@@ -89,11 +73,18 @@ const NewSessionPage = () => {
 			sessionType: "Studio",
 			status: "Scheduled",
 		}
-		setSessionData(newSessionData)
+
+		try {
+			const response = await postSessions(newSessionData);
+			navigate('/dashboard')
+			return response.data
+		} catch (error) {
+			console.log("Error creating session: ", error)
+		}
 	}
 
 	return (
-		<div className="p-8  flex flex-col items-center ">
+		<div className="p-8 flex flex-col items-center ">
 			<div className="rounded-lg bg-white shadow max-w-lg w-full">
 				<div className="p-8 flex flex-col gap-8">
 					<div className="flex flex-col items-center">
@@ -101,65 +92,57 @@ const NewSessionPage = () => {
 						<h2 className="text-center text-xl">קביעת אימון חדש למתאמן</h2>
 					</div>
 					<form onSubmit={(e) => handleNewSessionSubmit(e)}>
-						<div className=""></div>
 
 						<div className="flex flex-col gap-4">
-							<CacheProvider value={rtlCache}>
-								<ThemeProvider theme={theme}>
-									<div dir="rtl">
-										<Autocomplete
-											onChange={(event, newValue) => {
-												setSelectedClient(newValue)
-											}}
-											value={selectedClient}
-											renderInput={(params) => (
-												<TextField
-													{...params}
-													placeholder="מתאמנים"
-													sx={{
-														"& .MuiInputBase-root": {
-															backgroundColor: "#f3f4f6",
-															boxShadow:
-																"0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-															borderRadius: "0.25rem",
-														},
-														"& .MuiOutlinedInput-root": {
-															"& fieldset": {
-																border: "none",
+							<div className="flex flex-col gap-4 lg:flex-row">
+								<CacheProvider value={rtlCache}>
+									<ThemeProvider theme={theme}>
+										<div dir="rtl" className="flex-1">
+											<Autocomplete
+												onChange={(_, client) => {
+													setSelectedClient(client)
+												}}
+												value={selectedClient}
+												renderInput={(params) => (
+													<TextField
+														{...params}
+														placeholder="מתאמנים"
+														sx={{
+															"& .MuiInputBase-root": {
+																backgroundColor: "#f3f4f6",
+																boxShadow:
+																	"0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+																borderRadius: "0.25rem",
+															},
+															"& .MuiOutlinedInput-root": {
+																"& fieldset": {
+																	border: "none",
+																},
+															},
+														}}
+													/>
+												)}
+												getOptionLabel={(client) =>
+													`${client.firstName} ${client.lastName}`
+												}
+												options={clients}
+												slotProps={{
+													popper: {
+														sx: {
+															"& .MuiAutocomplete-listbox": {
+																textAlign: "right",
+															},
+															"& .MuiAutocomplete-option": {
+																justifyContent: "flex-end",
+																direction: "rtl",
 															},
 														},
-													}}
-												/>
-											)}
-											getOptionLabel={(client) =>
-												`${client.firstName} ${client.lastName}`
-											}
-											options={clients}
-											slotProps={{
-												popper: {
-													sx: {
-														"& .MuiAutocomplete-listbox": {
-															textAlign: "right",
-														},
-														"& .MuiAutocomplete-option": {
-															justifyContent: "flex-end",
-															direction: "rtl",
-														},
 													},
-												},
-											}}
-										/>
-									</div>
-								</ThemeProvider>
-							</CacheProvider>
-
-							<div className="flex items-center">
-								<input onChange={handleCheckbox} type="checkbox" />
-								&nbsp;
-								<span>אימון של שעה</span>
-							</div>
-
-							<div className="flex flex-col gap-4 lg:flex-row">
+												}}
+											/>
+										</div>
+									</ThemeProvider>
+								</CacheProvider>
 								<DatePicker
 									wrapperClassName="flex-1"
 									name="date"
@@ -169,6 +152,14 @@ const NewSessionPage = () => {
 									onChange={(date) => setStartDate(date)}
 									isClearable
 								/>
+							</div>
+							<div className="flex items-center">
+								<input onChange={handleCheckbox} type="checkbox" />
+								&nbsp;
+								<span>אימון של שעה</span>
+							</div>
+
+							<div className="flex flex-col gap-4 lg:flex-row">
 								<DatePicker
 									wrapperClassName="flex-1"
 									name="startTime"

@@ -19,7 +19,7 @@ export const getSessions = async (req: Request, res: Response) => {
 export const postSession = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const { clientId, startTime, endTime, sessionType, status } = req.body
+        const { clientId, startTime, sessionDate, endTime, sessionType, status } = req.body
 
         const sessionStartTime = new Date(startTime)
         const sessionEndTime = endTime ? new Date(endTime) : new Date(sessionStartTime.getTime() + 60 * 60 * 1000)
@@ -28,6 +28,7 @@ export const postSession = async (req: Request, res: Response) => {
             const session = new Session({
                 trainerId: user.id,
                 clientId: clientId,
+                sessionDate: new Date(sessionDate),
                 startTime: new Date(startTime),
                 endTime: sessionEndTime,
                 sessionType: sessionType,
@@ -38,6 +39,7 @@ export const postSession = async (req: Request, res: Response) => {
             return res.status(200).json(session)
         }
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ "error": error })
     }
 }

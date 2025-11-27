@@ -65,7 +65,6 @@ const EditWorkoutModal = ({
 				onClick={onClose}
 			/>
 
-			{/* <div className="w-full max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-20 bg-white z-50 rounded-lg shadow-2xl"> */}
 			<div className="fixed inset-0 flex items-center justify-center p-4 z-50 pointer-events-none">
 				<div className="p-20 bg-white max-w-md w-full pointer-events-auto rounded-lg overflow-auto max-h-1/2">
 					<form className="gap-4 flex flex-col" onSubmit={handleSubmit}>
