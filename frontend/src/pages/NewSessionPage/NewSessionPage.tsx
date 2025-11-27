@@ -14,9 +14,9 @@ import { rtlCache, theme } from "./theme"
 export interface Session {
 	trainerId: string
 	clientId: string
-	sessionDate: string
-	startTime: string
-	endTime: string
+	sessionDate: Date
+	startTime: Date
+	endTime: Date | null
 	sessionType: string
 	status: string
 }
@@ -26,14 +26,16 @@ const NewSessionPage = () => {
 	const [startDate, setStartDate] = useState<Date | null>(null)
 	const [startTime, setStartTime] = useState<Date | null>(null)
 	const [endTime, setEndTime] = useState<Date | null>(null)
+	const [oneHourCheckbox, setOneHourCheckbox] = useState<boolean>(false)
+	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 	const token = useAuthStore((state) => state.token)
 
 	const [sessionData, setSessionData] = useState<Session>({
 		trainerId: "",
 		clientId: "",
-		sessionDate: "",
-		startTime: "",
-		endTime: "",
+		sessionDate: new Date(),
+		startTime: new Date(),
+		endTime: new Date(),
 		sessionType: "",
 		status: "",
 	})
@@ -51,18 +53,15 @@ const NewSessionPage = () => {
 		getClientsData()
 	}, [])
 
-	const handleDataChange = (e) => {
-		if (!token) return
-		// setSessionData({
-		// 	trainerId: token,
-		// 	clientId: "692023b0313c7895476bdefb",
-		// 	startTime: startTime,
-
-		// })
+	const handleCheckbox = () => {
+		setOneHourCheckbox(!oneHourCheckbox)
 	}
 
 	const handleNewSessionSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
+		if (!token || !selectedClient?._id) return null
+		const trainerId = token
+		const clientId = selectedClient?._id
 		if (!startDate || !endTime || !startTime) return null
 		const sessionStart = new Date(
 			startDate.getFullYear(),
@@ -72,16 +71,25 @@ const NewSessionPage = () => {
 			startTime.getMinutes(),
 			0, // seconds
 		)
+
 		const sessionEnd = new Date(
 			startDate.getFullYear(),
 			startDate.getMonth(),
 			startDate.getDate(),
 			endTime.getHours(),
 			endTime.getMinutes(),
+			0,
 		)
-
-		console.log("SESSION STARTS = ", sessionStart)
-		console.log("SESSION ENDS = ", sessionEnd)
+		const newSessionData = {
+			trainerId: trainerId,
+			clientId: clientId,
+			sessionDate: startDate,
+			startTime: sessionStart,
+			endTime: oneHourCheckbox ? null : sessionEnd,
+			sessionType: "Studio",
+			status: "Scheduled",
+		}
+		setSessionData(newSessionData)
 	}
 
 	return (
@@ -100,6 +108,10 @@ const NewSessionPage = () => {
 								<ThemeProvider theme={theme}>
 									<div dir="rtl">
 										<Autocomplete
+											onChange={(event, newValue) => {
+												setSelectedClient(newValue)
+											}}
+											value={selectedClient}
 											renderInput={(params) => (
 												<TextField
 													{...params}
@@ -107,7 +119,8 @@ const NewSessionPage = () => {
 													sx={{
 														"& .MuiInputBase-root": {
 															backgroundColor: "#f3f4f6",
-															boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+															boxShadow:
+																"0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
 															borderRadius: "0.25rem",
 														},
 														"& .MuiOutlinedInput-root": {
@@ -118,9 +131,10 @@ const NewSessionPage = () => {
 													}}
 												/>
 											)}
-											options={clients.map((client) => {
-												return `${client.firstName} ${client.lastName}`
-											})}
+											getOptionLabel={(client) =>
+												`${client.firstName} ${client.lastName}`
+											}
+											options={clients}
 											slotProps={{
 												popper: {
 													sx: {
@@ -129,6 +143,7 @@ const NewSessionPage = () => {
 														},
 														"& .MuiAutocomplete-option": {
 															justifyContent: "flex-end",
+															direction: "rtl",
 														},
 													},
 												},
@@ -138,133 +153,72 @@ const NewSessionPage = () => {
 								</ThemeProvider>
 							</CacheProvider>
 
-							<DatePicker
-								name="date"
-								placeholderText="תאריך"
-								className="bg-gray-100 shadow rounded p-4"
-								selected={startDate}
-								onChange={(date) => setStartDate(date)}
-							/>
-							<DatePicker
-								name="startTime"
-								placeholderText="זמן התחלה"
-								className="bg-gray-100 shadow rounded p-4"
-								showTimeSelect
-								showTimeSelectOnly
-								timeIntervals={15}
-								dateFormat="HH:mm"
-								timeFormat="HH:mm" // 24-hour format in dropdown
-								showTimeCaption={false}
-								selected={startTime}
-								onChange={(date) => setStartTime(date)}
-							/>
-							<DatePicker
-								name="endTime"
-								placeholderText="זמן סיום"
-								className="bg-gray-100 shadow rounded p-4"
-								showTimeSelect
-								showTimeSelectOnly
-								timeIntervals={15}
-								dateFormat="HH:mm"
-								timeFormat="HH:mm" // 24-hour format in dropdown
-								showTimeCaption={false}
-								selected={endTime}
-								onChange={(date) => setEndTime(date)}
-								minTime={startTime || new Date(new Date().setHours(0, 0, 0, 0))}
-								maxTime={new Date(new Date().setHours(23, 45, 0, 0))}
-							/>
+							<div className="flex items-center">
+								<input onChange={handleCheckbox} type="checkbox" />
+								&nbsp;
+								<span>אימון של שעה</span>
+							</div>
 
-							<button className="bg-green-500 rounded p-2" type="submit">אישור</button>
-
-							{/* <input
-					name="date"
-					onChange={(e) => handleDateChange(e)}
-					type="date"
-					/> */}
-							{/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="he">
-					<DateTimePicker
-					ampm={false}
-					open={dateTimePickerOpen}
-					onClose={() => setDateTimePickerOpen(false)}
-					reduceAnimations={true}
-					disablePast={true}
-					format="DD/MM/YY HH:mm"
-					value={dateValue}
-					enableAccessibleFieldDOMStructure={false}
-					onChange={(newValue) => {
-						console.log(newValue)
-						setDateValue(newValue)
-						}}
-						localeText={{
-								toolbarTitle: "בחר תאריך ושעה",
-								cancelButtonLabel: "ביטול",
-								okButtonLabel: "אישור",
-								nextStepButtonLabel: "הבא",
-								}}
-								slotProps={{
-									textField: {
-								placeholder: "תאריך ושעה",
-								onClick: () => setDateTimePickerOpen(true),
-								sx: {
-									cursor: "pointer",
-									"& .MuiInputAdornment-root": {
-										pointerEvents: "none",
-										},
-										"& .MuiInputBase-root": {
-											backgroundColor: "#f3f4f6",
-											boxShadow:
-											"0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-											
-											"&:hover": {
-												backgroundColor: "#d1d5dc",
-												},
-												},
-											"& .MuiOutlinedInput-root": {
-												"& fieldset": {
-													border: "none",
-													},
-										},
-										},
-										},
-								}}
+							<div className="flex flex-col gap-4 lg:flex-row">
+								<DatePicker
+									wrapperClassName="flex-1"
+									name="date"
+									placeholderText="תאריך"
+									className="bg-gray-100 shadow rounded p-4 focus:outline-0 w-full"
+									selected={startDate}
+									onChange={(date) => setStartDate(date)}
+									isClearable
 								/>
-								</LocalizationProvider> */}
-							{/* <Autocomplete
-														popupIcon={false} // remove default icon
-														options={clients.map(
-															(client) => `${client.firstName} ${client.lastName}`,
-														)}
-														slotProps={{
-															popper: {
-																sx: {
-																	"& .MuiAutocomplete-option": {
-																		justifyContent: "flex-end",
-																	},
-																},
-															},
-														}}
-														renderInput={(params) => (
-															<TextField
-																{...params}
-																placeholder="מתאמן"
-																sx={{
-																	"& .MuiInputBase-root": {
-																		backgroundColor: "#f3f4f6",
-																		boxShadow:
-																			"0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-																		"&:hover": {
-																			backgroundColor: "#d1d5dc",
-																		},
-																	},
-																	"& .MuiOutlinedInput-root": {
-																		"& fieldset": {
-																			border: "none",
-																		},
-																	},
-																}}
-															/>
-														)}
-													/> */}
+								<DatePicker
+									wrapperClassName="flex-1"
+									name="startTime"
+									placeholderText="זמן התחלה"
+									className="bg-gray-100 shadow rounded p-4 focus:outline-0 w-full"
+									showTimeSelect
+									showTimeSelectOnly
+									timeIntervals={15}
+									dateFormat="HH:mm"
+									timeFormat="HH:mm" // 24-hour format in dropdown
+									showTimeCaption={false}
+									selected={startTime}
+									onChange={(date) => setStartTime(date)}
+								/>
+								<DatePicker
+									disabled={oneHourCheckbox}
+									wrapperClassName="flex-1"
+									name="endTime"
+									placeholderText="זמן סיום"
+									className={`bg-gray-100 shadow rounded p-4 focus:outline-0 w-full ${oneHourCheckbox ? "hidden" : ""}`}
+									showTimeSelect
+									showTimeSelectOnly
+									timeIntervals={15}
+									dateFormat="HH:mm"
+									timeFormat="HH:mm" // 24-hour format in dropdown
+									showTimeCaption={false}
+									selected={endTime}
+									onChange={(date) => setEndTime(date)}
+									minTime={
+										startTime || new Date(new Date().setHours(0, 0, 0, 0))
+									}
+									maxTime={new Date(new Date().setHours(23, 45, 0, 0))}
+									popperPlacement="bottom"
+								/>
+							</div>
+
+							<div className="flex justify-center gap-3">
+								<button
+									className="bg-blue-500 text-white rounded p-2 shadow"
+									type="submit"
+								>
+									אישור
+								</button>
+								<button
+									type="button"
+									className="bg-gray-300 rounded p-2 shadow"
+								>
+									ביטול
+								</button>
+							</div>
 						</div>
 					</form>
 				</div>
