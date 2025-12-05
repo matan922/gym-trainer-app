@@ -38,6 +38,7 @@ export const getClient = async (req: Request, res: Response) => {
 // add new client
 export const postClient = async (req: Request, res: Response) => {
     try {
+        const { firstName, lastName, age, weight, goal, notes, } = req.body
         const user = req.user
         const newClient = new Client({ ...req.body, trainerId: user?.id }) // creates and saves 1 client with all data + trainerId
         const savedClient = await newClient.save()

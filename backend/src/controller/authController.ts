@@ -1,10 +1,14 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import Trainer from "../models/Trainer";
 import bcrypt from "bcryptjs";
-import jwt, { type JwtPayload } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { generateAccessToken, generateRefreshToken } from "../helper/genAccessToken";
 import RefreshToken from "../models/RefreshToken";
-
+import { transporter } from "../config/emailConfig";
+import crypto from 'crypto'
+import PasswordResetToken from "../models/PasswordResetToken";
+import EmailVerificationToken from "../models/EmailVerificationToken";
+import Client from "../models/Client";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -17,10 +21,46 @@ export const register = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const newTrainer = new Trainer({ firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email, password: hashedPassword })
         await newTrainer.save()
+        const { password, ...trainerData } = newTrainer.toObject()
 
-        res.status(200).json({ success: true, newTrainer })
+        const token = crypto.randomBytes(32).toString('hex')
+        await EmailVerificationToken.create({
+            token: token,
+            trainerId: trainerData._id,
+            expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 60 minutes
+        })
+
+        await transporter.sendMail({
+            from: "Personal Trainer App",
+            to: req.body.email,
+            subject: "Email Verification",
+            html: `<b>http://localhost:5173/auth/verify-email?token=${token}</b>`
+        })
+
+        res.status(200).json({ success: true, trainerData })
     } catch (error) {
-        res.status(500).json({ success: false, message: "something went wrong" })
+        res.status(500).json({ success: false, message: "Something went wrong" })
+    }
+}
+
+export const verifyEmail = async (req: Request, res: Response) => {
+    try {
+        const { token } = req.body
+
+        const tokenInDb = await EmailVerificationToken.findOne({
+            token,
+            expiresAt: { $gt: new Date() } // greater than now
+        })
+        if (!tokenInDb) {
+            return res.status(401).json({ success: false, message: "Invalid token" })
+        }
+
+        await Trainer.findOneAndUpdate({ _id: tokenInDb.trainerId }, { emailVerified: true })
+        await EmailVerificationToken.deleteOne({ token })
+        return res.status(200).json({ success: true, message: "Successfully verified the email" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "Something went wrong" })
     }
 }
 
@@ -31,10 +71,15 @@ export const login = async (req: Request, res: Response) => {
         if (!email || !password) {
             return res.status(400).json({ success: false, message: "Missing data" })
         }
-        const trainer = await Trainer.findOne({ email: email }).exec()
+        const trainer = await Trainer.findOne({ email: email })
+
 
         if (!trainer) {
             return res.status(401).json({ success: false, message: 'Invalid credentials (no trainer)' })
+        }
+
+        if (!trainer.emailVerified) {
+            return res.status(401).json({ success: false, message: "Verify your email address first" })
         }
 
         if (await bcrypt.compare(password, trainer.password)) {
@@ -58,7 +103,7 @@ export const login = async (req: Request, res: Response) => {
             })
 
             const { password: _, ...trainerData } = trainer.toObject()
-            res.json({ trainer: trainerData, accessToken, refreshToken })
+            res.json({ success: true, trainer: trainerData, accessToken, refreshToken })
         } else {
             res.status(401).json({ success: false, message: "Invalid credentials" })
         }
@@ -118,9 +163,77 @@ export const logout = async (req: Request, res: Response) => {
     }
     catch (error) {
         console.log(error)
-        return res.status(500).json({ success: false, message: "Logout failed" })
+        return res.status(500).json({ success: false, message: "Something went wrong" })
     }
 }
+
+export const forgotPassword = async (req: Request, res: Response) => {
+    try {
+        const email = req.body.email
+        const trainer = await Trainer.findOne({ email })
+
+        if (!trainer) {
+            return res.status(200).json({ message: "If email exists a code will be sent (failed)" })
+        }
+
+        const token = crypto.randomBytes(32).toString('hex')
+        await PasswordResetToken.create({
+            token: token,
+            trainerId: trainer?._id,
+            expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 60 minutes
+        })
+
+        await transporter.sendMail({
+            from: "Personal Trainer App",
+            to: req.body.email,
+            subject: "Forgot Password",
+            html: `<h1>http://localhost:5173/auth/reset-password?token=${token}</h1>`
+        })
+
+        res.status(200).json({ message: "If email exists a code will be sent (success)" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "Something went wrong" })
+    }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+    try {
+        const { token, password } = req.body
+
+        const tokenInDb = await PasswordResetToken.findOne({
+            token,
+            expiresAt: { $gt: new Date() } // greater than now
+        })
+        if (!tokenInDb) {
+            return res.status(401).json({ success: false, message: "Invalid token or expired token" })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+        await Trainer.updateOne({ _id: tokenInDb.trainerId }, { password: hashedPassword })
+        await PasswordResetToken.deleteOne({ token })
+
+        return res.status(200).json({ success: true, message: "Password changed" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "Something went wrong" })
+    }
+}
+
+export const changePassword = async (req: Request, res: Response) => {
+    // TODO
+}
+
+
+
+// Client auth
+export const clientSetup = async (req: Request, res: Response) => {
+    const { token, password } = req.body
+
+    await Client.findOne()
+}
+
+
 
 // test
 export const testAuthorized = async (req: Request, res: Response) => {

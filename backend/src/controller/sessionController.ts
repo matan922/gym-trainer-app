@@ -7,7 +7,7 @@ export const getSessions = async (req: Request, res: Response) => {
     try {
         const user = req.user
         if (user) {
-            const sessions = await Session.find({ trainerId: user.id })
+            const sessions = await Session.find({ trainerId: user.id }).populate({path:"clientId", select: "firstName lastName"})
 
             res.status(200).json(sessions)
         }
@@ -35,6 +35,7 @@ export const postSession = async (req: Request, res: Response) => {
                 status: status
             })
 
+            console.log(session)
             await session.save()
             return res.status(200).json(session)
         }

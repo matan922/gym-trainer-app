@@ -1,9 +1,8 @@
 import TextField from "@mui/material/TextField"
-import dayjs, { Dayjs } from "dayjs"
 import React, { useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
 import { getClients, postSessions } from "../../services/api"
-import type { Client, Session } from "../../types/clientTypes"
+import type { Client } from "../../types/clientTypes"
 import "react-datepicker/dist/react-datepicker.css"
 import { CacheProvider } from "@emotion/react"
 import Autocomplete from "@mui/material/Autocomplete"
@@ -11,7 +10,6 @@ import { ThemeProvider } from "@mui/material/styles"
 import { useAuthStore } from "../../store/authStore"
 import { rtlCache, theme } from "./theme"
 import { useNavigate } from "react-router"
-
 
 const NewSessionPage = () => {
 	const [clients, setClients] = useState<Client[]>([])
@@ -22,7 +20,6 @@ const NewSessionPage = () => {
 	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 	const navigate = useNavigate()
 	const token = useAuthStore((state) => state.token)
-
 
 	useEffect(() => {
 		const getClientsData = async () => {
@@ -41,12 +38,15 @@ const NewSessionPage = () => {
 		setOneHourCheckbox(!oneHourCheckbox)
 	}
 
-	const handleNewSessionSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleNewSessionSubmit = async (
+		e: React.FormEvent<HTMLFormElement>,
+	) => {
 		e.preventDefault()
 		if (!token || !selectedClient?._id) return null
 		const trainerId = token
 		const clientId = selectedClient?._id
-		if (!startDate || !endTime || !startTime) return null
+		if (!startDate || !startTime) return null
+
 		const sessionStart = new Date(
 			startDate.getFullYear(),
 			startDate.getMonth(),
@@ -56,27 +56,30 @@ const NewSessionPage = () => {
 			0, // seconds
 		)
 
-		const sessionEnd = new Date(
-			startDate.getFullYear(),
-			startDate.getMonth(),
-			startDate.getDate(),
-			endTime.getHours(),
-			endTime.getMinutes(),
-			0,
-		)
+		const sessionEnd = endTime
+			? new Date(
+					startDate.getFullYear(),
+					startDate.getMonth(),
+					startDate.getDate(),
+					endTime.getHours(),
+					endTime.getMinutes(),
+					0,
+				)
+			: null
+
 		const newSessionData = {
 			trainerId: trainerId,
 			clientId: clientId,
 			sessionDate: startDate,
 			startTime: sessionStart,
-			endTime: oneHourCheckbox ? null : sessionEnd,
+			endTime: sessionEnd,
 			sessionType: "Studio",
 			status: "Scheduled",
 		}
 
 		try {
-			const response = await postSessions(newSessionData);
-			navigate('/dashboard')
+			const response = await postSessions(newSessionData)
+			navigate("/dashboard")
 			return response.data
 		} catch (error) {
 			console.log("Error creating session: ", error)
@@ -91,8 +94,8 @@ const NewSessionPage = () => {
 						<h1 className="text-center text-3xl font-bold">אימון חדש</h1>
 						<h2 className="text-center text-xl">קביעת אימון חדש למתאמן</h2>
 					</div>
-					<form onSubmit={(e) => handleNewSessionSubmit(e)}>
 
+					<form onSubmit={(e) => handleNewSessionSubmit(e)}>
 						<div className="flex flex-col gap-4">
 							<div className="flex flex-col gap-4 lg:flex-row">
 								<CacheProvider value={rtlCache}>

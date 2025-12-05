@@ -87,6 +87,13 @@ function DashboardLayout() {
 				</button>
 				<button
 					type="button"
+					onClick={() => handleNavigation("/dashboard/sessions")}
+					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
+				>
+					אימונים
+				</button>
+				<button
+					type="button"
 					onClick={() => handleNavigation("/dashboard/clients")}
 					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
 				>

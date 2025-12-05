@@ -2,16 +2,23 @@ import express from 'express';
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcrypt"
 import type { Request, Response, NextFunction } from 'express';
-import { login, register, testAuthorized, generateNewAccessToken, logout } from '../controller/authController';
+import { login, register, testAuthorized, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, clientSetup } from '../controller/authController';
 import { authenticateToken } from '../middlewares/authMiddleware';
 import { generateAccessToken } from '../helper/genAccessToken';
 
 const router = express.Router();
 
+// Trainer
 router.post('/register', register)
 router.post('/login', login)
 router.post('/token', generateNewAccessToken) // used to generate new access token from refresh token
+router.post('/verify-email', verifyEmail)
 router.delete('/logout', logout)
+router.post('/forgot-password', forgotPassword)
+router.post('/reset-password', resetPassword)
+
+// Client
+router.post('/client-setup', clientSetup)
 
 router.get('/test-authorized', authenticateToken, testAuthorized)
 

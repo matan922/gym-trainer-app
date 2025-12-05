@@ -1,7 +1,7 @@
-import express from "express";
-import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config()
+import express from "express";
+import mongoose from "mongoose";
 import { connectDB } from "./config/db";
 import cors from "cors";
 import clientRoutes from "./routes/clientRoutes";
