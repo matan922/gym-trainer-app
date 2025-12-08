@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "../store/authStore"
 import type { Client, SessionRequest, Workout } from "../types/clientTypes"
 
-const API_BASE_URL = "http://localhost:5000"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000"
 const api = axios.create({
 	baseURL: API_BASE_URL,
 	withCredentials: true, // Enable sending cookies with requests
