@@ -16,7 +16,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     credentials: true // Allow cookies to be sent
 }))
 app.use(cookieParser())
