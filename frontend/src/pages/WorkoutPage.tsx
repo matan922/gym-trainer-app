@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import { getWorkout } from "../services/api"
-import { useNavigate, useParams } from "react-router"
+import { useParams } from "react-router"
 import type { Workout } from "../types/clientTypes"
 
 const WorkoutPage = () => {
 	const { id, workoutId } = useParams()
 	const [workout, setWorkout] = useState<Workout>()
-	const navigate = useNavigate()
+
 	useEffect(() => {
 		const getWorkoutData = async () => {
 			try {

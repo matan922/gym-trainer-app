@@ -16,7 +16,7 @@ const RegisterPage = () => {
 		email: "",
 		password: "",
 	})
-	const [error, setError] = useState()
+	const [error, setError] = useState<string>()
 	const navigate = useNavigate()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +43,12 @@ const RegisterPage = () => {
 					<h1 className="text-3xl font-bold text-gray-800 mb-2">יצירת חשבון</h1>
 					<p className="text-gray-600">הירשם למערכת</p>
 				</div>
+
+				{error && (
+					<div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-right">
+						{error}
+					</div>
+				)}
 
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div>

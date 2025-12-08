@@ -44,6 +44,7 @@ export interface Session {
 	status: string
 }
 
-export interface SessionRequest extends Omit<Session, "clientId"> {
+export interface SessionRequest extends Omit<Session, "clientId" | "endTime"> {
 	clientId: string
+	endTime: Date | null
 }

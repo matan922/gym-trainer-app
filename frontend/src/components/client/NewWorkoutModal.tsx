@@ -68,7 +68,7 @@ const NewWorkoutModal = ({
 	])
 
 	const handleDeleteExercise = (index: number) => {
-		setExercises(exercises.filter((value, i) => i !== index))
+		setExercises(exercises.filter((_, i) => i !== index))
 	}
 
 	const handleAddExercise = () => {

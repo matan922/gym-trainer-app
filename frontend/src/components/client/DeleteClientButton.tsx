@@ -1,11 +1,8 @@
-import React from "react"
 import { deleteClient } from "../../services/api"
 
 const DeleteClientButton = ({ clientId, onDelete }: { clientId: string, onDelete:() => void }) => {
 	
-	const handleClientDeletion = async (
-		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-	) => {
+	const handleClientDeletion = async () => {
 		if (!confirm("האם אתה בטוח שברצונך למחוק לקוח זה?")) return
 
 		try {
@@ -21,7 +18,7 @@ const DeleteClientButton = ({ clientId, onDelete }: { clientId: string, onDelete
 	return (
 		<button
 			className="bg-gray-100 hover:bg-gray-300 p-2 rounded shadow"
-			onClick={(e) => handleClientDeletion(e)}
+			onClick={handleClientDeletion}
 			type="button"
 		>
 			מחיקה

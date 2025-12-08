@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { getSessions } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"
@@ -34,6 +34,11 @@ const DashboardMainPage = () => {
 		<div className="flex flex-col gap-4 p-4 lg:p-8 items-center">
 			<div className="w-full max-w-2xl">
 				<div className="flex flex-col gap-4">
+					{error && (
+						<div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded text-right">
+							{error}
+						</div>
+					)}
 					<div className="bg-white rounded-lg shadow p-4 lg:p-8">
 						<div className="flex items-center gap-2 mb-4">
 							<span className="text-xl lg:text-2xl font-bold">היום:</span>

@@ -1,8 +1,6 @@
 import axios, { type AxiosResponse } from "axios"
-import dayjs from "dayjs"
-import { jwtDecode } from "jwt-decode"
 import { useAuthStore } from "../store/authStore"
-import type { Client, Session, SessionRequest, Workout } from "../types/clientTypes"
+import type { Client, SessionRequest, Workout } from "../types/clientTypes"
 
 const API_BASE_URL = "http://localhost:5000"
 const api = axios.create({

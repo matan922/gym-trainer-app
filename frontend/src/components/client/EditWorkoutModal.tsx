@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import type { Workout } from "../../types/clientTypes"
 import reactDom from "react-dom"
-import { getWorkout } from "../../services/api"
 
 const EditWorkoutModal = ({
 	onClose,

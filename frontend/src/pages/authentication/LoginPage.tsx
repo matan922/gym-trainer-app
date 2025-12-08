@@ -10,7 +10,6 @@ interface User {
 
 const LoginPage = () => {
 	const setToken = useAuthStore((state) => state.setToken)
-	const token = useAuthStore((state) => state.token)
 	const [userData, setUserData] = useState<User>({
 		email: "",
 		password: "",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { getSessions } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"

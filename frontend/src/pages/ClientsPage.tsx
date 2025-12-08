@@ -6,7 +6,7 @@ import type { Client } from "../types/clientTypes"
 
 function ClientsPage() {
 	const [clients, setClients] = useState<Client[]>([])
-	const [error, setError] = useState<string>("")
+	// const [error, setError] = useState<string>("")
 	const originalClientsList = useRef<Client[]>([])
 	const navigate = useNavigate()
 
