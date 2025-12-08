@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import Session from "../models/Session";
+import Session from "../models/Session.js";
 
 
 

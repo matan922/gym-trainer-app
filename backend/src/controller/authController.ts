@@ -1,14 +1,14 @@
 import type { Request, Response } from "express";
-import Trainer from "../models/Trainer";
+import Trainer from "../models/Trainer.js";
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken'
-import { generateAccessToken, generateRefreshToken } from "../helper/genAccessToken";
-import RefreshToken from "../models/RefreshToken";
-import { transporter } from "../config/emailConfig";
+import { generateAccessToken, generateRefreshToken } from "../helper/genAccessToken.js";
+import RefreshToken from "../models/RefreshToken.js";
+import { transporter } from "../config/emailConfig.js";
 import crypto from 'crypto'
-import PasswordResetToken from "../models/PasswordResetToken";
-import EmailVerificationToken from "../models/EmailVerificationToken";
-import Client from "../models/Client";
+import PasswordResetToken from "../models/PasswordResetToken.js";
+import EmailVerificationToken from "../models/EmailVerificationToken.js";
+import Client from "../models/Client.js";
 
 export const register = async (req: Request, res: Response) => {
     try {

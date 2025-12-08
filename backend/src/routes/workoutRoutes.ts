@@ -1,6 +1,6 @@
 import express from 'express';
-import { deleteWorkout, getWorkout, getWorkouts, postWorkout, putWorkout } from '../controller/workoutController';
-import { authenticateToken } from '../middlewares/authMiddleware';
+import { deleteWorkout, getWorkout, getWorkouts, postWorkout, putWorkout } from '../controller/workoutController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router({ mergeParams: true });
 

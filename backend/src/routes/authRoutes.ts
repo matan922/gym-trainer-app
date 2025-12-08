@@ -2,9 +2,9 @@ import express from 'express';
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcrypt"
 import type { Request, Response, NextFunction } from 'express';
-import { login, register, testAuthorized, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, clientSetup } from '../controller/authController';
-import { authenticateToken } from '../middlewares/authMiddleware';
-import { generateAccessToken } from '../helper/genAccessToken';
+import { login, register, testAuthorized, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, clientSetup } from '../controller/authController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { generateAccessToken } from '../helper/genAccessToken.js';
 
 const router = express.Router();
 

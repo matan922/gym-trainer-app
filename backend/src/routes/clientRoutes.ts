@@ -1,7 +1,7 @@
 import express from 'express';
-import { deleteClient, getClient, getClients, postClient, putClient } from '../controller/clientController';
-import workoutRoutes from './workoutRoutes';
-import { authenticateToken } from '../middlewares/authMiddleware';
+import { deleteClient, getClient, getClients, postClient, putClient } from '../controller/clientController.js';
+import workoutRoutes from './workoutRoutes.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

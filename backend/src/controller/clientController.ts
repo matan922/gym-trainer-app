@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import Client from "../models/Client";
-import Workout from "../models/Workout";
+import Client from "../models/Client.js";
+import Workout from "../models/Workout.js";
 
 // all clients
 export const getClients = async (req: Request, res: Response) => {
