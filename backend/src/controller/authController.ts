@@ -39,6 +39,7 @@ export const register = async (req: Request, res: Response) => {
 
         res.status(200).json({ success: true, trainerData })
     } catch (error) {
+        console.log(error)
         res.status(500).json({ success: false, message: "Something went wrong" })
     }
 }
