@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and push frontend
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest ./frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest --build-arg VITE_API_URL='${{ secrets.VITE_API_URL }}' ./frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
 
   deploy:
@@ -42,4 +42,4 @@ jobs:
         run: docker run -d -p 4000:4000 --name backend-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
 
       - name: Run frontend container
-        run: docker run -d -p 80:80 --name frontend-container ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
+        run: docker run -d -p 3000:80 --name frontend-container ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
