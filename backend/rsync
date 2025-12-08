@@ -1,0 +1,1 @@
+rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env' -e "ssh -i ~/.ssh/israel-matan-pc.pem" . ubuntu@ec2-63-178-23-96.eu-central-1.compute.amazonaws.com:~/app

@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push backend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
+
+      - name: Build and push frontend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull backend image from docker hub
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
+
+      - name: Pull frontend image from docker hub
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
+
+      - name: Delete old containers
+        run: |
+          docker rm -f backend-container || true
+          docker rm -f frontend-container || true
+
+      - name: Run backend container
+        run: docker run -d -p 4000:4000 --name backend-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
+
+      - name: Run frontend container
+        run: docker run -d -p 80:80 --name frontend-container ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
