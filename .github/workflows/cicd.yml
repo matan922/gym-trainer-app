@@ -39,7 +39,7 @@ jobs:
           docker rm -f frontend-container || true
 
       - name: Run backend container
-        run: docker run -d -p 4000:4000 --name backend-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
+        run: docker run -d -p 5000:5000 --name backend-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
 
       - name: Run frontend container
         run: docker run -d -p 3000:80 --name frontend-container ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest
