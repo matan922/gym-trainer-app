@@ -81,7 +81,8 @@ export const getClient = async (id: string) => {
 
 export const postClient = async (clientData: Client) => {
 	const response = await api.post<Client>(`/clients`, clientData)
-	return response
+	console.log(response.data)
+	return response.data
 }
 
 export const putClient = async (clientData: Client, id: string) => {

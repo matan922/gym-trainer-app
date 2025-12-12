@@ -15,12 +15,14 @@ function AddClientPage() {
 		workouts: []
 	})
 	const navigate = useNavigate()
+
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		try {
 			const response = await postClient(clientData)
+			console.log(response)
 			navigate('/dashboard')
-			return response.data
+			return response
 		} catch (error) {
 			console.error("Error creating client:", error)
 		}

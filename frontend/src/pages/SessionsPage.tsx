@@ -37,26 +37,30 @@ const SessionsPage = () => {
 					<div className="flex flex-row justify-center">צריך להיות פילטור</div>
 					<div className="flex flex-col gap-4">
 						{error && <div className="text-red-500">{error}</div>}
-						{sessionsData.map((session, index) => (
-							<div
-								key={index}
-								className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
-							>
-								<div className="flex justify-between items-center">
-									<h3 className="text-lg font-semibold text-gray-800">
-										{session.clientId.firstName} {session.clientId.lastName}
-									</h3>
-									<span className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
-										{session.status}
-									</span>
+						{sessionsData.length > 0 ? (
+							sessionsData.map((session, index) => (
+								<div
+									key={index}
+									className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+								>
+									<div className="flex justify-between items-center">
+										<h3 className="text-lg font-semibold text-gray-800">
+											{session.clientId.firstName} {session.clientId.lastName}
+										</h3>
+										<span className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+											{session.status}
+										</span>
+									</div>
+									<div className="mt-2 text-sm text-gray-600 space-y-1">
+										<p>{dayjs(session.sessionDate).format("DD/MM/YY")}</p>
+										<p>{dayjs(session.startTime).format('HH:mm')} - {dayjs(session.endTime).format('HH:mm')}</p>
+										<p className="text-gray-500">{dayjs(session.startTime).fromNow()}</p>
+									</div>
 								</div>
-								<div className="mt-2 text-sm text-gray-600 space-y-1">
-									<p>{dayjs(session.sessionDate).format("DD/MM/YY")}</p>
-									<p>{dayjs(session.startTime).format('HH:mm')} - {dayjs(session.endTime).format('HH:mm')}</p>
-									<p className="text-gray-500">{dayjs(session.startTime).fromNow()}</p>
-								</div>
-							</div>
-						))}
+							))
+						) : (
+							<p className="text-center text-gray-500">אין אימונים</p>
+						)}
 					</div>
 				</div>
 			</div>

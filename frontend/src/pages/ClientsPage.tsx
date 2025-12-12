@@ -52,14 +52,17 @@ function ClientsPage() {
 						/>
 					</div>
 					<div className="flex flex-col gap-4">
-						{clients &&
+						{clients.length > 0 ? (
 							clients.map((client) => (
 								<ClientCard
 									key={client._id}
 									client={client}
 									onCard={() => navigate(`/dashboard/client/${client._id}`)}
 								/>
-							))}
+							))
+						) : (
+							<p className="text-center text-gray-500">אין מתאמנים</p>
+						)}
 					</div>
 				</div>
 			</div>

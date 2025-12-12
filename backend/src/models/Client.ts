@@ -11,8 +11,8 @@ const clientSchema = new Schema({
   weight: { type: Number, required: true },
   goal: { type: String, required: true },
   notes: { type: String, required: true },
-  email: { type: String, trim: true, required: true, unique: true },
-  password: { type: String, required: true },
+  // email: { type: String, trim: true, required: true, unique: true },
+  // password: { type: String, required: true },
   isActive: {type: Boolean, default: false},
   emailVerified: { type: Boolean, default: false },
 });

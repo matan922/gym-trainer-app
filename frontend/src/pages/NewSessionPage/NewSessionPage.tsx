@@ -128,7 +128,8 @@ const NewSessionPage = () => {
 												getOptionLabel={(client) =>
 													`${client.firstName} ${client.lastName}`
 												}
-												options={clients}
+												options={Array.isArray(clients) ? clients : []}
+												noOptionsText="אין מתאמנים"
 												slotProps={{
 													popper: {
 														sx: {
@@ -138,6 +139,9 @@ const NewSessionPage = () => {
 															"& .MuiAutocomplete-option": {
 																justifyContent: "flex-end",
 																direction: "rtl",
+															},
+															"& .MuiAutocomplete-noOptions": {
+																textAlign: "endלפ",
 															},
 														},
 													},
