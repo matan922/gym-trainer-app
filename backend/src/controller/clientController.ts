@@ -24,7 +24,7 @@ export const getClients = async (req: Request, res: Response) => {
                                 input: {
                                     $filter: {
                                         input: '$sessions',
-                                        cond: { $eq: ['$$this.status', 'Scheduled'] }
+                                        cond: { $eq: ['$$this.status', 'Completed'] }
                                     }
                                 },
                                 in: '$$this.sessionDate'

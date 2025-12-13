@@ -175,6 +175,36 @@ export const postSessions = async (sessionData: SessionRequest) => {
 	}
 }
 
+export const updateSessionStatus = async (sessionId: string, status: string) => {
+	try {
+		const response = await api.patch(`/sessions/${sessionId}`, { status })
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				return error.response.data
+			}
+			return { success: false, message: "Cannot connect to server" }
+		}
+		return { success: false, message: "Something went wrong" }
+	}
+}
+
+export const updateSession = async (sessionId: string, sessionData: any) => {
+	try {
+		const response = await api.put(`/sessions/${sessionId}`, sessionData)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				return error.response.data
+			}
+			return { success: false, message: "Cannot connect to server" }
+		}
+		return { success: false, message: "Something went wrong" }
+	}
+}
+
 
 
 // ---------------- AUTHENTICATION ----------------

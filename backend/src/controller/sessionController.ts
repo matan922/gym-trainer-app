@@ -44,3 +44,31 @@ export const postSession = async (req: Request, res: Response) => {
         return res.status(500).json({ "error": error })
     }
 }
+
+export const updateSessionStatus = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        const { sessionId } = req.params
+        const { status } = req.body
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+
+        // Find session and verify ownership
+        const session = await Session.findOne({ _id: sessionId, trainerId: user.id })
+
+        if (!session) {
+            return res.status(404).json({ success: false, message: "Session not found" })
+        }
+
+        // Update status
+        session.status = status
+        await session.save()
+
+        return res.status(200).json({ success: true, session })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, error: error })
+    }
+}

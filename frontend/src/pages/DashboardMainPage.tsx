@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { getSessions } from "../services/api"
+import { getSessions, updateSessionStatus } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"
+import SessionStatusBadge from "../components/session/SessionStatusBadge"
 
 const DashboardMainPage = () => {
 	const [sessionsData, setSessionsData] = useState<Session[]>([])
@@ -25,6 +26,24 @@ const DashboardMainPage = () => {
 
 		getSessionsData()
 	}, [])
+
+	const handleStatusChange = async (sessionId: string, newStatus: string) => {
+		try {
+			const response = await updateSessionStatus(sessionId, newStatus)
+			if (response.success) {
+				// Update local state
+				setSessionsData(prevSessions =>
+					prevSessions.map(session =>
+						session._id === sessionId
+							? { ...session, status: newStatus }
+							: session
+					)
+				)
+			}
+		} catch (error) {
+			console.error("Error updating session status:", error)
+		}
+	}
 
 	const todaysSessions = sessionsData.filter((session) =>
 		dayjs(session.sessionDate).isSame(dayjs().startOf("day")),
@@ -52,8 +71,9 @@ const DashboardMainPage = () => {
 										<span className="font-semibold min-w-[120px]">
 											{session.clientId.firstName} {session.clientId.lastName}
 										</span>
-										<span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs lg:text-sm">
-											{session.status}
+										<SessionStatusBadge session={session} editable={true} onStatusChange={handleStatusChange} />
+										<span className={`text-xs px-2 py-1 rounded ${session.sessionType === 'Online' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
+											{session.sessionType === 'Online' ? 'אונליין' : 'סטודיו'}
 										</span>
 										<span className="text-gray-600 text-sm lg:text-base ml-auto">
 											{dayjs(session.startTime).format("HH:mm")} -{" "}

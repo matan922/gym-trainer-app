@@ -18,6 +18,7 @@ const NewSessionPage = () => {
 	const [endTime, setEndTime] = useState<Date | null>(null)
 	const [oneHourCheckbox, setOneHourCheckbox] = useState<boolean>(false)
 	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+	const [sessionType, setSessionType] = useState<string>("Studio")
 	const navigate = useNavigate()
 	const token = useAuthStore((state) => state.token)
 
@@ -73,7 +74,7 @@ const NewSessionPage = () => {
 			sessionDate: startDate,
 			startTime: sessionStart,
 			endTime: sessionEnd,
-			sessionType: "Studio",
+			sessionType: sessionType,
 			status: "Scheduled",
 		}
 
@@ -161,10 +162,21 @@ const NewSessionPage = () => {
 									minDate={new Date()} // Can't select dates before today
 								/>
 							</div>
-							<div className="flex items-center">
-								<input onChange={handleCheckbox} type="checkbox" />
-								&nbsp;
-								<span>אימון של שעה</span>
+							<div className="flex items-center gap-4">
+								<div className="flex items-center">
+									<input onChange={handleCheckbox} type="checkbox" />
+									&nbsp;
+									<span>אימון של שעה</span>
+								</div>
+
+								<select
+									value={sessionType}
+									onChange={(e) => setSessionType(e.target.value)}
+									className="flex-1 shadow rounded p-4 bg-gray-100 outline-none cursor-pointer"
+								>
+									<option value="Studio">סטודיו</option>
+									<option value="Online">אונליין</option>
+								</select>
 							</div>
 
 							<div className="flex flex-col gap-4 lg:flex-row">

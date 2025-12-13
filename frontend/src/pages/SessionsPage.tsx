@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react"
-import { getSessions } from "../services/api"
+import { getSessions, updateSessionStatus, updateSession } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"
+import SessionStatusBadge from "../components/session/SessionStatusBadge"
+import EditSessionModal from "../components/session/EditSessionModal"
 
 const SessionsPage = () => {
 	const [sessionsData, setSessionsData] = useState<Session[]>([])
 	const [error, setError] = useState<string | null>(null)
+	const [editingSession, setEditingSession] = useState<Session | null>(null)
 
 	useEffect(() => {
 		const getSessionsData = async () => {
@@ -25,6 +28,43 @@ const SessionsPage = () => {
 
 		getSessionsData()
 	}, [])
+
+	const handleStatusChange = async (sessionId: string, newStatus: string) => {
+		try {
+			const response = await updateSessionStatus(sessionId, newStatus)
+			if (response.success) {
+				// Update local state
+				setSessionsData(prevSessions =>
+					prevSessions.map(session =>
+						session._id === sessionId
+							? { ...session, status: newStatus }
+							: session
+					)
+				)
+			}
+		} catch (error) {
+			console.error("Error updating session status:", error)
+		}
+	}
+
+	const handleSaveSession = async (sessionId: string, updatedData: Partial<Session>) => {
+		try {
+			const response = await updateSession(sessionId, updatedData)
+			if (response.success) {
+				// Update local state
+				setSessionsData(prevSessions =>
+					prevSessions.map(session =>
+						session._id === sessionId
+							? { ...session, ...updatedData }
+							: session
+					)
+				)
+				setEditingSession(null)
+			}
+		} catch (error) {
+			console.error("Error updating session:", error)
+		}
+	}
 
 
 	return (
@@ -47,18 +87,22 @@ const SessionsPage = () => {
 										<h3 className="text-lg font-semibold text-gray-800">
 											{session.clientId.firstName} {session.clientId.lastName}
 										</h3>
-										<span className={`text-sm px-3 py-1 rounded-full ${session.status === 'Completed' ? 'bg-green-100 text-green-700' :
-												session.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-													new Date() > new Date(session.startTime) ? 'bg-gray-100 text-gray-700' : // Overdue
-														'bg-blue-100 text-blue-700' // Scheduled (future)
-											}`}>
-											{new Date() > new Date(session.startTime) && session.status === 'Scheduled' ? 'Overdue' : session.status}
-										</span>
+										<div className="flex gap-2 items-center">
+											<SessionStatusBadge session={session} editable={true} onStatusChange={handleStatusChange} />
+											<button
+												onClick={() => setEditingSession(session)}
+												className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition-colors"
+											>
+												עריכה
+											</button>
+										</div>
 									</div>
 									<div className="mt-2 text-sm text-gray-600 space-y-1">
 										<p>{dayjs(session.sessionDate).format("DD/MM/YY")}</p>
 										<p>{dayjs(session.startTime).format('HH:mm')} - {dayjs(session.endTime).format('HH:mm')}</p>
-										<p className="text-gray-500">{dayjs(session.startTime).fromNow()}</p>
+										<span className={`text-xs px-2 py-1 rounded ${session.sessionType === 'Online' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
+											{session.sessionType === 'Online' ? 'אונליין' : 'סטודיו'}
+										</span>
 									</div>
 								</div>
 							))
@@ -68,6 +112,14 @@ const SessionsPage = () => {
 					</div>
 				</div>
 			</div>
+
+			{editingSession && (
+				<EditSessionModal
+					session={editingSession}
+					onClose={() => setEditingSession(null)}
+					onSave={handleSaveSession}
+				/>
+			)}
 		</div>
 	)
 }
