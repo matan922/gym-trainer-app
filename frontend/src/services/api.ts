@@ -287,3 +287,23 @@ export const logout = async () => {
 		return { success: false, message: "Something went wrong" }
 	}
 }
+
+export const verifyEmail = async (token: string) => {
+	try {
+		const response = await api.post(`/auth/verify-email`, token)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				// Server responded with error
+				console.log(error)
+				return error.response.data
+			}
+			// Network error
+			return { success: false, message: "Cannot connect to server" }
+		}
+		// Unexpected error
+		return { success: false, message: "Something went wrong" }
+	}
+
+}

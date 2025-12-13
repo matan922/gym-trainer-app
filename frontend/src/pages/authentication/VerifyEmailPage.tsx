@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, useNavigate } from "react-router"
-import axios from "axios"
+import { verifyEmail } from "../../services/api"
 
 function VerifyEmailPage() {
 	const [searchParams] = useSearchParams()
@@ -9,19 +9,17 @@ function VerifyEmailPage() {
 	const [message, setMessage] = useState("")
 
 	useEffect(() => {
-		const verifyEmail = async () => {
+		const verifyEmailData = async () => {
 			const token = searchParams.get("token")
 
 			if (!token) {
 				setStatus("error")
-				setMessage("אסימון חסר")
+				setMessage("invalid token")
 				return
 			}
 
 			try {
-				const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000"
-				const response = await axios.post(`${apiUrl}/auth/verify-email`, { token })
-
+				const response = await verifyEmail(token)
 				if (response.data.success) {
 					setStatus("success")
 					setMessage("האימייל אומת בהצלחה! מעביר להתחברות...")
@@ -36,7 +34,7 @@ function VerifyEmailPage() {
 			}
 		}
 
-		verifyEmail()
+		verifyEmailData()
 	}, [searchParams, navigate])
 
 	return (
