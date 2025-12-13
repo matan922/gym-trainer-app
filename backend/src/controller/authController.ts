@@ -31,6 +31,7 @@ export const register = async (req: Request, res: Response) => {
         })
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
+        console.log(frontendUrl)
         await transporter.sendMail({
             from: "Personal Trainer App",
             to: req.body.email,
