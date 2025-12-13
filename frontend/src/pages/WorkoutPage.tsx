@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { deleteWorkout, getWorkout, putWorkout } from "../services/api"
 import { useNavigate, useParams } from "react-router"
 import type { Workout } from "../types/clientTypes"
