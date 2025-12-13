@@ -30,11 +30,12 @@ export const register = async (req: Request, res: Response) => {
             expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 60 minutes
         })
 
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
         await transporter.sendMail({
             from: "Personal Trainer App",
             to: req.body.email,
             subject: "Email Verification",
-            html: `<b>http://localhost:5173/auth/verify-email?token=${token}</b>`
+            html: `<b>${frontendUrl}/auth/verify-email?token=${token}</b>`
         })
 
         res.status(200).json({ success: true, trainerData })
@@ -184,11 +185,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
             expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 60 minutes
         })
 
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
         await transporter.sendMail({
             from: "Personal Trainer App",
             to: req.body.email,
             subject: "Forgot Password",
-            html: `<h1>http://localhost:5173/auth/reset-password?token=${token}</h1>`
+            html: `<h1>${frontendUrl}/auth/reset-password?token=${token}</h1>`
         })
 
         res.status(200).json({ message: "If email exists a code will be sent (success)" })
