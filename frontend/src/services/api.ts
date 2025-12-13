@@ -290,7 +290,8 @@ export const logout = async () => {
 
 export const verifyEmail = async (token: string) => {
 	try {
-		const response = await api.post(`/auth/verify-email`, token)
+		console.log(token)
+		const response = await api.post(`/auth/verify-email`, { token: token })
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {

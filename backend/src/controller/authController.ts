@@ -49,6 +49,7 @@ export const register = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
     try {
         const { token } = req.body
+        console.log(token)
 
         const tokenInDb = await EmailVerificationToken.findOne({
             token,

@@ -20,13 +20,14 @@ function VerifyEmailPage() {
 
 			try {
 				const response = await verifyEmail(token)
-				if (response.data.success) {
+				console.log(response)
+				if (response.success) {
 					setStatus("success")
 					setMessage("האימייל אומת בהצלחה! מעביר להתחברות...")
 					setTimeout(() => navigate("/login"), 2000)
 				} else {
 					setStatus("error")
-					setMessage(response.data.message || "שגיאה באימות")
+					setMessage(response.message || "שגיאה באימות")
 				}
 			} catch (error: any) {
 				setStatus("error")
