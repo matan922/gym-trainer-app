@@ -15,6 +15,7 @@ import DashboardMainPage from "./pages/DashboardMainPage"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/he'
 import dayjs from "dayjs"
+import VerifyEmailPage from "./pages/authentication/VerifyEmailPage"
 
 dayjs.extend(relativeTime)
 dayjs.locale('he')
@@ -26,6 +27,7 @@ function App() {
 			<Route path="/" element={<Navigate to="/login" replace />} />
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/register" element={<RegisterPage />} />
+			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
 
 			<Route
 				path="/dashboard"
