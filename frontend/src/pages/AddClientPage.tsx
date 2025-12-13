@@ -101,9 +101,6 @@ function AddClientPage() {
 						>
 							יצירה
 						</button>
-						<button type="button" className="p-2 shadow rounded-sm bg-gray-100">
-							ביטול
-						</button>
 					</div>
 				</form>
 			</div>

@@ -160,6 +160,7 @@ const NewSessionPage = () => {
 									onChange={(date) => setStartDate(date)}
 									isClearable
 									minDate={new Date()} // Can't select dates before today
+									withPortal
 								/>
 							</div>
 							<div className="flex items-center gap-4">
@@ -201,7 +202,7 @@ const NewSessionPage = () => {
 										// If future date allow all times
 										return true;
 									}}
-
+									withPortal
 								/>
 								<DatePicker
 									disabled={oneHourCheckbox}
@@ -222,6 +223,7 @@ const NewSessionPage = () => {
 									}
 									maxTime={new Date(new Date().setHours(23, 45, 0, 0))}
 									popperPlacement="bottom"
+									withPortal
 								/>
 							</div>
 
