@@ -10,7 +10,7 @@ const clientSchema = new Schema({
   age: { type: Number, required: true },
   weight: { type: Number, required: true },
   goal: { type: String, required: true },
-  notes: { type: String, required: true },
+  notes: { type: String, required: true, trim: true },
   // email: { type: String, trim: true, required: true, unique: true },
   // password: { type: String, required: true },
   isActive: {type: Boolean, default: false},
@@ -23,6 +23,7 @@ clientSchema.pre("save", function (next) {
   user.lastName = user.lastName.replace(/ /g, "")
   next()
 })
+
 
 // clientSchema.pre('save', async function(next) {
 //   if (!this.isModified('password')) return next();

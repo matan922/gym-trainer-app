@@ -64,8 +64,8 @@ const DashboardMainPage = () => {
 						</div>
 					</div>
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-						<div className="bg-white rounded-lg shadow p-6">asd</div>
-						<div className="bg-white rounded-lg shadow p-6">asd</div>
+						{/* <div className="bg-white rounded-lg shadow p-6">asd</div>
+						<div className="bg-white rounded-lg shadow p-6">asd</div> */}
 					</div>
 				</div>
 			</div>

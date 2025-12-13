@@ -108,14 +108,14 @@ const ClientWorkoutsPage = () => {
 	}
 
 	return (
-		<div>
-			<div className="flex flex-col items-center">
-				<div className="flex flex-col gap-8 w-full max-w-lg">
-					<h1 className="text-2xl text-center">אימונים</h1>
-					<div className="flex justify-center">
+		<div className="p-8 w-full flex flex-col items-center">
+			<div className="max-w-lg w-full">
+				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+					<div className="flex justify-between items-center">
+						<h1 className="text-3xl font-bold text-gray-800">אימונים</h1>
 						<button
 							onClick={handleAddModalState}
-							className="p-2 shadow rounded-sm bg-blue-500 text-white"
+							className="px-4 py-2 shadow rounded bg-blue-500 hover:bg-blue-600 text-white transition-colors"
 							type="button"
 						>
 							אימון חדש
@@ -137,70 +137,67 @@ const ClientWorkoutsPage = () => {
 						/>
 					)}
 
-					{!workouts || workouts.length === 0 ? (
-						<div className="text-center text-gray-500 py-8">
-							<p>אין אימונים עדיין</p>
-						</div>
-					) : (
-						workouts.map((workout) => (
-							<div
-								key={workout._id}
-								className="shadow rounded-lg p-6 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-								onClick={() =>
-									navigate(`/dashboard/clients/${id}/workouts/${workout._id}`)
-								}
-							>
-								<div className="flex justify-between items-start mb-4">
-									<div>
-										{/* {workout.date && (
-											<p className="text-sm text-gray-600 mb-2">
-												{new Date(workout.date).toLocaleDateString('he-IL')}
-											</p>
-										)} */}
-										{workout.notes && (
-											<p className="text-gray-700">{workout.notes}</p>
-										)}
-									</div>
-									<button
-										onClick={(e) => handleDeleteWorkout(workout._id!, e)}
-										className="px-3 py-1 bg-red-500 text-white rounded-sm hover:bg-red-600 text-sm flex-shrink-0"
-									>
-										מחק
-									</button>
-								</div>
-
-								<div className="flex flex-col gap-4">
-									{workout.exercises?.map((exercise) => {
-										return (
-											<div
-												key={exercise._id}
-												className="shadow rounded-lg p-4 bg-white"
+					<div className="flex flex-col gap-4">
+						{!workouts || workouts.length === 0 ? (
+							<p className="text-center text-gray-500">אין אימונים עדיין</p>
+						) : (
+							workouts.map((workout) => (
+								<div
+									key={workout._id}
+									className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+									onClick={() =>
+										navigate(`/dashboard/clients/${id}/workouts/${workout._id}`)
+									}
+								>
+									<div className="flex justify-between items-start mb-4">
+										<div className="flex-1">
+											{workout.notes && (
+												<p className="text-gray-700 font-medium">{workout.notes}</p>
+											)}
+										</div>
+										<div className="flex gap-2">
+											<button
+												onClick={(e) => handleEditModalState(e, workout)}
+												className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
 											>
-												<h3 className="font-semibold text-lg mb-2">
-													{exercise.name}
-												</h3>
-												<div className="flex gap-8 text-sm text-gray-600">
-													<span>סטים: {exercise.sets}</span>
-													<span>חזרות: {exercise.reps}</span>
-													{exercise.rest >= 60 ? (
-														<span>מנוחה: {exercise.rest / 60} דקות</span>
-													) : (
-														<span>מנוחה: {exercise.rest} שניות</span>
-													)}
+												עריכה
+											</button>
+											<button
+												onClick={(e) => handleDeleteWorkout(workout._id!, e)}
+												className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+											>
+												מחק
+											</button>
+										</div>
+									</div>
+
+									{workout.exercises && workout.exercises.length > 0 && (
+										<div className="flex flex-col gap-3 mt-3">
+											{workout.exercises.map((exercise) => (
+												<div
+													key={exercise._id}
+													className="bg-white rounded-lg p-3 border border-gray-100"
+												>
+													<h3 className="font-semibold text-gray-800 mb-2">
+														{exercise.name}
+													</h3>
+													<div className="flex gap-6 text-sm text-gray-600">
+														<span>סטים: {exercise.sets}</span>
+														<span>חזרות: {exercise.reps}</span>
+														{exercise.rest >= 60 ? (
+															<span>מנוחה: {exercise.rest / 60} דקות</span>
+														) : (
+															<span>מנוחה: {exercise.rest} שניות</span>
+														)}
+													</div>
 												</div>
-											</div>
-										)
-									})}
-									<button
-										onClick={(e) => handleEditModalState(e, workout)}
-										className="p-2 bg-green-500 text-white rounded-sm hover:bg-green-600 text-sm w-fit"
-									>
-										עריכה
-									</button>
+											))}
+										</div>
+									)}
 								</div>
-							</div>
-						))
-					)}
+							))
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

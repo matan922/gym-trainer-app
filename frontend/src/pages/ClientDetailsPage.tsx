@@ -47,67 +47,66 @@ const ClientDetailsPage = () => {
 
 	// TODO FUTURE: PUT IT ALL IN COMPONENTS
 	return (
-		<div>
-			<div className="flex flex-col items-center">
-				<div className="shadow rounded-xl overflow-hidden w-full max-w-lg">
-					<div className="bg-gray-800 flex flex-row p-4 justify-between items-center text-white">
-						<div>
-							<button
-								type="button"
-								onClick={() => navigate("/dashboard")}
-								className="text-white"
-							>
-								← חזרה
-							</button>
-							<span> | </span>
-							<span>
-								{client.firstName} {client.lastName}
-							</span>
-						</div>
-
+		<div className="p-8 w-full flex flex-col items-center">
+			<div className="max-w-lg w-full">
+				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+					<div className="flex justify-between items-center">
+						<h1 className="text-3xl font-bold text-gray-800">
+							{client.firstName} {client.lastName}
+						</h1>
 						<button
 							type="button"
 							onClick={handleEdit}
-							className="p-2 rounded shadow bg-blue-500"
+							className="px-4 py-2 rounded shadow bg-blue-500 hover:bg-blue-600 text-white transition-colors"
 						>
-							עריכה
+							{editMode ? "ביטול" : "עריכה"}
 						</button>
 					</div>
 
-					<div className="bg-white p-4 flex flex-col gap-4">
-						{editMode ? (
-							<ClientEdit
-								editMode={handleEdit}
-								onSubmit={handleSubmit}
-								client={client}
-							/>
-						) : (
-							<>
-								<div className="flex flex-col">
-									<span>גיל: {client.age}</span>
-									<span>משקל: {client.weight}</span>
-									<span>מטרה: {client.goal}</span>
-									<span>הערות: {client.notes}</span>
+					{editMode ? (
+						<ClientEdit
+							editMode={handleEdit}
+							onSubmit={handleSubmit}
+							client={client}
+						/>
+					) : (
+						<>
+							<div className="flex flex-col gap-3 text-gray-700">
+								<div className="flex gap-2">
+									<span className="font-semibold">גיל:</span>
+									<span>{client.age}</span>
 								</div>
+								<div className="flex gap-2">
+									<span className="font-semibold">משקל:</span>
+									<span>{client.weight} ק"ג</span>
+								</div>
+								<div className="flex gap-2">
+									<span className="font-semibold">מטרה:</span>
+									<span>{client.goal}</span>
+								</div>
+								<div className="flex flex-col gap-1">
+									<span className="font-semibold">הערות:</span>
+									<span className="text-gray-600">{client.notes}</span>
+								</div>
+							</div>
 
-								<div>
-									<button
-										type="button"
-										onClick={() => {
-											navigate(`/dashboard/clients/${client._id}/workouts`)
-										}}
-										className="bg-gray-100 hover:bg-gray-300 p-2 rounded shadow"
-									>
-										אימונים
-									</button>
-									<DeleteClientButton
-										onDelete={() => navigate("/dashboard")}
-										clientId={client._id!}
-									/>
-								</div>
-							</>
-						)}
-					</div>
+							<div className="flex gap-3 pt-4 border-t border-gray-200">
+								<button
+									type="button"
+									onClick={() => {
+										navigate(`/dashboard/clients/${client._id}/workouts`)
+									}}
+									className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded shadow transition-colors"
+								>
+									אימונים
+								</button>
+								<DeleteClientButton
+									onDelete={() => navigate("/dashboard")}
+									clientId={client._id!}
+								/>
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 		</div>

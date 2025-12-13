@@ -12,6 +12,7 @@ export interface Client {
 	goal: string
 	notes: string
 	workouts: Workout[] | []
+	lastSessionDate?: Date | null
 }
 
 export interface Workout {

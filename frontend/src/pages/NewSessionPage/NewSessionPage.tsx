@@ -58,13 +58,13 @@ const NewSessionPage = () => {
 
 		const sessionEnd = endTime
 			? new Date(
-					startDate.getFullYear(),
-					startDate.getMonth(),
-					startDate.getDate(),
-					endTime.getHours(),
-					endTime.getMinutes(),
-					0,
-				)
+				startDate.getFullYear(),
+				startDate.getMonth(),
+				startDate.getDate(),
+				endTime.getHours(),
+				endTime.getMinutes(),
+				0,
+			)
 			: null
 
 		const newSessionData = {
@@ -158,6 +158,7 @@ const NewSessionPage = () => {
 									selected={startDate}
 									onChange={(date) => setStartDate(date)}
 									isClearable
+									minDate={new Date()} // Can't select dates before today
 								/>
 							</div>
 							<div className="flex items-center">
@@ -176,10 +177,19 @@ const NewSessionPage = () => {
 									showTimeSelectOnly
 									timeIntervals={15}
 									dateFormat="HH:mm"
-									timeFormat="HH:mm" // 24-hour format in dropdown
+									timeFormat="HH:mm"
 									showTimeCaption={false}
 									selected={startTime}
 									onChange={(date) => setStartTime(date)}
+									filterTime={(time) => {
+										// If selected date is today only allow future times
+										if (startDate && startDate.toDateString() === new Date().toDateString()) {
+											return time.getTime() > new Date().getTime();
+										}
+										// If future date allow all times
+										return true;
+									}}
+
 								/>
 								<DatePicker
 									disabled={oneHourCheckbox}
@@ -203,18 +213,12 @@ const NewSessionPage = () => {
 								/>
 							</div>
 
-							<div className="flex justify-center gap-3">
+							<div className="flex justify-center">
 								<button
 									className="bg-blue-500 text-white rounded p-2 shadow"
 									type="submit"
 								>
 									אישור
-								</button>
-								<button
-									type="button"
-									className="bg-gray-300 rounded p-2 shadow"
-								>
-									ביטול
 								</button>
 							</div>
 						</div>

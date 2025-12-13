@@ -10,7 +10,7 @@ const sessionSchema = new Schema({
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   sessionType: { type: String, required: true, enum: ["Studio", "Online"] },
-  status: { type: String, required: true, enum: ["Scheduled", "Completed", "Cancelled"] } // (studio, online),
+  status: { type: String, required: true, enum: ["Scheduled", "Completed", "Cancelled"] }
 });
 
 export default mongoose.model("Session", sessionSchema);

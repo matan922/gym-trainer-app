@@ -34,7 +34,7 @@ const SessionsPage = () => {
 					<h1 className="text-3xl font-bold text-gray-800 text-center">
 						אימונים
 					</h1>
-					<div className="flex flex-row justify-center">צריך להיות פילטור</div>
+					{/* <div className="flex flex-row justify-center">צריך להיות פילטור</div> */}
 					<div className="flex flex-col gap-4">
 						{error && <div className="text-red-500">{error}</div>}
 						{sessionsData.length > 0 ? (
@@ -47,8 +47,12 @@ const SessionsPage = () => {
 										<h3 className="text-lg font-semibold text-gray-800">
 											{session.clientId.firstName} {session.clientId.lastName}
 										</h3>
-										<span className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
-											{session.status}
+										<span className={`text-sm px-3 py-1 rounded-full ${session.status === 'Completed' ? 'bg-green-100 text-green-700' :
+												session.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+													new Date() > new Date(session.startTime) ? 'bg-gray-100 text-gray-700' : // Overdue
+														'bg-blue-100 text-blue-700' // Scheduled (future)
+											}`}>
+											{new Date() > new Date(session.startTime) && session.status === 'Scheduled' ? 'Overdue' : session.status}
 										</span>
 									</div>
 									<div className="mt-2 text-sm text-gray-600 space-y-1">

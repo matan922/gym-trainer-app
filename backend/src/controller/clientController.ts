@@ -6,13 +6,46 @@ import Workout from "../models/Workout.js";
 export const getClients = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const clients = await Client.find({ trainerId: user?.id }); // returns a list of clients
+        // Get clients with their last session if there is one
+        const clients = await Client.aggregate([
+            {
+                $lookup: {
+                    from: 'sessions',
+                    localField: '_id',
+                    foreignField: 'clientId',
+                    as: 'sessions'
+                }
+            },
+            {
+                $addFields: {
+                    lastSessionDate: {
+                        $max: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$sessions',
+                                        cond: { $eq: ['$$this.status', 'Scheduled'] }
+                                    }
+                                },
+                                in: '$$this.sessionDate'
+                            }
+                        }
+
+                    }
+                }
+            },
+            {
+                $project: { sessions: 0 }
+            }
+        ])
+
         if (clients.length > 0) {
             return res.json(clients);
         }
-        res.json({ message: "No clients found" })
+
+        return res.json({ message: "No clients found" })
     } catch (error) {
-        res.status(500).json({ message: error instanceof Error ? error.message : String(error) });
+        return res.status(500).json({ message: error instanceof Error ? error.message : String(error) });
     }
 }
 
