@@ -39,7 +39,7 @@ jobs:
           docker rm -f frontend-container || true
 
       - name: Run backend container
-        run: docker run -d -p 5000:5000 --name backend-container -e MONGO_URI='${{ secrets.MONGO_URI }}' -e CORS_ORIGIN='${{ secrets.CORS_ORIGIN }}' -e SMTP_USER='${{ secrets.SMTP_USER }}' -e SMTP_PASS='${{ secrets.SMTP_PASS }}' -e ACCESS_TOKEN_SECRET='${{ secrets.ACCESS_TOKEN_SECRET }}' -e REFRESH_TOKEN_SECRET='${{ secrets.REFRESH_TOKEN_SECRET }}' -e FRONTEND_URL='${{ secrets.FRONTEND_URL }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
+        run: docker run -d -p 5000:5000 --name backend-container -e NODE_ENV='${{ secrets.NODE_ENV }}' -e MONGO_URI='${{ secrets.MONGO_URI }}' -e CORS_ORIGIN='${{ secrets.CORS_ORIGIN }}' -e SMTP_USER='${{ secrets.SMTP_USER }}' -e SMTP_PASS='${{ secrets.SMTP_PASS }}' -e ACCESS_TOKEN_SECRET='${{ secrets.ACCESS_TOKEN_SECRET }}' -e REFRESH_TOKEN_SECRET='${{ secrets.REFRESH_TOKEN_SECRET }}' -e FRONTEND_URL='${{ secrets.FRONTEND_URL }}' ${{ secrets.DOCKER_USERNAME }}/gym-trainer-backend:latest
 
       - name: Run frontend container
         run: docker run -d -p 3000:80 --name frontend-container ${{ secrets.DOCKER_USERNAME }}/gym-trainer-frontend:latest

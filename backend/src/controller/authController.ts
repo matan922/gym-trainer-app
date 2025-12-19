@@ -94,8 +94,8 @@ export const login = async (req: Request, res: Response) => {
             // store in httponly cookie
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                sameSite: "lax", // development
-                secure: false, // development
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : "lax", // development
+                secure: process.env.NODE_ENV === 'production',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 path: '/'
             })
@@ -145,9 +145,9 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
 
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
-            sameSite: "lax",
-            secure: false,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : "lax", // development
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             path: '/'
         })
 
