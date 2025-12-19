@@ -2,7 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcrypt"
 import type { Request, Response, NextFunction } from 'express';
-import { login, register, testAuthorized, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, clientSetup } from '../controller/authController.js';
+import { login, register, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, clientSetup } from '../controller/authController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { generateAccessToken } from '../helper/genAccessToken.js';
 
@@ -20,7 +20,6 @@ router.post('/reset-password', resetPassword)
 // Client
 router.post('/client-setup', clientSetup)
 
-router.get('/test-authorized', authenticateToken, testAuthorized)
 
 
 

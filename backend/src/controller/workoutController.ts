@@ -72,8 +72,6 @@ export const putWorkout = async (req: Request, res: Response) => {
         const { clientId, workoutId } = req.params;
         const workoutData = req.body;
 
-        console.log(workoutData, clientId, workoutId)
-
         const client = await Client.findOne({ _id: clientId, trainerId: user?.id })
         if (!client) {
             return res.status(404).json({ message: "Client not found" })

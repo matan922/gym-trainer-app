@@ -31,7 +31,6 @@ export const register = async (req: Request, res: Response) => {
         })
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
-        console.log(frontendUrl)
         await transporter.sendMail({
             from: "Personal Trainer App",
             to: req.body.email,
@@ -49,7 +48,6 @@ export const register = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
     try {
         const { token } = req.body
-        console.log(token)
 
         const tokenInDb = await EmailVerificationToken.findOne({
             token,
@@ -237,12 +235,3 @@ export const clientSetup = async (req: Request, res: Response) => {
 
     await Client.findOne()
 }
-
-
-
-// test
-export const testAuthorized = async (req: Request, res: Response) => {
-    console.log("USER DATA = ", req.user)
-    return res.sendStatus(200)
-}
-
