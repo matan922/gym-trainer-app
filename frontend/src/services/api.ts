@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "../store/authStore"
 import type { Client, SessionRequest, Workout } from "../types/clientTypes"
 
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/"
 const api = axios.create({
 	baseURL: API_BASE_URL,
@@ -34,10 +35,11 @@ api.interceptors.response.use(
 		return response
 	},
 	async (error) => {
-		const { status } = error.response
+		const status = error.response?.status
 		const originalRequest = error.config
 
 		if (
+			status &&
 			(status === 401 || status === 403) &&
 			!originalRequest._retry &&
 			error.config.url !== "/auth/token"

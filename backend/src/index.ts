@@ -8,19 +8,12 @@ import clientRoutes from "./routes/clientRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 import sessionRoutes from "./routes/sessionRoutes.js";
-import { rateLimit } from 'express-rate-limit'
 
 connectDB();
 
 const app = express();
 
-const limiter = rateLimit({
-    windowMs: 60 * 1000,
-    limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-})
 
-app.use(limiter)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors({
