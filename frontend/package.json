@@ -1,0 +1,41 @@
+{
+	"name": "frontend",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"preview": "vite preview",
+		"lint-format": "biome check --write"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
+		"@mui/material": "^7.3.5",
+		"@mui/stylis-plugin-rtl": "^7.3.5",
+		"@mui/x-date-pickers": "^8.19.0",
+		"@tailwindcss/vite": "^4.1.14",
+		"axios": "^1.12.2",
+		"dayjs": "^1.11.19",
+		"jwt-decode": "^4.0.0",
+		"react": "^19.1.1",
+		"react-datepicker": "^8.10.0",
+		"react-dom": "^19.1.1",
+		"react-router": "^7.9.4",
+		"react-time-picker": "^8.0.2",
+		"stylis": "^4.3.6",
+		"tailwindcss": "^4.1.14",
+		"zustand": "^5.0.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.4",
+		"@types/node": "^24.6.0",
+		"@types/react": "^19.1.16",
+		"@types/react-dom": "^19.1.9",
+		"@types/stylis": "^4.2.7",
+		"@vitejs/plugin-react": "^5.0.4",
+		"typescript": "~5.9.3",
+		"vite": "^7.1.7"
+	}
+}

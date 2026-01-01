@@ -1,0 +1,74 @@
+import type { Request, Response } from "express";
+import Session from "../models/Session.js";
+
+
+
+export const getSessions = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        if (user) {
+            const sessions = await Session.find({ trainerId: user.id }).populate({path:"clientId", select: "firstName lastName"})
+
+            res.status(200).json(sessions)
+        }
+    } catch (error) {
+        return res.status(500).json({ "error": error })
+    }
+}
+
+export const postSession = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        const { clientId, startTime, sessionDate, endTime, sessionType, status } = req.body
+
+        const sessionStartTime = new Date(startTime)
+        const sessionEndTime = endTime ? new Date(endTime) : new Date(sessionStartTime.getTime() + 60 * 60 * 1000)
+
+        if (user) {
+            const session = new Session({
+                trainerId: user.id,
+                clientId: clientId,
+                sessionDate: new Date(sessionDate),
+                startTime: new Date(startTime),
+                endTime: sessionEndTime,
+                sessionType: sessionType,
+                status: status
+            })
+
+            console.log(session)
+            await session.save()
+            return res.status(200).json(session)
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ "error": error })
+    }
+}
+
+export const updateSessionStatus = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        const { sessionId } = req.params
+        const { status } = req.body
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+
+        // Find session and verify ownership
+        const session = await Session.findOne({ _id: sessionId, trainerId: user.id })
+
+        if (!session) {
+            return res.status(404).json({ success: false, message: "Session not found" })
+        }
+
+        // Update status
+        session.status = status
+        await session.save()
+
+        return res.status(200).json({ success: true, session })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, error: error })
+    }
+}
