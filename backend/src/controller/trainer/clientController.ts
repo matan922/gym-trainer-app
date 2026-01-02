@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import User from "../models/user/User.js";
-import Workout from "../models/Workout.js";
-import TrainerClientRelation from "../models/TrainerClientRelation.js";
-import Session from "../models/Session.js";
+import User from "../../models/user/User.js";
+import Workout from "../../models/Workout.js";
+import TrainerClientRelation from "../../models/TrainerClientRelation.js";
+import Session from "../../models/Session.js";
 
 // all clients
 export const getClients = async (req: Request, res: Response) => {
@@ -64,14 +64,7 @@ export const getClient = async (req: Request, res: Response) => {
         if (!relatedWorkouts) {
             return res.status(400).json({ message: 'No workouts created yet' })
         }
-        // const client = await Client.findOne({ _id: clientId, trainerId: user?.id })
-
-        // if (!client) {
-        //     return res.status(404).json({ message: "No client found" })
-        // }
-
-        // const workouts = await Workout.find({ clientId: clientId })
-        // res.status(200).json({ client, workouts })
+        
         return res.status(200).json({ client: relatedClient, workouts: relatedWorkouts })
     } catch (error) {
         res.status(400).json({ message: error instanceof Error ? error.message : String(error) })
@@ -82,40 +75,23 @@ export const getClient = async (req: Request, res: Response) => {
 // TODO: trainer shouldnt edit their client's personal data but they should be able to update notes about said client
 // add trainerNotes to relationship model
 
-// export const putClient = async (req: Request, res: Response) => {
-//     try {
-//         const user = req.user
-//         const { clientId } = req.params
-//         const client = await Client.findOneAndUpdate({ _id: clientId, trainerId: user?.id }, req.body, { new: true, runValidators: true }
-//         );
 
-//         if (!client) {
-//             return res.status(404).json({ message: "Client not found" });
-//         }
-
-//         res.status(200).json({ client, success: true });
-//     } catch (error) {
-//         res.status(400).json({ message: error instanceof Error ? error.message : String(error) });
-//     }
-// }
-
-// delete a client relation for current trainer
+// end a client relation for current trainer
 export const endRelation = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const { relationId } = req.params
+        const { clientId } = req.params
 
         const relation = await TrainerClientRelation.findOne({
-            _id: relationId,
-            $or: [
-                { trainerId: user?.id },
-                { clientId: user?.id }
-            ],
-            status: 'active'
+            trainerId: user?.id,
+            clientId: clientId
         });
-
         if (!relation) {
             return res.status(404).json({ message: 'Relationship not found' });
+        }
+
+        if (relation.status !== 'active') {
+            return res.status(400).json({ message: 'Relationship already ended' });
         }
 
         relation.status = 'ended';
