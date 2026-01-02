@@ -81,12 +81,16 @@ export const sendClientInvite = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
+        const myTrainerUser = await User.findById(userId)
+        if (myTrainerUser && myTrainerUser.email === email) {
+            return res.status(400).json({message: "You cant send an invite to yourself"})
+        }
+
+        const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
         await ClientInviteToken.findOneAndDelete({ clientEmail: email }) // delete if a token already exist for that client email
         const inviteToken = crypto.randomBytes(32).toString('hex') // new random token
-        await ClientInviteToken.create({ token: inviteToken, clientEmail: email, userId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
+        await ClientInviteToken.create({ token: inviteToken, clientEmail: email, userTrainerId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
 
-        const myTrainerUser = await User.findById(userId)
-        const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
         await transporter.sendMail({
@@ -104,7 +108,6 @@ export const sendClientInvite = async (req: Request, res: Response) => {
 }
 
 
-// --------------- Frontend calls it in inviteAccept request!! ---------------
 export const validateInviteToken = async (req: Request, res: Response) => {
     try {
         const { inviteToken } = req.params;
@@ -181,7 +184,7 @@ export const addProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
         const { profileType, firstName, lastName, age, weight, goal, notes } = req.body;
-        
+
         if (!isValidProfileType(profileType)) {
             return res.status(400).json({ message: "Invalid profile type" });
         }
@@ -203,7 +206,7 @@ export const addProfile = async (req: Request, res: Response) => {
 
         user.activeProfile = profileType; // Switch to new profile
         await user.save();
-        
+
         res.status(200).json({
             success: true,
             message: `${profileType} profile added successfully`
@@ -217,12 +220,12 @@ export const addProfile = async (req: Request, res: Response) => {
 export const changeProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id
-        
+
         const user = await User.findById(userId)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        
+
         const targetProfile = user.activeProfile === "trainer" ? "client" : "trainer";
         if (!user.profiles[targetProfile]) {
             return res.status(400).json({ success: false, message: `You don't have a ${targetProfile} profile. Create one first.` });
@@ -233,7 +236,7 @@ export const changeProfile = async (req: Request, res: Response) => {
 
         const accessToken = generateAccessToken({ id: user._id, activeProfile: user.activeProfile });
         const refreshToken = generateRefreshToken({ id: user._id, activeProfile: user.activeProfile });
-        
+
         // Delete old token and create a new one
         await RefreshToken.deleteOne({ userId: user._id });
         await RefreshToken.create({
@@ -241,7 +244,7 @@ export const changeProfile = async (req: Request, res: Response) => {
             userId: user._id,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         });
-        
+
         // Set new cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -257,6 +260,10 @@ export const changeProfile = async (req: Request, res: Response) => {
         console.log(error)
         res.status(500).json({ scuccess: false, message: "Something went wrong" })
     }
+}
+
+export const endTrainerRelation = async (req: Request, res: Response) => {
+    
 }
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -326,7 +333,7 @@ export const login = async (req: Request, res: Response) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 path: '/'
             })
-            
+
             await RefreshToken.create({
                 token: refreshToken,
                 userId: user._id,
@@ -350,7 +357,7 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
         if (!refreshToken) {
             return res.status(401).json({ success: false, message: "No token found (in cookie)" })
         }
-        
+
         const tokenExisting = await RefreshToken.findOne({ token: refreshToken }).exec()
         if (!tokenExisting) {
             return res.status(401).json({ success: false, message: "No token found (in db)" })
@@ -436,7 +443,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
     try {
         const { token, password } = req.body
-        
+
         const tokenInDb = await PasswordResetToken.findOne({
             token,
             expiresAt: { $gt: new Date() } // greater than now
@@ -464,7 +471,7 @@ export const changePassword = async (req: Request, res: Response) => {
 
 // Client auth
 // export const clientSetup = async (req: Request, res: Response) => {
-    //     const { token, password } = req.body
+//     const { token, password } = req.body
 
 //     await Client.findOne()
 // }
