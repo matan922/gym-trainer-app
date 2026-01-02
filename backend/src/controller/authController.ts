@@ -38,7 +38,7 @@ export const register = async (req: Request, res: Response) => {
         if (profileType === 'trainer') {
             newUser.profiles.trainer = { firstName, lastName };
         } else {
-            newUser.profiles.client = { firstName, lastName, age, weight, goal, notes, trainers: [] };
+            newUser.profiles.client = { firstName, lastName, age, weight, goal, notes };
         }
 
         await newUser.save();
@@ -85,8 +85,8 @@ export const sendClientInvite = async (req: Request, res: Response) => {
         const token = crypto.randomBytes(32).toString('hex') // new random token
         await ClientInviteToken.create({ token: token, clientEmail: email, userId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
 
-        const user = await User.findById(userId)
-        const trainerName = `${user?.profiles.trainer?.firstName} ${user?.profiles.trainer?.lastName}` || 'your trainer'
+        const myTrainerUser = await User.findById(userId)
+        const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
         await transporter.sendMail({
@@ -103,6 +103,8 @@ export const sendClientInvite = async (req: Request, res: Response) => {
     }
 }
 
+
+// --------------- Frontend calls it in inviteAccept request!! ---------------
 export const validateInviteToken = async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
@@ -118,6 +120,9 @@ export const validateInviteToken = async (req: Request, res: Response) => {
         const user = await User.findById(invite.userId)
         const trainerName = `${user?.profiles.trainer?.firstName} ${user?.profiles.trainer?.lastName}` || 'your trainer'
 
+        // if userExists = false => save the inviteToken in local storage and redirect user to register (a client profile). after register make frontend detect the inviteToken in local storage and send request to create relation.
+        // if userExists = true but hasClientProfile = false => save the inviteToken in local storage and redirect user to login. after login redirect them to addProfile route. after creating a profile make frontend detect the inviteToken in local storage and send request to create a relation.
+        // if userExists = true and hasClientProfile = true  => save the inviteToken in local storage and redirect user to login. after login make frontend detect the inviteToken in local storage and send request to create relation.
         res.status(200).json({
             valid: true, trainerName: trainerName, clientEmail: invite.clientEmail, userExists: existingUser ? true : false, hasClientProfile: existingUser?.profiles.client ? true : false
         })
@@ -137,17 +142,18 @@ export const inviteAccept = async (req: Request, res: Response) => {
     try {
         const { token, password, firstName, lastName, age, weight, goal, notes } = req.body
 
-        if (!token || !password || !firstName || !lastName) {
-            return res.status(400).json({ message: "Missing required fields" });
+        if (!token) {
+            return res.status(400).json({ message: "Token required" });
         }
 
         const invite = await validateInvite(token)
         const clientEmail = invite.clientEmail
 
         const existingUser = await User.findOne({ email: clientEmail })
-        // if user does not exist
+
         let clientId
         if (!existingUser) {
+            // OPTION 1: brand new user
             const hashedPassword = await bcrypt.hash(password, 10);
             const newUser = new User({
                 email: clientEmail,
@@ -158,12 +164,26 @@ export const inviteAccept = async (req: Request, res: Response) => {
             newUser.profiles.client = { firstName, lastName, age, weight, goal, notes }
             await newUser.save()
             clientId = newUser._id
-        } else {
-            if (!existingUser.profiles.client) {
-                existingUser.profiles.client = { firstName, lastName, age, weight, goal, notes }
-                await existingUser.save()
+
+        } else if (!existingUser.profiles.client) {
+            // OPTION 2: User exists (trainer) but no client profile
+            if (!password) {
+                return res.status(400).json({ message: "Password required to verify identity" });
             }
+
+            const passwordMatch = await bcrypt.compare(password, existingUser.password);
+            if (!passwordMatch) {
+                return res.status(401).json({ message: "Invalid password" });
+            }
+
+            existingUser.profiles.client = { firstName: existingUser.profiles.trainer?.firstName || firstName, lastName: existingUser.profiles.trainer?.lastName || lastName, age, weight, goal, notes }
+            await existingUser.save()
+
             clientId = existingUser._id
+        } else {
+            // OPTION 3: User exists with client profile already
+            // This shouldn't happen through this endpoint - they should login first
+            return res.status(400).json({ message: "User already has client profile. Please login to accept invite." })
         }
 
         await TrainerClientRelation.create({ trainerId: invite.userId, clientId: clientId, status: 'active' })
@@ -178,6 +198,16 @@ export const inviteAccept = async (req: Request, res: Response) => {
                 error.message.includes("used"))) {
             return res.status(400).json({ success: false, message: error.message });
         }
+        res.status(500).json({ success: false, message: "Something went wrong" })
+    }
+}
+
+export const inviteAcceptAuthenticated = async (req: Request, res: Response) => {
+    try {
+
+
+    } catch (error) {
+        console.log(error)
         res.status(500).json({ success: false, message: "Something went wrong" })
     }
 }
@@ -288,7 +318,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // Login function that creates access and refresh tokens for the client
 export const login = async (req: Request, res: Response) => {
     try {
-        const { email, password, loginAs } = req.body
+        const { email, password, loginAs, inviteToken } = req.body
 
         if (!email || !password || !loginAs) {
             return res.status(400).json({ success: false, message: `Missing data` })
