@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, inviteAccept, validateInviteToken, sendClientInvite } from '../controller/authController.js';
+import { login, register, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, validateInviteToken, sendClientInvite, inviteAcceptAuthenticated } from '../controller/authController.js';
 import { apiLimiter, loginLimiter, logoutLimiter, refreshLimiter } from '../middlewares/rateLimitersMiddleware.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 
@@ -13,8 +13,10 @@ router.delete('/logout', logoutLimiter, logout)
 router.post('/forgot-password', apiLimiter, forgotPassword)
 router.post('/reset-password', apiLimiter, resetPassword)
 router.post('/send-client-invite', [apiLimiter, authenticateToken], sendClientInvite)
-router.post('/invite-accept', apiLimiter, inviteAccept)
 router.get('/validate-invite-token', apiLimiter, validateInviteToken)
+router.get('/validate-invite-token', apiLimiter, validateInviteToken)
+router.post('/invite-accept-authenticated', [apiLimiter, authenticateToken], inviteAcceptAuthenticated)
+// router.post('/invite-accept', apiLimiter, inviteAccept)
 
 
 

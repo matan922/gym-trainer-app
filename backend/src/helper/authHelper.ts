@@ -4,8 +4,8 @@ export const isValidProfileType = (value: any): value is 'trainer' | 'client' =>
     return value === 'trainer' || value === 'client';
 }
 
-export async function validateInvite(token: string) {
-    const invite = await ClientInviteToken.findOne({ token });
+export async function validateInvite(inviteToken: string) {
+    const invite = await ClientInviteToken.findOne({ inviteToken });
     
     if (!invite) {
         throw new Error("Invalid token");

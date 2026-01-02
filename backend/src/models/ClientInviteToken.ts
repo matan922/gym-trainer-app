@@ -8,7 +8,7 @@ const clientInviteToken = new Schema({
         required: true,
         unique: true
     },
-    userId: {
+    userTrainerId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true

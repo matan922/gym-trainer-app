@@ -82,8 +82,8 @@ export const sendClientInvite = async (req: Request, res: Response) => {
         }
 
         await ClientInviteToken.findOneAndDelete({ clientEmail: email }) // delete if a token already exist for that client email
-        const token = crypto.randomBytes(32).toString('hex') // new random token
-        await ClientInviteToken.create({ token: token, clientEmail: email, userId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
+        const inviteToken = crypto.randomBytes(32).toString('hex') // new random token
+        await ClientInviteToken.create({ token: inviteToken, clientEmail: email, userId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
 
         const myTrainerUser = await User.findById(userId)
         const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
@@ -93,7 +93,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
             from: "Merkaz Imunim",
             to: req.body.email,
             subject: `Invited by ${trainerName}`,
-            html: `<h1>${frontendUrl}/auth/invite-accept?token=${token}</h1>`
+            html: `<h1>${frontendUrl}/auth/invite-accept?token=${inviteToken}</h1>`
         })
 
         res.status(201).json({ success: true, message: "Invite sent" })
@@ -107,17 +107,17 @@ export const sendClientInvite = async (req: Request, res: Response) => {
 // --------------- Frontend calls it in inviteAccept request!! ---------------
 export const validateInviteToken = async (req: Request, res: Response) => {
     try {
-        const { token } = req.params;
+        const { inviteToken } = req.params;
 
-        if (!token) {
+        if (!inviteToken) {
             return res.status(400).json({ success: false, message: "Invalid token" })
         }
-        const invite = await validateInvite(token)
+        const invite = await validateInvite(inviteToken)
 
         // Check if user exists
         const existingUser = await User.findOne({ email: invite.clientEmail });
 
-        const user = await User.findById(invite.userId)
+        const user = await User.findById(invite.userTrainerId)
         const trainerName = `${user?.profiles.trainer?.firstName} ${user?.profiles.trainer?.lastName}` || 'your trainer'
 
         // if userExists = false => save the inviteToken in local storage and redirect user to register (a client profile). after register make frontend detect the inviteToken in local storage and send request to create relation.
@@ -138,58 +138,33 @@ export const validateInviteToken = async (req: Request, res: Response) => {
     }
 }
 
-export const inviteAccept = async (req: Request, res: Response) => {
+
+export const inviteAcceptAuthenticated = async (req: Request, res: Response) => {
     try {
-        const { token, password, firstName, lastName, age, weight, goal, notes } = req.body
-
-        if (!token) {
-            return res.status(400).json({ message: "Token required" });
-        }
-
-        const invite = await validateInvite(token)
+        const userClient = req.user
+        const { inviteToken } = req.body
+        const invite = await validateInvite(inviteToken)
+        const trainerId = invite.userTrainerId
+        const clientId = userClient?.id
         const clientEmail = invite.clientEmail
 
-        const existingUser = await User.findOne({ email: clientEmail })
-
-        let clientId
-        if (!existingUser) {
-            // OPTION 1: brand new user
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = new User({
-                email: clientEmail,
-                password: hashedPassword,
-                emailVerified: true,
-                activeProfile: 'client'
-            })
-            newUser.profiles.client = { firstName, lastName, age, weight, goal, notes }
-            await newUser.save()
-            clientId = newUser._id
-
-        } else if (!existingUser.profiles.client) {
-            // OPTION 2: User exists (trainer) but no client profile
-            if (!password) {
-                return res.status(400).json({ message: "Password required to verify identity" });
-            }
-
-            const passwordMatch = await bcrypt.compare(password, existingUser.password);
-            if (!passwordMatch) {
-                return res.status(401).json({ message: "Invalid password" });
-            }
-
-            existingUser.profiles.client = { firstName: existingUser.profiles.trainer?.firstName || firstName, lastName: existingUser.profiles.trainer?.lastName || lastName, age, weight, goal, notes }
-            await existingUser.save()
-
-            clientId = existingUser._id
-        } else {
-            // OPTION 3: User exists with client profile already
-            // This shouldn't happen through this endpoint - they should login first
-            return res.status(400).json({ message: "User already has client profile. Please login to accept invite." })
+        const loggedClientUser = await User.findById(clientId)
+        if (loggedClientUser && clientEmail !== loggedClientUser.email) {
+            return res.status(403).json({ message: 'Emails dont match' })
         }
 
-        await TrainerClientRelation.create({ trainerId: invite.userId, clientId: clientId, status: 'active' })
-        await ClientInviteToken.findOneAndUpdate({ token: token }, { usedAt: Date.now() })
+        const relationExist = await TrainerClientRelation.findOne({ trainerId: trainerId, clientId: clientId })
+        if (relationExist && relationExist.status === "active") {
+            return res.status(400).json({ message: 'Relation already exist' })
+        } else if (relationExist && relationExist.status === "ended") {
+            await TrainerClientRelation.updateOne({ _id: relationExist._id }, { status: 'active', $unset: { endedAt: 1 } })
+        } else {
+            await TrainerClientRelation.create({ trainerId: trainerId, clientId: clientId, status: 'active' })
+        }
 
-        res.status(200).json({ success: true, message: "Invite accepted" })
+        invite.usedAt = new Date()
+        await invite.save()
+        return res.status(201).json({ message: 'Created relation to trainer' })
     } catch (error) {
         console.log(error)
         if (error instanceof Error &&
@@ -202,21 +177,11 @@ export const inviteAccept = async (req: Request, res: Response) => {
     }
 }
 
-export const inviteAcceptAuthenticated = async (req: Request, res: Response) => {
-    try {
-
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ success: false, message: "Something went wrong" })
-    }
-}
-
 export const addProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
         const { profileType, firstName, lastName, age, weight, goal, notes } = req.body;
-
+        
         if (!isValidProfileType(profileType)) {
             return res.status(400).json({ message: "Invalid profile type" });
         }
@@ -233,12 +198,12 @@ export const addProfile = async (req: Request, res: Response) => {
         if (profileType === 'trainer') {
             user.profiles.trainer = { firstName, lastName };
         } else {
-            user.profiles.client = { firstName, lastName, age, weight, goal, notes, trainers: [] };
+            user.profiles.client = { firstName, lastName, age, weight, goal, notes };
         }
 
         user.activeProfile = profileType; // Switch to new profile
         await user.save();
-
+        
         res.status(200).json({
             success: true,
             message: `${profileType} profile added successfully`
@@ -252,12 +217,12 @@ export const addProfile = async (req: Request, res: Response) => {
 export const changeProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id
-
+        
         const user = await User.findById(userId)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-
+        
         const targetProfile = user.activeProfile === "trainer" ? "client" : "trainer";
         if (!user.profiles[targetProfile]) {
             return res.status(400).json({ success: false, message: `You don't have a ${targetProfile} profile. Create one first.` });
@@ -268,7 +233,7 @@ export const changeProfile = async (req: Request, res: Response) => {
 
         const accessToken = generateAccessToken({ id: user._id, activeProfile: user.activeProfile });
         const refreshToken = generateRefreshToken({ id: user._id, activeProfile: user.activeProfile });
-
+        
         // Delete old token and create a new one
         await RefreshToken.deleteOne({ userId: user._id });
         await RefreshToken.create({
@@ -276,7 +241,7 @@ export const changeProfile = async (req: Request, res: Response) => {
             userId: user._id,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         });
-
+        
         // Set new cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -361,7 +326,7 @@ export const login = async (req: Request, res: Response) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 path: '/'
             })
-
+            
             await RefreshToken.create({
                 token: refreshToken,
                 userId: user._id,
@@ -385,7 +350,7 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
         if (!refreshToken) {
             return res.status(401).json({ success: false, message: "No token found (in cookie)" })
         }
-
+        
         const tokenExisting = await RefreshToken.findOne({ token: refreshToken }).exec()
         if (!tokenExisting) {
             return res.status(401).json({ success: false, message: "No token found (in db)" })
@@ -471,7 +436,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
     try {
         const { token, password } = req.body
-
+        
         const tokenInDb = await PasswordResetToken.findOne({
             token,
             expiresAt: { $gt: new Date() } // greater than now
@@ -499,7 +464,71 @@ export const changePassword = async (req: Request, res: Response) => {
 
 // Client auth
 // export const clientSetup = async (req: Request, res: Response) => {
-//     const { token, password } = req.body
+    //     const { token, password } = req.body
 
 //     await Client.findOne()
+// }
+
+// export const inviteAccept = async (req: Request, res: Response) => {
+//     try {
+//         const { inviteToken, password, firstName, lastName, age, weight, goal, notes } = req.body
+
+//         if (!inviteToken) {
+//             return res.status(400).json({ message: "Token required" });
+//         }
+
+//         const invite = await validateInvite(inviteToken)
+//         const clientEmail = invite.clientEmail
+
+//         const existingUser = await User.findOne({ email: clientEmail })
+
+//         let clientId
+//         if (!existingUser) {
+//             // OPTION 1: brand new user
+//             const hashedPassword = await bcrypt.hash(password, 10);
+//             const newUser = new User({
+//                 email: clientEmail,
+//                 password: hashedPassword,
+//                 emailVerified: true,
+//                 activeProfile: 'client'
+//             })
+//             newUser.profiles.client = { firstName, lastName, age, weight, goal, notes }
+//             await newUser.save()
+//             clientId = newUser._id
+
+//         } else if (!existingUser.profiles.client) {
+//             // OPTION 2: User exists (trainer) but no client profile
+//             if (!password) {
+//                 return res.status(400).json({ message: "Password required to verify identity" });
+//             }
+
+//             const passwordMatch = await bcrypt.compare(password, existingUser.password);
+//             if (!passwordMatch) {
+//                 return res.status(401).json({ message: "Invalid password" });
+//             }
+
+//             existingUser.profiles.client = { firstName: existingUser.profiles.trainer?.firstName || firstName, lastName: existingUser.profiles.trainer?.lastName || lastName, age, weight, goal, notes }
+//             await existingUser.save()
+
+//             clientId = existingUser._id
+//         } else {
+//             // OPTION 3: User exists with client profile already
+//             // This shouldn't happen through this endpoint - they should login first
+//             return res.status(400).json({ message: "User already has client profile. Please login to accept invite." })
+//         }
+
+//         await TrainerClientRelation.create({ trainerId: invite.userTrainerId, clientId: clientId, status: 'active' })
+//         await ClientInviteToken.findOneAndUpdate({ token: inviteToken }, { usedAt: Date.now() })
+
+//         res.status(200).json({ success: true, message: "Invite accepted" })
+//     } catch (error) {
+//         console.log(error)
+//         if (error instanceof Error &&
+//             (error.message.includes("Invalid") ||
+//                 error.message.includes("Expired") ||
+//                 error.message.includes("used"))) {
+//             return res.status(400).json({ success: false, message: error.message });
+//         }
+//         res.status(500).json({ success: false, message: "Something went wrong" })
+//     }
 // }
