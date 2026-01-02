@@ -100,21 +100,22 @@ export const getClient = async (req: Request, res: Response) => {
 // }
 
 // delete a client relation for current trainer
-export const deleteClientRelation = async (req: Request, res: Response) => {
+export const endRelation = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const { clientId } = req.params
+        const { relationId } = req.params
 
         const relation = await TrainerClientRelation.findOne({
-            trainerId: user?.id,
-            clientId: clientId
+            _id: relationId,
+            $or: [
+                { trainerId: user?.id },
+                { clientId: user?.id }
+            ],
+            status: 'active'
         });
+
         if (!relation) {
             return res.status(404).json({ message: 'Relationship not found' });
-        }
-
-        if (relation.status !== 'active') {
-            return res.status(400).json({ message: 'Relationship already ended' });
         }
 
         relation.status = 'ended';

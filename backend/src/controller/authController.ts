@@ -262,9 +262,6 @@ export const changeProfile = async (req: Request, res: Response) => {
     }
 }
 
-export const endTrainerRelation = async (req: Request, res: Response) => {
-    
-}
 
 export const verifyEmail = async (req: Request, res: Response) => {
     try {
