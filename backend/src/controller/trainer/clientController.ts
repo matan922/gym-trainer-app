@@ -61,10 +61,6 @@ export const getClient = async (req: Request, res: Response) => {
 
 
         const relatedWorkouts = await Workout.find({ trainerId: user?.id, clientId: clientId })
-        if (!relatedWorkouts) {
-            return res.status(400).json({ message: 'No workouts created yet' })
-        }
-        
         return res.status(200).json({ client: relatedClient, workouts: relatedWorkouts })
     } catch (error) {
         res.status(400).json({ message: error instanceof Error ? error.message : String(error) })
