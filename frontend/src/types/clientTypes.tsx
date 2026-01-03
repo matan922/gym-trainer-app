@@ -49,3 +49,15 @@ export interface SessionRequest extends Omit<Session, "clientId" | "endTime"> {
 	clientId: string
 	endTime: Date | null
 }
+
+export interface RegisterData {
+	firstName: string
+	lastName: string
+	email: string
+	password: string
+	age: string
+	weight: string
+	goal: string
+	notes: string
+	profileType: "trainer" | "client" | null
+}

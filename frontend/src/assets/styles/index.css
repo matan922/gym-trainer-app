@@ -1,4 +1,91 @@
 @import "tailwindcss";
+@theme {
+	/* ========================================
+	   BRAND COLORS
+	   ======================================== */
+	
+	/* Trainer - Sunset Red */
+	--color-trainer-primary: #EF4444;
+	--color-trainer-secondary: #F87171;
+	--color-trainer-dark: #B91C1C;
+
+	/* Client - Ocean Teal */
+	--color-client-primary: #14B8A6;
+	--color-client-secondary: #2DD4BF;
+	--color-client-dark: #0D9488;
+
+	/* Neutral Primary - Vibrant Orange */
+	--color-primary: #F97316;
+	--color-primary-dark: #EA580C;
+
+
+	/* ========================================
+	   TEXT COLORS
+	   ======================================== */
+	
+	--color-text-dark: #1F2937;       /* Headings, important text */
+	--color-text-medium: #374151;     /* Body text, labels */
+	--color-text-light: #6B7280;      /* Secondary text, descriptions */
+	--color-text-lighter: #9CA3AF;    /* Placeholders, disabled states */
+
+
+	/* ========================================
+	   SURFACE COLORS
+	   ======================================== */
+	
+	--color-surface: #FFFFFF;         /* Cards, modals */
+	--color-background: #FEF3C7;      /* Warm cream base */
+	
+	/* Sidebar Surfaces */
+	--color-sidebar-trainer: rgba(255, 255, 255, 0.97);
+	--color-sidebar-client: rgba(255, 255, 255, 0.97);
+	--color-sidebar-border-trainer: rgba(251, 146, 60, 0.2);   /* Warm orange border */
+	--color-sidebar-border-client: rgba(45, 212, 191, 0.2);    /* Teal border */
+
+
+	/* ========================================
+	   SIDEBAR MENU STATES
+	   ======================================== */
+	
+	/* Trainer Sidebar */
+	--color-sidebar-item-hover-trainer: rgba(239, 68, 68, 0.12);      /* Light red tint */
+	--color-sidebar-item-active-trainer: rgba(239, 68, 68, 0.18);     /* Stronger red tint */
+	--color-sidebar-item-active-border-trainer: #EF4444;              /* Solid red accent */
+	
+	/* Client Sidebar */
+	--color-sidebar-item-hover-client: rgba(20, 184, 166, 0.12);      /* Light teal tint */
+	--color-sidebar-item-active-client: rgba(20, 184, 166, 0.18);     /* Stronger teal tint */
+	--color-sidebar-item-active-border-client: #14B8A6;               /* Solid teal accent */
+
+
+	/* ========================================
+	   BACKGROUND GRADIENTS
+	   ======================================== */
+	
+	/* Auth Pages */
+	--background-image-sunset: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 50%, #FCA5A5 100%);
+	--background-image-tropical: linear-gradient(135deg, #CCFBF1 0%, #FEF3C7 50%, #FED7AA 100%);
+	
+	/* Role-Specific Pages */
+	--background-image-trainer: linear-gradient(135deg, #FCA5A5 0%, #FDBA74 50%, #FCD34D 100%);
+	--background-image-client: linear-gradient(135deg, #99F6E4 0%, #BAE6FD 50%, #DBEAFE 100%);
+
+
+	/* ========================================
+	   BUTTON GRADIENTS
+	   ======================================== */
+	
+	/* Primary Button (Neutral) */
+	--background-image-primary-button: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+	--background-image-primary-button-hover: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
+
+	/* Role-Specific Buttons */
+	--background-image-trainer-button: linear-gradient(135deg, #EF4444 0%, #F97316 100%);
+	--background-image-trainer-button-hover: linear-gradient(135deg, #DC2626 0%, #EA580C 100%);
+
+	--background-image-client-button: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
+	--background-image-client-button-hover: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
+}
 
 body {
 	margin: 0;

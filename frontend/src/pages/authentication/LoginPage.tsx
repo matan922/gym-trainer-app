@@ -23,26 +23,27 @@ const LoginPage = () => {
 
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		const loginData = await login(userData)
-		setToken(loginData.accessToken)
+		const response = await login(userData)
+		console.log(response)
+		setToken(response.accessToken)
 		navigate("/dashboard")
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-			<div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-				<div className="text-center mb-8">
-					<h1 className="text-3xl font-bold text-gray-800 mb-2">
+		<div className="min-h-screen flex items-center justify-center bg-sunset">
+			<div className="bg-surface p-10 rounded-3xl shadow-2xl w-full max-w-md">
+				<div className="text-center mb-8 flex flex-col gap-2">
+					<h1 className="text-4xl font-bold text-text-dark">
 						ברוכים השבים
 					</h1>
-					<p className="text-gray-600">התחבר לחשבון שלך</p>
+					<p className="text-text-medium font-medium text-lg">התחבר לחשבון שלך</p>
 				</div>
 
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div>
 						<label
 							htmlFor="email"
-							className="block text-sm font-medium text-gray-700 mb-2 text-right"
+							className="block text-sm font-medium text-text-medium mb-2 text-right"
 						>
 							אימייל
 						</label>
@@ -51,7 +52,7 @@ const LoginPage = () => {
 							name="email"
 							id="email"
 							type="email"
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
 							placeholder="your@email.com"
 						/>
 					</div>
@@ -59,7 +60,7 @@ const LoginPage = () => {
 					<div>
 						<label
 							htmlFor="password"
-							className="block text-sm font-medium text-gray-700 mb-2 text-right"
+							className="block text-sm font-medium text-text-medium mb-2 text-right"
 						>
 							סיסמה
 						</label>
@@ -68,25 +69,25 @@ const LoginPage = () => {
 							name="password"
 							id="password"
 							type="password"
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
 							placeholder="••••••••"
 						/>
 					</div>
 
 					<button
 						type="submit"
-						className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-md hover:shadow-lg"
+						className="w-full text-white py-3 rounded-lg font-semibold transition duration-200 shadow-xl bg-primary-button hover:bg-primary-button-hover"
 					>
 						התחבר
 					</button>
 				</form>
 
-				<div className="mt-6 text-center">
-					<p className="text-gray-600 text-sm">
+				<div className="mt-6 text-center pt-4 border-t border-gray-100">
+					<p className="text-text-light">
 						עדיין אין לך חשבון?{" "}
 						<Link
 							to="/register"
-							className="text-indigo-600 hover:text-indigo-700 font-medium"
+							className="text-primary hover:text-primary-dark font-semibold"
 						>
 							הירשם כעת
 						</Link>

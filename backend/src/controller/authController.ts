@@ -37,8 +37,10 @@ export const register = async (req: Request, res: Response) => {
 
         if (profileType === 'trainer') {
             newUser.profiles.trainer = { firstName, lastName };
+            newUser.activeProfile = "trainer"
         } else {
             newUser.profiles.client = { firstName, lastName, age, weight, goal, notes };
+            newUser.activeProfile = "client"
         }
 
         await newUser.save();
@@ -83,7 +85,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
 
         const myTrainerUser = await User.findById(userId)
         if (myTrainerUser && myTrainerUser.email === email) {
-            return res.status(400).json({message: "You cant send an invite to yourself"})
+            return res.status(400).json({ message: "You cant send an invite to yourself" })
         }
 
         const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
@@ -287,7 +289,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // Login function that creates access and refresh tokens for the client
 export const login = async (req: Request, res: Response) => {
     try {
-        const { email, password, loginAs, inviteToken } = req.body
+        const { email, password, inviteToken } = req.body
+
+        const user = await User.findOne({ email: email }).select("+password")
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' })
+        }
+
+        const loginAs = user.activeProfile // sets loginAs as last activeProfile after creating a user/changing from within the account
 
         if (!email || !password || !loginAs) {
             return res.status(400).json({ success: false, message: `Missing data` })
@@ -296,12 +305,6 @@ export const login = async (req: Request, res: Response) => {
         if (!isValidProfileType(loginAs)) {
             return res.status(400).json({ success: false, message: "Invalid profile type" });
         }
-
-        const user = await User.findOne({ email: email }).select("+password")
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials (no user)' })
-        }
-
 
         if (loginAs === 'trainer' && !user.profiles.trainer) {
             return res.status(400).json({ message: "No trainer profile" });
@@ -315,11 +318,10 @@ export const login = async (req: Request, res: Response) => {
         }
 
         if (await bcrypt.compare(password, user.password)) {
-            user.activeProfile = loginAs
             await user.save()
             await RefreshToken.deleteOne({ userId: user._id }) // Delete refresh token if already existing for trainer
-            const accessToken = generateAccessToken({ id: user._id, activeProfile: user.activeProfile })
-            const refreshToken = generateRefreshToken({ id: user._id, activeProfile: user.activeProfile })
+            const accessToken = generateAccessToken({ id: user._id, activeProfile: loginAs })
+            const refreshToken = generateRefreshToken({ id: user._id, activeProfile: loginAs })
 
 
             // store in httponly cookie

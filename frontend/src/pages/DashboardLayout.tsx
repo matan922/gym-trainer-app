@@ -34,7 +34,7 @@ function DashboardLayout() {
 	return (
 		<div className="sm:grid sm:grid-cols-[280px_1fr] min-h-screen">
 			<div
-				className={`fixed inset-y-0 w-[280px] z-50 bg-gray-800 text-white flex flex-col gap-4 p-4 transition-transform duration-300 ${hamburgerOpen ? "translate-x-0" : "translate-x-full"} sm:relative sm:translate-x-0 sm:flex`}
+				className={`fixed inset-y-0 w-[280px] z-50 bg-surface shadow-2xl border-r border-gray-100 text-white flex flex-col gap-4 p-4 transition-transform duration-300 ${hamburgerOpen ? "translate-x-0" : "translate-x-full"} sm:relative sm:translate-x-0 sm:flex`}
 			>
 				<button
 					type="button"
@@ -81,38 +81,38 @@ function DashboardLayout() {
 				<button
 					type="button"
 					onClick={() => handleNavigation("/dashboard")}
-					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
+					className="rounded-lg text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark transition-all"
 				>
 					לוח ראשי
 				</button>
 				<button
 					type="button"
 					onClick={() => handleNavigation("/dashboard/sessions")}
-					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
+					className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors"
 				>
 					אימונים
 				</button>
 				<button
 					type="button"
 					onClick={() => handleNavigation("/dashboard/clients")}
-					className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700"
+					className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors"
 				>
 					מתאמנים
 				</button>
-				<button onClick={() => handleNavigation("/dashboard/new-session")} className="text-white bg-gray-600 rounded-sm px-2 py-1 hover:bg-gray-700">
+				<button onClick={() => handleNavigation("/dashboard/new-session")} className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors">
 					קביעת אימון
 				</button>
 				<button
 					type="button"
 					onClick={() => handleNavigation("/dashboard/new-client")}
-					className="text-white bg-blue-500 rounded-sm px-2 py-1 hover:bg-blue-700"
+					className="rounded-lg bg-primary-button hover:brightness-90 text-white font-semibold transition shadow-md"
 				>
 					הוספת מתאמן
 				</button>
 				<button
 					type="button"
 					onClick={handleLogout}
-					className="text-white bg-red-600 rounded-sm px-2 py-1 hover:bg-red-700"
+					className="rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
 				>
 					התנתקות
 				</button>
@@ -159,7 +159,7 @@ function DashboardLayout() {
 				</svg>
 			</button>
 
-			<div className="p-4 bg-[#F5F5F5] min-h-screen">
+			<div className="p-4 bg-trainer min-h-screen">
 				<Outlet />
 			</div>
 		</div>
