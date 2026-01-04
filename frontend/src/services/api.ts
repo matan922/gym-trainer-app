@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "../store/authStore"
-import type { Client, SessionRequest, Workout } from "../types/clientTypes"
+import type { Client, ClientInvite, SessionRequest, Workout } from "../types/clientTypes"
 
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/"
@@ -81,12 +81,20 @@ export const getClient = async (id: string) => {
 	return response
 }
 
-export const postClient = async (clientData: Client) => {
-	const response = await api.post<Client>(`/clients`, clientData)
-	console.log(response.data)
+export const sendClientInvite = async (clientData: ClientInvite) => {
+	const response = await api.post<ClientInvite>(`/auth/send-client-invite`, clientData)
 	return response.data
 }
 
+export const validateClientInvite = async (inviteToken: string) => {
+	const response = await api.post('/auth/validate-invite-token', { inviteToken })
+	return response.data
+}
+
+export const acceptInviteAuthenticated = async (inviteToken: string) => {
+	const response = await api.post('/auth/invite-accept-authenticated', { inviteToken })
+	return response.data
+}
 export const putClient = async (clientData: Client, id: string) => {
 	const response = await api.put<{ client: Client; success: boolean }>(
 		`/clients/${id}`,

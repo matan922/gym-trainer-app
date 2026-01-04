@@ -72,6 +72,7 @@ export const register = async (req: Request, res: Response) => {
 export const sendClientInvite = async (req: Request, res: Response) => {
     try {
         const currentProfile = req.user?.activeProfile
+        console.log(currentProfile)
         const userId = req.user?.id
         const email = req.body.email // Add email regex
 
@@ -99,7 +100,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
             from: "Merkaz Imunim",
             to: req.body.email,
             subject: `Invited by ${trainerName}`,
-            html: `<h1>${frontendUrl}/auth/invite-accept?token=${inviteToken}</h1>`
+            html: `<h1>${frontendUrl}/invite-accept?token=${inviteToken}</h1>`
         })
 
         res.status(201).json({ success: true, message: "Invite sent" })
@@ -112,10 +113,11 @@ export const sendClientInvite = async (req: Request, res: Response) => {
 
 export const validateInviteToken = async (req: Request, res: Response) => {
     try {
-        const { inviteToken } = req.params;
-
+        const { inviteToken } = req.body;
+        console.log(inviteToken)
+        
         if (!inviteToken) {
-            return res.status(400).json({ success: false, message: "Invalid token" })
+            return res.status(401).json({ success: false, message: "Invalid token" })
         }
         const invite = await validateInvite(inviteToken)
 

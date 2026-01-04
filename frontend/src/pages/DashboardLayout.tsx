@@ -78,43 +78,62 @@ function DashboardLayout() {
 						</g>
 					</svg>
 				</button>
-				<button
-					type="button"
-					onClick={() => handleNavigation("/dashboard")}
-					className="rounded-lg text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark transition-all"
-				>
-					לוח ראשי
-				</button>
-				<button
-					type="button"
-					onClick={() => handleNavigation("/dashboard/sessions")}
-					className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors"
-				>
-					אימונים
-				</button>
-				<button
-					type="button"
-					onClick={() => handleNavigation("/dashboard/clients")}
-					className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors"
-				>
-					מתאמנים
-				</button>
-				<button onClick={() => handleNavigation("/dashboard/new-session")} className="rounded-lg text-text-medium hover:bg-trainer-primary/10 hover:text-trainer-primary transition-colors">
-					קביעת אימון
-				</button>
-				<button
-					type="button"
-					onClick={() => handleNavigation("/dashboard/new-client")}
-					className="rounded-lg bg-primary-button hover:brightness-90 text-white font-semibold transition shadow-md"
-				>
-					הוספת מתאמן
-				</button>
+				{/* Navigation Items */}
+				<nav className="space-y-2 mb-6">
+					<button
+						type="button"
+						onClick={() => handleNavigation("/dashboard")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+					>
+						<span className="text-2xl">🏠</span>
+						<span className="flex-1 text-right">לוח ראשי</span>
+					</button>
+
+					<button
+						type="button"
+						onClick={() => handleNavigation("/dashboard/clients")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+					>
+						<span className="text-2xl">👥</span>
+						<span className="flex-1 text-right">מתאמנים</span>
+					</button>
+
+					<button
+						type="button"
+						onClick={() => handleNavigation("/dashboard/new-client")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+					>
+						<span className="text-2xl">📧</span>
+						<span className="flex-1 text-right">הזמן מתאמן</span>
+					</button>
+
+					<button
+						type="button"
+						onClick={() => handleNavigation("/dashboard/sessions")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+					>
+						<span className="text-2xl">📅</span>
+						<span className="flex-1 text-right">אימונים</span>
+					</button>
+
+					<button
+						type="button"
+						onClick={() => handleNavigation("/dashboard/new-session")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+					>
+						<span className="text-2xl">⚡</span>
+						<span className="flex-1 text-right">קביעת אימון</span>
+					</button>
+				</nav>
+
+				{/* Logout - Danger Style */}
 				<button
 					type="button"
 					onClick={handleLogout}
-					className="rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+					className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md transition-all font-medium border border-transparent hover:border-red-200"
 				>
-					התנתקות
+					<span className="text-2xl">🚪</span>
+					<span className="flex-1 text-right">התנתקות</span>
 				</button>
 			</div>
 

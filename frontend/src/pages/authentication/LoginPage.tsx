@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { login } from "../../services/api"
+import { acceptInviteAuthenticated, login } from "../../services/api"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 
@@ -10,6 +10,7 @@ interface User {
 
 const LoginPage = () => {
 	const setToken = useAuthStore((state) => state.setToken)
+	const [error, setError] = useState<string>("")
 	const [userData, setUserData] = useState<User>({
 		email: "",
 		password: "",
@@ -21,12 +22,38 @@ const LoginPage = () => {
 		setUserData({ ...userData, [name]: value })
 	}
 
-	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		const response = await login(userData)
-		console.log(response)
-		setToken(response.accessToken)
-		navigate("/dashboard")
+
+		if (!response.success) {
+			setError(response.message || "התחברות נכשלה")
+			return
+		}
+
+		if (response.accessToken) {
+			setToken(response.accessToken)
+
+			// CHECK FOR PENDING INVITE TOKEN
+			const pendingToken = localStorage.getItem("pendingInviteToken")
+
+			if (pendingToken) {
+				try {
+					const inviteResponse = await acceptInviteAuthenticated(pendingToken)
+
+					if (inviteResponse.success) {
+						localStorage.removeItem("pendingInviteToken")
+						// Optional: Show success message
+						console.log("הצטרפת בהצלחה למאמן!")
+					}
+				} catch (error) {
+					// Don't block login if invite acceptance fails
+					console.error("Error accepting invite:", error)
+				}
+			}
+
+			navigate("/dashboard")
+		}
 	}
 
 	return (
@@ -38,6 +65,12 @@ const LoginPage = () => {
 					</h1>
 					<p className="text-text-medium font-medium text-lg">התחבר לחשבון שלך</p>
 				</div>
+
+				{error && (
+					<div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-right">
+						{error}
+					</div>
+				)}
 
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div>
@@ -52,7 +85,7 @@ const LoginPage = () => {
 							name="email"
 							id="email"
 							type="email"
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
+							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
 							placeholder="your@email.com"
 						/>
 					</div>
@@ -69,7 +102,7 @@ const LoginPage = () => {
 							name="password"
 							id="password"
 							type="password"
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
+							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
 							placeholder="••••••••"
 						/>
 					</div>
@@ -82,7 +115,7 @@ const LoginPage = () => {
 					</button>
 				</form>
 
-				<div className="mt-6 text-center pt-4 border-t border-gray-100">
+				<div className="mt-6 text-center pt-4 border-t border-border-light">
 					<p className="text-text-light">
 						עדיין אין לך חשבון?{" "}
 						<Link

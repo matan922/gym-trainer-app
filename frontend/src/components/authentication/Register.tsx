@@ -6,20 +6,39 @@ interface RegisterProps {
     registerData: RegisterData;
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    hasPendingInvite: boolean
+    error?: string
 }
 
-const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit }: RegisterProps) => {
+const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit, hasPendingInvite, error }: RegisterProps) => {
     const isTrainer = registerType === "trainer";
     const focusRing = isTrainer ? "focus:ring-trainer-primary" : "focus:ring-client-primary";
     const buttonBg = isTrainer ? "bg-trainer-button hover:bg-trainer-button-hover" : "bg-client-button hover:bg-client-button-hover";
 
     return (
         <div className="bg-surface flex flex-col p-10 rounded-3xl shadow-2xl w-full max-w-md gap-6">
-            <div>
-                <button className={`${buttonBg} text-white px-4 py-2 rounded-lg font-semibold transition`} onClick={onBack}>
-                    בחירת סוג משתמש
-                </button>
-            </div>
+            {hasPendingInvite && (
+                <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg text-center">
+                    <p className="text-teal-700 font-medium text-sm">
+                        📧 הרשמה דרך הזמנת מאמן
+                    </p>
+                </div>
+            )}
+
+            {!hasPendingInvite && (
+                <div>
+                    <button className={`${buttonBg} text-white px-4 py-2 rounded-lg font-semibold transition`} onClick={onBack}>
+                        בחירת סוג משתמש
+                    </button>
+                </div>
+            )}
+
+            {error && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-right">
+                    {error}
+                </div>
+            )}
+
             <form className="flex flex-col gap-3" onSubmit={onSubmit}>
                 <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -35,7 +54,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                             id="firstName"
                             type="text"
                             value={registerData.firstName}
-                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                            className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                         />
                     </div>
 
@@ -52,7 +71,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                             id="lastName"
                             type="text"
                             value={registerData.lastName}
-                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                            className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                         />
                     </div>
                 </div>
@@ -70,7 +89,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                         id="email"
                         type="email"
                         value={registerData.email}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                        className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                     />
                 </div>
 
@@ -87,7 +106,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                         id="password"
                         type="password"
                         value={registerData.password}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                        className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                     />
                 </div>
 
@@ -107,7 +126,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                                     id="age"
                                     type="number"
                                     value={registerData.age}
-                                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                                    className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                                 />
                             </div>
 
@@ -124,7 +143,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                                     id="weight"
                                     type="number"
                                     value={registerData.weight}
-                                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                                    className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                                 />
                             </div>
                         </div>
@@ -142,7 +161,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                                 id="goal"
                                 type="text"
                                 value={registerData.goal}
-                                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                                className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
                             />
                         </div>
 
@@ -159,7 +178,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit 
                                 id="notes"
                                 rows={2}
                                 value={registerData.notes}
-                                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition resize-none`}
+                                className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition resize-none`}
                             />
                         </div>
                     </>

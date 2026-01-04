@@ -13,7 +13,7 @@ router.delete('/logout', logoutLimiter, logout)
 router.post('/forgot-password', apiLimiter, forgotPassword)
 router.post('/reset-password', apiLimiter, resetPassword)
 router.post('/send-client-invite', [apiLimiter, authenticateToken], sendClientInvite)
-router.get('/validate-invite-token', apiLimiter, validateInviteToken)
+router.post('/validate-invite-token', apiLimiter, validateInviteToken)
 router.post('/invite-accept-authenticated', [apiLimiter, authenticateToken], inviteAcceptAuthenticated)
 // router.post('/invite-accept', apiLimiter, inviteAccept)
 

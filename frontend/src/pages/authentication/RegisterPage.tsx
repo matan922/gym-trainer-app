@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { register } from "../../services/api"
 import RoleSelectionView from "../../components/authentication/RoleSelectionView"
@@ -22,6 +22,20 @@ const RegisterPage = () => {
 	const [error, setError] = useState<string>()
 	const [registerType, setRegisterType] = useState<"trainer" | "client" | null>(null)
 	const navigate = useNavigate()
+	const [hasPendingInvite, setHasPendingInvite] = useState(false)
+
+	useEffect(() => {
+		// Check if user came from invite link
+		const pendingToken = localStorage.getItem("pendingInviteToken")
+		setHasPendingInvite(!!pendingToken)
+
+		if (pendingToken) {
+			setHasPendingInvite(true)
+			// Automatically set to client registration
+			setRegisterType("client")
+			setRegisterData(prev => ({ ...prev, profileType: "client" }))
+		}
+	}, [])
 
 	const handleRegisterTypeChange = (type: "trainer" | "client" | null) => {
 		setRegisterType(type)
@@ -43,13 +57,28 @@ const RegisterPage = () => {
 			return
 		}
 
-		navigate('/')
+		navigate('/login')
+	}
+
+	const handleBack = () => {
+		// Don't allow going back if there's a pending invite
+		if (hasPendingInvite) return
+
+		setRegisterType(null)
 	}
 
 	return (
 		<div className={`min-h-screen flex items-center justify-center ${registerType === null ? "bg-sunset" : registerType === "trainer" ? "bg-trainer" : "bg-client"} p-4`}>
 			{!registerType && <RoleSelectionView roleChange={handleRegisterTypeChange} />}
-			{registerType && <Register registerData={registerData} onInputChange={handleInputChange} onSubmit={handleSubmit} registerType={registerType} onBack={() => { setRegisterType(null) }} />}
+			{registerType && <Register
+				registerData={registerData}
+				onInputChange={handleInputChange}
+				onSubmit={handleSubmit}
+				registerType={registerType}
+				onBack={handleBack}
+				hasPendingInvite={hasPendingInvite}
+				error={error}
+			/>}
 		</div>
 	)
 

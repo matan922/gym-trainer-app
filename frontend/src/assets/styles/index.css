@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @theme {
-	/* ========================================
-	   BRAND COLORS
-	   ======================================== */
+	/* ----- BRAND COLORS ----- */
 	
 	/* Trainer - Sunset Red */
 	--color-trainer-primary: #EF4444;
@@ -19,9 +17,7 @@
 	--color-primary-dark: #EA580C;
 
 
-	/* ========================================
-	   TEXT COLORS
-	   ======================================== */
+	/* ---- TEXT COLORS ----- */
 	
 	--color-text-dark: #1F2937;       /* Headings, important text */
 	--color-text-medium: #374151;     /* Body text, labels */
@@ -29,9 +25,7 @@
 	--color-text-lighter: #9CA3AF;    /* Placeholders, disabled states */
 
 
-	/* ========================================
-	   SURFACE COLORS
-	   ======================================== */
+	/* ----- SURFACE COLORS ----- */
 	
 	--color-surface: #FFFFFF;         /* Cards, modals */
 	--color-background: #FEF3C7;      /* Warm cream base */
@@ -43,9 +37,7 @@
 	--color-sidebar-border-client: rgba(45, 212, 191, 0.2);    /* Teal border */
 
 
-	/* ========================================
-	   SIDEBAR MENU STATES
-	   ======================================== */
+	/* ----- SIDEBAR MENU STATES ----- */
 	
 	/* Trainer Sidebar */
 	--color-sidebar-item-hover-trainer: rgba(239, 68, 68, 0.12);      /* Light red tint */
@@ -58,9 +50,7 @@
 	--color-sidebar-item-active-border-client: #14B8A6;               /* Solid teal accent */
 
 
-	/* ========================================
-	   BACKGROUND GRADIENTS
-	   ======================================== */
+	/* ----- BACKGROUND GRADIENTS ----- */
 	
 	/* Auth Pages */
 	--background-image-sunset: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 50%, #FCA5A5 100%);
@@ -71,9 +61,7 @@
 	--background-image-client: linear-gradient(135deg, #99F6E4 0%, #BAE6FD 50%, #DBEAFE 100%);
 
 
-	/* ========================================
-	   BUTTON GRADIENTS
-	   ======================================== */
+	/* ----- BUTTON GRADIENTS ----- */
 	
 	/* Primary Button (Neutral) */
 	--background-image-primary-button: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
@@ -85,6 +73,13 @@
 
 	--background-image-client-button: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
 	--background-image-client-button-hover: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
+
+	
+	/* ----- BORDERS ----- */
+	
+	--color-border-light: #E5E7EB;    /* Light borders */
+	--color-border-medium: #D1D5DB;   /* Medium borders */
+
 }
 
 body {

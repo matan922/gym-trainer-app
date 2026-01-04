@@ -3,6 +3,10 @@ export interface AuthenticatedTrainer {
 	lastName: string
 }
 
+export interface ClientInvite {
+	email: string
+}
+
 export interface Client {
 	_id?: string
 	firstName: string

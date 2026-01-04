@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router"
-import AddClientPage from "./pages/AddClientPage"
+import InviteClientPage from "./pages/InviteClientPage"
 import LoginPage from "./pages/authentication/LoginPage"
 import ClientDetailsPage from "./pages/ClientDetailsPage"
 import ClientsPage from "./pages/ClientsPage"
@@ -16,6 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/he'
 import dayjs from "dayjs"
 import VerifyEmailPage from "./pages/authentication/VerifyEmailPage"
+import InviteAcceptPage from "./pages/authentication/InviteAcceptPage"
 
 dayjs.extend(relativeTime)
 dayjs.locale('he')
@@ -28,6 +29,7 @@ function App() {
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/register" element={<RegisterPage />} />
 			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+			<Route path="/invite-accept" element={<InviteAcceptPage />} />
 
 			<Route
 				path="/dashboard"
@@ -40,7 +42,7 @@ function App() {
 				<Route index element={<DashboardMainPage />} />
 				<Route path="/dashboard/sessions" element={<SessionsPage />} />
 				<Route path="/dashboard/clients" element={<ClientsPage />} />
-				<Route path="/dashboard/new-client" element={<AddClientPage />} />
+				<Route path="/dashboard/new-client" element={<InviteClientPage />} />
 				<Route path="/dashboard/client/:id" element={<ClientDetailsPage />} />
 				<Route
 					path="/dashboard/clients/:id/workouts"
