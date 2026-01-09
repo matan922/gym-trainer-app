@@ -15,7 +15,8 @@ import TrainerClientRelation from "../models/TrainerClientRelation.js";
 export const register = async (req: Request, res: Response) => {
     try {
         const profileType = req.body.profileType;
-        const { email, password, firstName, lastName, age, weight, goal, notes } = req.body;
+        const { email, password, trainerType, age, weight, goal, notes } = req.body;
+        const { inviteToken } = req.body // If registering from trainer invite
         // check is profileType is a valid profile (client or trainer)
         if (!isValidProfileType(profileType)) {
             return res.status(400).json({ success: false, message: "Invalid profile type" });
@@ -36,14 +37,24 @@ export const register = async (req: Request, res: Response) => {
         });
 
         if (profileType === 'trainer') {
-            newUser.profiles.trainer = { firstName, lastName };
+            newUser.profiles.trainer = { trainerType };
             newUser.activeProfile = "trainer"
         } else {
-            newUser.profiles.client = { firstName, lastName, age, weight, goal, notes };
+            newUser.profiles.client = { age, weight, goal, notes };
             newUser.activeProfile = "client"
         }
 
         await newUser.save();
+
+        if (inviteToken) {
+            // If there is an invite link from trainer create relation between new user and their trainer
+            const inviteTokenInDb = await ClientInviteToken.findOne({ token: inviteToken })
+            if (inviteTokenInDb) {
+                await TrainerClientRelation.create({ clientId: newUser._id, trainerId: inviteTokenInDb?.userTrainerId, status: "active" })
+                inviteTokenInDb.usedAt = new Date()
+                await inviteTokenInDb.save()
+            }
+        }
 
         // Send verification email
         const token = crypto.randomBytes(32).toString('hex');
@@ -89,7 +100,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "You cant send an invite to yourself" })
         }
 
-        const trainerName = `${myTrainerUser?.profiles.trainer?.firstName} ${myTrainerUser?.profiles.trainer?.lastName}` || 'your trainer'
+        const trainerName = `${myTrainerUser?.firstName} ${myTrainerUser?.lastName}` || 'your trainer'
         await ClientInviteToken.findOneAndDelete({ clientEmail: email }) // delete if a token already exist for that client email
         const inviteToken = crypto.randomBytes(32).toString('hex') // new random token
         await ClientInviteToken.create({ token: inviteToken, clientEmail: email, userTrainerId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
@@ -114,10 +125,10 @@ export const sendClientInvite = async (req: Request, res: Response) => {
 export const validateInviteToken = async (req: Request, res: Response) => {
     try {
         const { inviteToken } = req.body;
-        console.log(inviteToken)
-        
-        if (!inviteToken) {
-            return res.status(401).json({ success: false, message: "Invalid token" })
+
+        const existingInviteToken = await ClientInviteToken.findOne({ token: inviteToken })
+        if (existingInviteToken?.usedAt) {
+            return res.status(401).json({ success: false, message: "הזמנה לא תקפה" })
         }
         const invite = await validateInvite(inviteToken)
 
@@ -125,7 +136,7 @@ export const validateInviteToken = async (req: Request, res: Response) => {
         const existingUser = await User.findOne({ email: invite.clientEmail });
 
         const user = await User.findById(invite.userTrainerId)
-        const trainerName = `${user?.profiles.trainer?.firstName} ${user?.profiles.trainer?.lastName}` || 'your trainer'
+        const trainerName = `${user?.firstName} ${user?.lastName}` || 'your trainer'
 
         // if userExists = false => save the inviteToken in local storage and redirect user to register (a client profile). after register make frontend detect the inviteToken in local storage and send request to create relation.
         // if userExists = true but hasClientProfile = false => save the inviteToken in local storage and redirect user to login. after login redirect them to addProfile route. after creating a profile make frontend detect the inviteToken in local storage and send request to create a relation.
@@ -146,48 +157,11 @@ export const validateInviteToken = async (req: Request, res: Response) => {
 }
 
 
-export const inviteAcceptAuthenticated = async (req: Request, res: Response) => {
-    try {
-        const userClient = req.user
-        const { inviteToken } = req.body
-        const invite = await validateInvite(inviteToken)
-        const trainerId = invite.userTrainerId
-        const clientId = userClient?.id
-        const clientEmail = invite.clientEmail
-
-        const loggedClientUser = await User.findById(clientId)
-        if (loggedClientUser && clientEmail !== loggedClientUser.email) {
-            return res.status(403).json({ message: 'Emails dont match' })
-        }
-
-        const relationExist = await TrainerClientRelation.findOne({ trainerId: trainerId, clientId: clientId })
-        if (relationExist && relationExist.status === "active") {
-            return res.status(400).json({ message: 'Relation already exist' })
-        } else if (relationExist && relationExist.status === "ended") {
-            await TrainerClientRelation.updateOne({ _id: relationExist._id }, { status: 'active', $unset: { endedAt: 1 } })
-        } else {
-            await TrainerClientRelation.create({ trainerId: trainerId, clientId: clientId, status: 'active' })
-        }
-
-        invite.usedAt = new Date()
-        await invite.save()
-        return res.status(201).json({ message: 'Created relation to trainer' })
-    } catch (error) {
-        console.log(error)
-        if (error instanceof Error &&
-            (error.message.includes("Invalid") ||
-                error.message.includes("Expired") ||
-                error.message.includes("used"))) {
-            return res.status(400).json({ success: false, message: error.message });
-        }
-        res.status(500).json({ success: false, message: "Something went wrong" })
-    }
-}
 
 export const addProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
-        const { profileType, firstName, lastName, age, weight, goal, notes } = req.body;
+        const { profileType, trainerType, age, weight, goal, notes } = req.body;
 
         if (!isValidProfileType(profileType)) {
             return res.status(400).json({ message: "Invalid profile type" });
@@ -203,9 +177,9 @@ export const addProfile = async (req: Request, res: Response) => {
         }
 
         if (profileType === 'trainer') {
-            user.profiles.trainer = { firstName, lastName };
+            user.profiles.trainer = { trainerType };
         } else {
-            user.profiles.client = { firstName, lastName, age, weight, goal, notes };
+            user.profiles.client = { age, weight, goal, notes };
         }
 
         user.activeProfile = profileType; // Switch to new profile
@@ -238,8 +212,8 @@ export const changeProfile = async (req: Request, res: Response) => {
         user.activeProfile = targetProfile;
         await user.save()
 
-        const accessToken = generateAccessToken({ id: user._id, activeProfile: user.activeProfile });
-        const refreshToken = generateRefreshToken({ id: user._id, activeProfile: user.activeProfile });
+        const accessToken = generateAccessToken({ id: user._id, activeProfile: user.activeProfile, firstName: user.firstName, lastName: user.lastName });
+        const refreshToken = generateRefreshToken({ id: user._id, activeProfile: user.activeProfile, firstName: user.firstName, lastName: user.lastName });
 
         // Delete old token and create a new one
         await RefreshToken.deleteOne({ userId: user._id });
@@ -322,8 +296,8 @@ export const login = async (req: Request, res: Response) => {
         if (await bcrypt.compare(password, user.password)) {
             await user.save()
             await RefreshToken.deleteOne({ userId: user._id }) // Delete refresh token if already existing for trainer
-            const accessToken = generateAccessToken({ id: user._id, activeProfile: loginAs })
-            const refreshToken = generateRefreshToken({ id: user._id, activeProfile: loginAs })
+            const accessToken = generateAccessToken({ id: user._id, activeProfile: loginAs, firstName: user.firstName, lastName: user.lastName })
+            const refreshToken = generateRefreshToken({ id: user._id, activeProfile: loginAs, firstName: user.firstName, lastName: user.lastName })
 
 
             // store in httponly cookie
@@ -367,8 +341,8 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, async (err: any, payload: any) => {
             if (err) return res.status(403).json({ success: false, message: "Invalid token" })
 
-            const accessToken = generateAccessToken({ id: payload.id, activeProfile: payload.activeProfile })
-            const newRefreshToken = generateRefreshToken({ id: payload.id, activeProfile: payload.activeProfile })
+            const accessToken = generateAccessToken({ id: payload.id, activeProfile: payload.activeProfile, firstName: payload.firstName, lastName: payload.lastName })
+            const newRefreshToken = generateRefreshToken({ id: payload.id, activeProfile: payload.activeProfile, firstName: payload.firstName, lastName: payload.lastName })
 
             await RefreshToken.findOneAndUpdate(
                 { token: refreshToken },

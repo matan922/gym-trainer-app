@@ -7,15 +7,14 @@ const Schema = mongoose.Schema;
 export interface IUser {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
   emailVerified: boolean;
   profiles: {
     trainer?: {
-      firstName: string;
-      lastName: string;
+      trainerType: string;
     };
     client?: {
-      firstName: string;
-      lastName: string;
       age?: number;
       weight?: number;
       goal?: string;
@@ -35,6 +34,14 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
     trim: true
+  },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
   },
   password: {
     type: String,
@@ -62,6 +69,13 @@ const userSchema = new Schema({
     default: Date.now
   }
 });
+
+userSchema.pre("save", function (next) {
+  let user = this;
+  user.firstName = user.firstName.replace(/ /g, "")
+  user.lastName = user.lastName.replace(/ /g, "")
+  next()
+})
 
 
 export default mongoose.model<IUser>("User", userSchema);

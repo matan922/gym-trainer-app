@@ -8,6 +8,7 @@ import clientRoutes from "./routes/clientRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 import sessionRoutes from "./routes/sessionRoutes.js";
+import trainerRoutes from './routes/trainerRoutes.js';
 
 connectDB();
 
@@ -25,6 +26,7 @@ app.use(cookieParser())
 app.use('/clients', clientRoutes)
 app.use('/auth', authRoutes)
 app.use('/sessions', sessionRoutes)
+app.use('/trainer', trainerRoutes)
 
 app.get("/health", (req, res) => {
     res.json({ health: "Success" });

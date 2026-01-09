@@ -33,51 +33,41 @@ function DashboardLayout() {
 
 	return (
 		<div className="sm:grid sm:grid-cols-[280px_1fr] min-h-screen">
+			{/* Mobile Overlay */}
+			{hamburgerOpen && (
+				<div
+					className="fixed inset-0 bg-black/50 z-40 sm:hidden"
+					onClick={handleHamburger}
+				/>
+			)}
+
+			{/* Sidebar */}
 			<div
-				className={`fixed inset-y-0 w-[280px] z-50 bg-surface shadow-2xl border-r border-gray-100 text-white flex flex-col gap-4 p-4 transition-transform duration-300 ${hamburgerOpen ? "translate-x-0" : "translate-x-full"} sm:relative sm:translate-x-0 sm:flex`}
+				className={`fixed inset-y-0 right-0 w-[280px] z-50 bg-surface shadow-2xl border-l border-border-light flex flex-col gap-4 p-4 transition-transform duration-300 ${hamburgerOpen ? "translate-x-0" : "translate-x-full"
+					} sm:relative sm:translate-x-0 sm:flex sm:right-auto`}
 			>
+				{/* Close Button (Mobile Only) */}
 				<button
 					type="button"
 					onClick={handleHamburger}
-					className="sm:hidden text-white bg-gray-800 "
+					className="sm:hidden self-end p-2 rounded-lg hover:bg-gray-100 transition"
 				>
 					<svg
-						className="w-10 h-10"
+						className="w-6 h-6 text-text-dark"
 						viewBox="0 0 24 24"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
-						role="img"
-						aria-label="Toggle menu"
 					>
-						<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-						<g
-							id="SVGRepo_tracerCarrier"
+						<path
+							d="M18 6L6 18M6 6L18 18"
+							stroke="currentColor"
+							strokeWidth="2"
 							strokeLinecap="round"
 							strokeLinejoin="round"
-						></g>
-						<g id="SVGRepo_iconCarrier">
-							{" "}
-							<path
-								d="M20 7L4 7"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-							></path>{" "}
-							<path
-								d="M20 12L4 12"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-							></path>{" "}
-							<path
-								d="M20 17L4 17"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-							></path>{" "}
-						</g>
+						/>
 					</svg>
 				</button>
+
 				{/* Navigation Items */}
 				<nav className="space-y-2 mb-6">
 					<button
@@ -130,59 +120,42 @@ function DashboardLayout() {
 				<button
 					type="button"
 					onClick={handleLogout}
-					className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md transition-all font-medium border border-transparent hover:border-red-200"
+					className="w-full flex items-center gap-4 px-5 py-4 mt-auto rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md transition-all font-medium border border-transparent hover:border-red-200"
 				>
 					<span className="text-2xl">🚪</span>
 					<span className="flex-1 text-right">התנתקות</span>
 				</button>
 			</div>
 
-			<button
-				type="button"
-				onClick={handleHamburger}
-				className="sm:hidden text-white bg-gray-800 p-2"
-			>
-				<svg
-					className="w-10 h-10"
-					viewBox="0 0 24 24"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
+			{/* Main Content Area */}
+			<div className="relative min-h-screen">
+				{/* Mobile Menu Button */}
+				<button
+					type="button"
+					onClick={handleHamburger}
+					className="sm:hidden fixed top-4 left-4 z-30 p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition"
 				>
-					<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-					<g
-						id="SVGRepo_tracerCarrier"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					></g>
-					<g id="SVGRepo_iconCarrier">
-						{" "}
+					<svg
+						className="w-6 h-6"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
 						<path
-							d="M20 7L4 7"
+							d="M4 6h16M4 12h16M4 18h16"
 							stroke="currentColor"
-							strokeWidth="1.5"
+							strokeWidth="2"
 							strokeLinecap="round"
-						></path>{" "}
-						<path
-							d="M20 12L4 12"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-						></path>{" "}
-						<path
-							d="M20 17L4 17"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-						></path>{" "}
-					</g>
-				</svg>
-			</button>
+						/>
+					</svg>
+				</button>
 
-			<div className="p-4 bg-trainer min-h-screen">
-				<Outlet />
+				{/* Page Content */}
+				<div className="bg-trainer min-h-screen">
+					<Outlet />
+				</div>
 			</div>
-		</div>
-	)
+		</div>)
 }
 
 export default DashboardLayout

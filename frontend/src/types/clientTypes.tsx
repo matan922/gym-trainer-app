@@ -64,4 +64,7 @@ export interface RegisterData {
 	goal: string
 	notes: string
 	profileType: "trainer" | "client" | null
+	inviteToken?: string
 }
+
+

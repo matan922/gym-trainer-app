@@ -3,8 +3,6 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const clientProfileSchema = new Schema({
-  firstName: { type: String, trim: true, required: true },
-  lastName: { type: String, trim: true, required: true },
   age: { type: Number },
   weight: { type: Number },
   goal: { type: String, trim: true },
@@ -22,12 +20,6 @@ const clientProfileSchema = new Schema({
   }]
 }, { _id: false });
 
-clientProfileSchema.pre("save", function (next) {
-  let user = this;
-  user.firstName = user.firstName.replace(/ /g, "")
-  user.lastName = user.lastName.replace(/ /g, "")
-  next()
-})
 
 
 // clientSchema.pre('save', async function(next) {

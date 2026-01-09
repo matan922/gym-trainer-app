@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router"
+import { useNavigate, useSearchParams } from "react-router"
 import { register } from "../../services/api"
 import RoleSelectionView from "../../components/authentication/RoleSelectionView"
 import Register from "../../components/authentication/Register"
@@ -16,26 +16,24 @@ const RegisterPage = () => {
 		weight: "",
 		goal: "",
 		notes: "",
-		profileType: null
-
+		profileType: null,
+		inviteToken: ""
 	})
 	const [error, setError] = useState<string>()
 	const [registerType, setRegisterType] = useState<"trainer" | "client" | null>(null)
 	const navigate = useNavigate()
-	const [hasPendingInvite, setHasPendingInvite] = useState(false)
+	const [searchParams] = useSearchParams()
 
+	// checks if there is pending invite token from a trainer
+	const pendingToken = searchParams.get('token')
+	const hasPendingInvite = Boolean(pendingToken)
 	useEffect(() => {
-		// Check if user came from invite link
-		const pendingToken = localStorage.getItem("pendingInviteToken")
-		setHasPendingInvite(!!pendingToken)
+		if (!pendingToken) return // if none return and continue registration normally
 
-		if (pendingToken) {
-			setHasPendingInvite(true)
-			// Automatically set to client registration
-			setRegisterType("client")
-			setRegisterData(prev => ({ ...prev, profileType: "client" }))
-		}
-	}, [])
+		// Automatically set to client registration
+		setRegisterType("client")
+		setRegisterData(prev => ({ ...prev, profileType: "client", inviteToken: pendingToken }))
+	}, [pendingToken])
 
 	const handleRegisterTypeChange = (type: "trainer" | "client" | null) => {
 		setRegisterType(type)
