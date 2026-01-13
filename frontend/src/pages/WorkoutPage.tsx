@@ -49,58 +49,77 @@ const WorkoutPage = () => {
 	}
 
 	return (
-		<div className="p-8 w-full flex flex-col items-center">
-			<div className="max-w-lg w-full">
-				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-					<div className="flex justify-between items-center">
-						<h1 className="text-3xl font-bold text-gray-800">פרטי אימון</h1>
+		<div className="min-h-screen bg-trainer p-4 lg:p-8">
+			<div className="max-w-4xl mx-auto">
+				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{/* Header */}
+					<div className="flex justify-between items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<div className="flex items-center gap-3">
+							<span className="text-4xl">💪</span>
+							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">פרטי אימון</h1>
+						</div>
 						<div className="flex gap-2">
 							<button
 								onClick={() => setIsEditOpen(true)}
-								className="px-4 py-2 rounded shadow bg-green-500 hover:bg-green-600 text-white transition-colors"
+								className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
 							>
-								עריכה
+								✏️ עריכה
 							</button>
 							<button
 								onClick={handleDeleteWorkout}
-								className="px-4 py-2 rounded shadow bg-red-500 hover:bg-red-600 text-white transition-colors"
+								className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-md transition-all"
 							>
-								מחק
+								🗑️ מחק
 							</button>
 						</div>
 					</div>
 
-					{workout?.notes && (
-						<div className="flex flex-col gap-1">
-							<span className="font-semibold text-gray-700">הערות:</span>
-							<span className="text-gray-600">{workout.notes}</span>
+					{/* Notes */}
+					{workout && (
+						<div className="mb-6 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
+							<div className="flex items-center gap-2 mb-2">
+								<span className="text-xl">📝</span>
+								<span className="font-semibold text-text-medium">הערות</span>
+							</div>
+							<p className="text-text-dark mr-7">{workout.workoutName}</p>
 						</div>
 					)}
 
+					{/* Exercises Section */}
 					<div className="flex flex-col gap-4">
-						<h2 className="text-xl font-semibold text-gray-800">תרגילים</h2>
-						{workout?.exercises && workout.exercises.length > 0 ? (
+						<div className="flex items-center gap-2 pb-3 border-b border-trainer-primary/20">
+							<span className="text-2xl">🏋️</span>
+							<h2 className="text-2xl font-bold text-trainer-dark">תרגילים</h2>
+							<span className="text-lg text-trainer-primary font-semibold">
+								({workout?.exercises?.length || 0})
+							</span>
+						</div>
+
+						{workout && workout.exercises.length > 0 ? (
 							workout.exercises.map((exercise, index) => (
 								<div
 									key={index}
-									className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+									className="p-4 bg-white rounded-lg border border-trainer-primary/20 shadow-md"
 								>
-									<h3 className="font-semibold text-lg text-gray-800 mb-2">
+									<h3 className="font-bold text-lg text-trainer-dark mb-3 flex items-center gap-2">
+										<span className="text-xl">🏋️</span>
 										{exercise.name}
 									</h3>
-									<div className="flex gap-6 text-sm text-gray-600">
-										<span>סטים: {exercise.sets}</span>
-										<span>חזרות: {exercise.reps}</span>
+									<div className="flex gap-4 text-sm text-text-medium mr-7">
+										<span>🔢 {exercise.sets} סטים</span>
+										<span>🔁 {exercise.reps} חזרות</span>
 										{exercise.rest >= 60 ? (
-											<span>מנוחה: {exercise.rest / 60} דקות</span>
+											<span>⏱️ {exercise.rest / 60} דקות מנוחה</span>
 										) : (
-											<span>מנוחה: {exercise.rest} שניות</span>
+											<span>⏱️ {exercise.rest} שניות מנוחה</span>
 										)}
 									</div>
 								</div>
 							))
 						) : (
-							<p className="text-center text-gray-500">אין תרגילים</p>
+							<div className="text-center py-12">
+								<p className="text-text-light text-lg">אין תרגילים</p>
+							</div>
 						)}
 					</div>
 				</div>

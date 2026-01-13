@@ -37,21 +37,35 @@ function ClientsPage() {
 	}
 
 	return (
-		<div className="p-8 w-full flex flex-col items-center">
-			<div className="max-w-lg w-full">
-				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-					<h1 className="text-3xl font-bold text-gray-800 text-center">
-						מתאמנים
-					</h1>
-					<div className="flex flex-row justify-center">
-						<input
-							onChange={(e) => handleSearchChange(e)}
-							className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none max-w-50 "
-							placeholder="חיפוש"
-							type="text"
-						/>
+		<div className="min-h-screen bg-trainer p-4 lg:p-8">
+			<div className="max-w-4xl mx-auto">
+				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{/* Header */}
+					<div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<span className="text-4xl">💪</span>
+						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
+							מתאמנים
+						</h1>
+						<span className="text-lg text-trainer-primary font-semibold mr-auto">
+							({clients.length})
+						</span>
 					</div>
-					<div className="flex flex-col gap-4">
+
+					{/* Search */}
+					<div className="mb-6">
+						<div className="relative">
+							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">🔍</span>
+							<input
+								onChange={(e) => handleSearchChange(e)}
+								className="w-full pr-12 pl-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+								placeholder="חיפוש לפי שם..."
+								type="text"
+							/>
+						</div>
+					</div>
+
+					{/* Clients Grid */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
 						{clients.length > 0 ? (
 							clients.map((client) => (
 								<ClientCard
@@ -61,7 +75,9 @@ function ClientsPage() {
 								/>
 							))
 						) : (
-							<p className="text-center text-gray-500">אין מתאמנים</p>
+							<div className="col-span-full text-center py-12">
+								<p className="text-text-light text-lg">אין מתאמנים</p>
+							</div>
 						)}
 					</div>
 				</div>

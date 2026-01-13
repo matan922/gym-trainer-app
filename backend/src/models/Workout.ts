@@ -13,7 +13,7 @@ const workoutSchema = new Schema({
     trainerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     assignedDate: { type: Date, default: Date.now },
-    notes: String,
+    workoutName: { type: String },
     exercises: [exerciseSchema]
 });
 

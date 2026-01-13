@@ -60,41 +60,49 @@ const EditWorkoutModal = ({
 	return reactDom.createPortal(
 		<>
 			<div
-				className="fixed inset-0 bg-gradient-to-b from-gray-900 to-gray-800 opacity-50 z-40"
+				className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
 				onClick={onClose}
 			/>
 
-			<div className="fixed inset-0 flex items-center justify-center p-8 z-50 pointer-events-none">
-				<div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto pointer-events-auto">
-					<div className="p-8">
-						<div className="flex justify-between items-center mb-6">
-							<h2 className="text-3xl font-bold text-gray-800">עריכת אימון</h2>
+			<div className="fixed inset-0 flex items-center justify-center p-4 lg:p-8 z-50 pointer-events-none">
+				<div className="bg-surface rounded-xl shadow-2xl border border-trainer-primary/20 max-w-3xl w-full max-h-[90vh] overflow-auto pointer-events-auto">
+					<div className="p-6 lg:p-8">
+						{/* Header */}
+						<div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-trainer-primary/20">
+							<div className="flex items-center gap-3">
+								<span className="text-3xl">✏️</span>
+								<h2 className="text-3xl font-bold text-trainer-dark">עריכת אימון</h2>
+							</div>
 							<button
 								onClick={onClose}
 								type="button"
-								className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+								className="text-text-medium hover:text-trainer-primary text-3xl font-bold transition-colors"
 							>
 								×
 							</button>
 						</div>
 
 						<form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+							{/* Exercises */}
 							{workout.exercises.map((exercise, index) => (
 								<div
 									key={index}
-									className="p-6 bg-gray-50 rounded-lg border border-gray-200"
+									className="p-5 bg-white rounded-lg border border-trainer-primary/20 shadow-md"
 								>
-									<div className="flex justify-between items-center mb-4">
-										<h3 className="text-xl font-semibold text-gray-800">
-											תרגיל {index + 1}
-										</h3>
+									<div className="flex justify-between items-center mb-4 pb-3 border-b border-trainer-primary/10">
+										<div className="flex items-center gap-2">
+											<span className="text-2xl">🏋️</span>
+											<h3 className="text-xl font-bold text-trainer-dark">
+												תרגיל {index + 1}
+											</h3>
+										</div>
 										{workout.exercises.length > 1 && (
 											<button
 												onClick={() => handleDeleteExercise(index)}
 												type="button"
-												className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all"
 											>
-												מחק
+												🗑️ מחק
 											</button>
 										)}
 									</div>
@@ -104,38 +112,47 @@ const EditWorkoutModal = ({
 											onChange={(e) => handleExercisesChange(e, index)}
 											name="name"
 											placeholder="שם התרגיל"
-											className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none"
+											className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
 											type="text"
 											value={exercise.name}
 										/>
 
-										<div className="grid grid-cols-3 gap-4">
-											<input
-												onChange={(e) => handleExercisesChange(e, index)}
-												name="sets"
-												placeholder="סטים"
-												value={exercise.sets === 0 ? "" : exercise.sets}
-												className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none"
-												type="number"
-											/>
+										<div className="grid grid-cols-3 gap-3">
+											<div>
+												<label className="block text-sm text-text-medium mb-1 text-right">🔢 סטים</label>
+												<input
+													onChange={(e) => handleExercisesChange(e, index)}
+													name="sets"
+													placeholder="0"
+													value={exercise.sets === 0 ? "" : exercise.sets}
+													className="w-full px-3 py-2 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+													type="number"
+												/>
+											</div>
 
-											<input
-												onChange={(e) => handleExercisesChange(e, index)}
-												name="reps"
-												placeholder="חזרות"
-												value={exercise.reps === 0 ? "" : exercise.reps}
-												className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none"
-												type="number"
-											/>
+											<div>
+												<label className="block text-sm text-text-medium mb-1 text-right">🔁 חזרות</label>
+												<input
+													onChange={(e) => handleExercisesChange(e, index)}
+													name="reps"
+													placeholder="0"
+													value={exercise.reps === 0 ? "" : exercise.reps}
+													className="w-full px-3 py-2 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+													type="number"
+												/>
+											</div>
 
-											<input
-												onChange={(e) => handleExercisesChange(e, index)}
-												name="rest"
-												placeholder="מנוחה (שניות)"
-												value={exercise.rest === 0 ? "" : exercise.rest}
-												className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none"
-												type="number"
-											/>
+											<div>
+												<label className="block text-sm text-text-medium mb-1 text-right">⏱️ מנוחה (שניות)</label>
+												<input
+													onChange={(e) => handleExercisesChange(e, index)}
+													name="rest"
+													placeholder="0"
+													value={exercise.rest === 0 ? "" : exercise.rest}
+													className="w-full px-3 py-2 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+													type="number"
+												/>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -143,34 +160,43 @@ const EditWorkoutModal = ({
 
 							<button
 								onClick={handleAddExercise}
-								className="p-2 shadow rounded-sm bg-green-500 hover:bg-green-600 text-white transition-colors"
+								className="p-3 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2"
 								type="button"
 							>
-								+ הוסף תרגיל
+								<span>➕</span>
+								הוסף תרגיל
 							</button>
 
-							<input
-								onChange={handleWorkoutChange}
-								name="notes"
-								placeholder="הערות לאימון"
-								value={workout.notes}
-								className="w-full shadow rounded-sm p-2 bg-gray-100 focus:bg-gray-300 outline-none"
-								type="text"
-							/>
+							{/* Notes */}
+							<div>
+								<label className="block text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+									<span className="text-lg">📝</span>
+									הערות לאימון
+								</label>
+								<input
+									onChange={handleWorkoutChange}
+									name="notes"
+									placeholder="הערות כלליות על האימון..."
+									value={workout.notes}
+									className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+									type="text"
+								/>
+							</div>
 
-							<div className="flex gap-4 justify-center pt-4">
+							{/* Action Buttons */}
+							<div className="flex gap-3 justify-center pt-4 border-t-2 border-trainer-primary/20">
 								<button
-									className="px-4 py-2 shadow rounded bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+									className="px-6 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
 									type="submit"
 								>
-									אישור
+									✅ אישור
 								</button>
 								<button
 									onClick={onClose}
 									type="button"
-									className="px-4 py-2 shadow rounded bg-gray-100 hover:bg-gray-200 transition-colors"
+									className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold transition-all"
 								>
-									ביטול
+									❌ ביטול
 								</button>
 							</div>
 						</form>

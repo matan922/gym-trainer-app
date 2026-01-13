@@ -26,8 +26,8 @@ export const getClients = async (req: Request, res: Response) => {
 
             return {
                 _id: user._id,
-                firstName: user.profiles.client?.firstName,
-                lastName: user.profiles.client?.lastName,
+                firstName: user.firstName,
+                lastName: user.lastName,    
                 age: user.profiles.client?.age,
                 weight: user.profiles.client?.weight,
                 goal: user.profiles.client?.goal,

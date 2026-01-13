@@ -7,12 +7,9 @@ export const getSessions = async (req: Request, res: Response) => {
         const user = req.user
 
         // Get ALL sessions for this trainer
-        const sessions = await Session.find({ trainerId: user?.id })
-            .populate({
-                path: "clientId",
-                select: "profiles.client"
-            })
+        const sessions = await Session.find({ trainerId: user?.id }).populate({ path: "clientId", select: "profiles.client" }).populate({ path: "workoutId" })
 
+        console.log(sessions)
         res.status(200).json(sessions)
     } catch (error) {
         return res.status(500).json({ "error": error })
@@ -22,7 +19,7 @@ export const getSessions = async (req: Request, res: Response) => {
 export const postSession = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const { clientId, startTime, sessionDate, endTime, sessionType, status } = req.body
+        const { clientId, startTime, sessionDate, endTime, sessionType, status, workoutName, workoutId } = req.body
 
         const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
         if (!relation) {
@@ -39,7 +36,8 @@ export const postSession = async (req: Request, res: Response) => {
             startTime: new Date(startTime),
             endTime: sessionEndTime,
             sessionType: sessionType,
-            status: status
+            status: status,
+            workoutName: workoutName
         })
 
         await session.save()
@@ -47,7 +45,39 @@ export const postSession = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ "error": error })
+        return res.status(500).json({ error: error })
+    }
+}
+
+export const updateSession = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        const { sessionId } = req.params
+        const { clientId, startTime, sessionDate, endTime, sessionType, status, workoutName, workoutId } = req.body
+
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: 'active' })
+        if (!relation) {
+            return res.status(400).json({ message: "No relation between this client and you" })
+        }
+
+        const session = await Session.findById(sessionId)
+        if (!session) {
+            return res.status(400).json({ message: "Session dont exist" })
+        }
+
+        session.startTime = startTime || session.startTime
+        session.sessionDate = sessionDate || session.sessionDate
+        session.endTime = endTime || session.endTime
+        session.sessionType = sessionType || session.sessionType
+        session.status = status || session.status
+        session.workoutName = workoutName || session.workoutName
+        session.workoutId = workoutId || session.workoutId
+        await session.save()
+        return res.status(200).json({ message: "Updated session", session })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: error })
+
     }
 }
 

@@ -15,6 +15,7 @@ const SessionsPage = () => {
 			try {
 				const response = await getSessions()
 				if (response) {
+					console.log(response)
 					setSessionsData(response)
 					setError(null)
 				} else {
@@ -68,46 +69,116 @@ const SessionsPage = () => {
 
 
 	return (
-		<div className="p-8 w-full flex flex-col items-center">
-			<div className="max-w-lg w-full">
-				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-					<h1 className="text-3xl font-bold text-gray-800 text-center">
-						אימונים
-					</h1>
-					{/* <div className="flex flex-row justify-center">צריך להיות פילטור</div> */}
+		<div className="min-h-screen bg-trainer p-4 lg:p-8">
+			<div className="max-w-4xl mx-auto">
+				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{/* Header */}
+					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<span className="text-4xl">📅</span>
+						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
+							אימונים
+						</h1>
+						<span className="text-lg text-trainer-primary font-semibold">
+							({sessionsData.length})
+						</span>
+					</div>
+
+					{/* Sessions List */}
 					<div className="flex flex-col gap-4">
-						{error && <div className="text-red-500">{error}</div>}
+						{error && (
+							<div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-right">
+								{error}
+							</div>
+						)}
 						{sessionsData.length > 0 ? (
 							sessionsData.map((session, index) => (
 								<div
 									key={index}
-									className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+									className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"
 								>
-									<div className="flex justify-between items-center">
-										<h3 className="text-lg font-semibold text-gray-800">
-											{session.clientId.firstName} {session.clientId.lastName}
-										</h3>
+									{/* Header with client name and actions */}
+									<div className="flex justify-between items-start mb-4 pb-3 border-b border-trainer-primary/10">
+										<div className="flex items-center gap-2">
+											<span className="text-2xl">👤</span>
+											<h3 className="text-xl font-bold text-trainer-dark">
+												{session.clientId.firstName} {session.clientId.lastName}
+											</h3>
+										</div>
 										<div className="flex gap-2 items-center">
 											<SessionStatusBadge session={session} editable={true} onStatusChange={handleStatusChange} />
 											<button
 												onClick={() => setEditingSession(session)}
-												className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition-colors"
+												className="px-3 py-1 bg-trainer-primary hover:bg-trainer-dark text-white rounded-lg text-sm font-medium transition-all"
 											>
-												עריכה
+												✏️ עריכה
 											</button>
 										</div>
 									</div>
-									<div className="mt-2 text-sm text-gray-600 space-y-1">
-										<p>{dayjs(session.sessionDate).format("DD/MM/YY")}</p>
-										<p>{dayjs(session.startTime).format('HH:mm')} - {dayjs(session.endTime).format('HH:mm')}</p>
-										<span className={`text-xs px-2 py-1 rounded ${session.sessionType === 'Online' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
-											{session.sessionType === 'Online' ? 'אונליין' : 'סטודיו'}
-										</span>
+
+									{/* Session Details */}
+									<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+										{/* Date */}
+										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+											<span className="text-lg">📅</span>
+											<div className="flex flex-col">
+												<span className="text-xs text-text-medium">תאריך</span>
+												<span className="text-sm font-semibold text-text-dark">
+													{dayjs(session.sessionDate).format("DD/MM/YY")}
+												</span>
+											</div>
+										</div>
+
+										{/* Time */}
+										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+											<span className="text-lg">🕐</span>
+											<div className="flex flex-col">
+												<span className="text-xs text-text-medium">שעה</span>
+												<span className="text-sm font-semibold text-text-dark">
+													{dayjs(session.startTime).format('HH:mm')} - {dayjs(session.endTime).format('HH:mm')}
+												</span>
+											</div>
+										</div>
+
+										{/* Session Type */}
+										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+											<span className="text-lg">{session.sessionType === 'Online' ? '💻' : '🏋️'}</span>
+											<div className="flex flex-col">
+												<span className="text-xs text-text-medium">סוג</span>
+												<span className="text-sm font-semibold text-text-dark">
+													{session.sessionType === 'Online' ? 'אונליין' : 'סטודיו'}
+												</span>
+											</div>
+										</div>
+
+										{/* Workout */}
+										{session.workoutId ? (
+											<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+												<span className="text-lg">💪</span>
+												<div className="flex flex-col">
+													<span className="text-xs text-text-medium">אימון</span>
+													<span className="text-sm font-semibold text-text-dark">
+														{session.workoutId.workoutName || `${session.workoutId.exercises?.length || 0} תרגילים`}
+													</span>
+												</div>
+											</div>
+										) : (
+											<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg opacity-50">
+												<span className="text-lg">💪</span>
+												<div className="flex flex-col">
+													<span className="text-xs text-text-medium">אימון</span>
+													<span className="text-sm font-semibold text-text-dark">
+														ללא אימון מוגדר
+													</span>
+												</div>
+											</div>
+										)}
 									</div>
 								</div>
 							))
 						) : (
-							<p className="text-center text-gray-500">אין אימונים</p>
+							<div className="text-center py-12">
+								<p className="text-text-light text-lg">אין אימונים</p>
+							</div>
 						)}
 					</div>
 				</div>

@@ -123,7 +123,6 @@ const DashboardMainPage = () => {
 							</div>
 						) : (
 							<div className="text-center py-8">
-								<div className="text-4xl mb-2">🎉</div>
 								<p className="text-text-light text-sm">אין אימונים להיום</p>
 							</div>
 						)}

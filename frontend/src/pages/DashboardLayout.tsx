@@ -32,7 +32,7 @@ function DashboardLayout() {
 	}
 
 	return (
-		<div className="sm:grid sm:grid-cols-[280px_1fr] min-h-screen">
+		<div className="sm:grid sm:grid-cols-[280px_1fr] min-h-screen max-h-screen sm:overflow-hidden">
 			{/* Mobile Overlay */}
 			{hamburgerOpen && (
 				<div
@@ -41,10 +41,10 @@ function DashboardLayout() {
 				/>
 			)}
 
-			{/* Sidebar */}
+			{/* Sidebar - Fixed on desktop */}
 			<div
-				className={`fixed inset-y-0 right-0 w-[280px] z-50 bg-surface shadow-2xl border-l border-border-light flex flex-col gap-4 p-4 transition-transform duration-300 ${hamburgerOpen ? "translate-x-0" : "translate-x-full"
-					} sm:relative sm:translate-x-0 sm:flex sm:right-auto`}
+				className={`fixed inset-y-0 right-0 w-[280px] z-50 bg-surface shadow-2xl border-l border-border-light flex flex-col gap-4 p-4 transition-transform duration-300 overflow-y-auto ${hamburgerOpen ? "translate-x-0" : "translate-x-full"
+					} sm:translate-x-0 sm:flex sm:right-auto sm:sticky sm:top-0 sm:h-screen`}
 			>
 				{/* Close Button (Mobile Only) */}
 				<button
@@ -127,33 +127,33 @@ function DashboardLayout() {
 				</button>
 			</div>
 
-			{/* Main Content Area */}
-			<div className="relative min-h-screen">
-				{/* Mobile Menu Button */}
-				<button
-					type="button"
-					onClick={handleHamburger}
-					className="sm:hidden fixed top-4 left-4 z-30 p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition"
-				>
-					<svg
-						className="w-6 h-6"
-						viewBox="0 0 24 24"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
+			{/* Main Content Area - Scrollable */}
+			<div className="relative min-h-screen bg-trainer sm:h-screen sm:overflow-y-auto">
+				{/* Mobile Menu Button - Sticky */}
+				<div className="sm:hidden sticky top-4 z-30 flex justify-end p-4">
+					<button
+						type="button"
+						onClick={handleHamburger}
+						className="p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition"
 					>
-						<path
-							d="M4 6h16M4 12h16M4 18h16"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-						/>
-					</svg>
-				</button>
+						<svg
+							className="w-6 h-6"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M4 6h16M4 12h16M4 18h16M4 18h16"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+							/>
+						</svg>
+					</button>
+				</div>
 
 				{/* Page Content */}
-				<div className="bg-trainer min-h-screen">
-					<Outlet />
-				</div>
+				<Outlet />
 			</div>
 		</div>)
 }

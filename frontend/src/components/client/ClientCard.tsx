@@ -12,17 +12,30 @@ function ClientCard({ client, onCard }: ClientCardProps) {
 			onClick={onCard}
 			key={client._id}
 			type="button"
-			className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+			className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 hover:shadow-2xl hover:border-trainer-primary/30 hover:bg-sidebar-item-hover-trainer transition-all text-right"
 		>
-			<div className="flex flex-col gap-1 items-start">
-				<div className="font-semibold">
-					{client.firstName} {client.lastName}
+			<div className="flex flex-col gap-3">
+				{/* Client Name */}
+				<div className="flex items-center gap-2 pb-3 border-b-2 border-trainer-primary/20">
+					<span className="text-2xl">👤</span>
+					<h3 className="text-xl font-bold text-trainer-dark">
+						{client.firstName} {client.lastName}
+					</h3>
 				</div>
-				<div className="flex justify-between w-full">
-					<span className="text-sm text-gray-600">{client.goal}</span>
-					<span className="text-sm text-gray-600">אימון אחרון: {client.lastSessionDate && new Date(client.lastSessionDate).toDateString() === new Date().toDateString()
-						? "היום"
-						: dayjs(client.lastSessionDate).fromNow()}
+
+				{/* Goal */}
+				<div className="flex items-center gap-2">
+					<span className="text-lg">🎯</span>
+					<span className="text-sm text-text-medium font-medium">{client.goal}</span>
+				</div>
+
+				{/* Last Session */}
+				<div className="flex items-center justify-between p-3 bg-white rounded-lg border-r-4 border-trainer-primary">
+					<span className="text-sm text-text-light">אימון אחרון:</span>
+					<span className="text-sm font-bold text-trainer-primary">
+						{client.lastSessionDate && new Date(client.lastSessionDate).toDateString() === new Date().toDateString()
+							? "היום"
+							: dayjs(client.lastSessionDate).fromNow()}
 					</span>
 				</div>
 			</div>

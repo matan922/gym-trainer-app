@@ -21,7 +21,7 @@ export interface Client {
 
 export interface Workout {
 	_id?: string
-	notes: string
+	workoutName: string
 	// date: Date;
 	exercises: Exercise[] | []
 }
@@ -46,7 +46,9 @@ export interface Session {
 	startTime: Date
 	endTime: Date
 	sessionType: string
+	workoutName?: string
 	status: string
+	workoutId?: Workout
 }
 
 export interface SessionRequest extends Omit<Session, "clientId" | "endTime"> {

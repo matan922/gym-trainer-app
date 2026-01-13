@@ -15,7 +15,7 @@ import TrainerClientRelation from "../models/TrainerClientRelation.js";
 export const register = async (req: Request, res: Response) => {
     try {
         const profileType = req.body.profileType;
-        const { email, password, trainerType, age, weight, goal, notes } = req.body;
+        const { email, password, trainerType, firstName, lastName, age, weight, goal, notes } = req.body;
         const { inviteToken } = req.body // If registering from trainer invite
         // check is profileType is a valid profile (client or trainer)
         if (!isValidProfileType(profileType)) {
@@ -32,6 +32,8 @@ export const register = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             email,
+            firstName,
+            lastName,
             password: hashedPassword,
             activeProfile: profileType
         });

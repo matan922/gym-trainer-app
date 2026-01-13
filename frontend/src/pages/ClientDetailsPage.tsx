@@ -7,6 +7,7 @@ import type { Client } from "../types/clientTypes"
 
 const ClientDetailsPage = () => {
 	const [client, setClient] = useState<Client | null>(null)
+	const [clientId, setClientId] = useState<string>('')
 	const { id } = useParams()
 	const navigate = useNavigate()
 	const [editMode, setEditMode] = useState<boolean>(false)
@@ -16,7 +17,9 @@ const ClientDetailsPage = () => {
 			try {
 				if (id) {
 					const response = await getClient(id)
-					setClient(response.data.client)
+					console.log(response.data.client.profiles.client)
+					setClient(response.data.client.profiles.client)
+					setClientId(response.data.client._id)
 				}
 			} catch (error) {
 				console.error("Error fetching client:", error)
@@ -47,19 +50,23 @@ const ClientDetailsPage = () => {
 
 	// TODO FUTURE: PUT IT ALL IN COMPONENTS
 	return (
-		<div className="p-8 w-full flex flex-col items-center">
-			<div className="max-w-lg w-full">
-				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-					<div className="flex justify-between items-center">
-						<h1 className="text-3xl font-bold text-gray-800">
-							{client.firstName} {client.lastName}
-						</h1>
+		<div className="min-h-screen bg-trainer p-4 lg:p-8">
+			<div className="max-w-4xl mx-auto">
+				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{/* Header */}
+					<div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<div className="flex items-center gap-3">
+							<span className="text-4xl">👤</span>
+							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
+								{client.firstName} {client.lastName}
+							</h1>
+						</div>
 						<button
 							type="button"
 							onClick={handleEdit}
-							className="px-4 py-2 rounded shadow bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+							className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
 						>
-							{editMode ? "ביטול" : "עריכה"}
+							{editMode ? "ביטול" : "✏️ עריכה"}
 						</button>
 					</div>
 
@@ -71,38 +78,62 @@ const ClientDetailsPage = () => {
 						/>
 					) : (
 						<>
-							<div className="flex flex-col gap-3 text-gray-700">
-								<div className="flex gap-2">
-									<span className="font-semibold">גיל:</span>
-									<span>{client.age}</span>
+							{/* Client Info */}
+							<div className="flex flex-col gap-4 mb-6">
+								{/* Age Card */}
+								<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
+									<span className="text-2xl">📅</span>
+									<div className="flex flex-col gap-1 flex-1">
+										<span className="text-sm text-text-medium font-medium">גיל</span>
+										<span className="text-lg font-bold text-trainer-primary">{client.age}</span>
+									</div>
 								</div>
-								<div className="flex gap-2">
-									<span className="font-semibold">משקל:</span>
-									<span>{client.weight} ק"ג</span>
+
+								{/* Weight Card */}
+								<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
+									<span className="text-2xl">⚖️</span>
+									<div className="flex flex-col gap-1 flex-1">
+										<span className="text-sm text-text-medium font-medium">משקל</span>
+										<span className="text-lg font-bold text-trainer-primary">{client.weight} ק"ג</span>
+									</div>
 								</div>
-								<div className="flex gap-2">
-									<span className="font-semibold">מטרה:</span>
-									<span>{client.goal}</span>
+
+								{/* Goal Card */}
+								<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
+									<span className="text-2xl">🎯</span>
+									<div className="flex flex-col gap-1 flex-1">
+										<span className="text-sm text-text-medium font-medium">מטרה</span>
+										<span className="text-lg font-bold text-trainer-primary">{client.goal}</span>
+									</div>
 								</div>
-								<div className="flex flex-col gap-1">
-									<span className="font-semibold">הערות:</span>
-									<span className="text-gray-600">{client.notes}</span>
-								</div>
+
+								{/* Notes Card */}
+								{client.notes && (
+									<div className="flex items-start gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
+										<span className="text-2xl">📝</span>
+										<div className="flex flex-col gap-1 flex-1">
+											<span className="text-sm text-text-medium font-medium">הערות</span>
+											<p className="text-base text-text-dark text-right">{client.notes}</p>
+										</div>
+									</div>
+								)}
 							</div>
 
-							<div className="flex gap-3 pt-4 border-t border-gray-200">
+							{/* Action Buttons */}
+							<div className="flex gap-3 pt-4 border-t-2 border-trainer-primary/20">
 								<button
 									type="button"
 									onClick={() => {
-										navigate(`/dashboard/clients/${client._id}/workouts`)
+										navigate(`/dashboard/clients/${clientId}/workouts`)
 									}}
-									className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded shadow transition-colors"
+									className="flex-1 flex items-center justify-center gap-2 bg-trainer-primary hover:bg-trainer-dark text-white py-3 px-4 rounded-lg font-semibold shadow-md transition-all"
 								>
+									<span className="text-xl">💪</span>
 									אימונים
 								</button>
 								<DeleteClientButton
 									onDelete={() => navigate("/dashboard")}
-									clientId={client._id!}
+									clientId={clientId!}
 								/>
 							</div>
 						</>

@@ -1,6 +1,7 @@
 import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "../store/authStore"
-import type { Client, ClientInvite, Dashboard, SessionRequest, Workout } from "../types/clientTypes"
+import type { Client, ClientInvite, SessionRequest, Workout } from "../types/clientTypes"
+import type { Dashboard } from "../types/dashboardTypes"
 
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/"

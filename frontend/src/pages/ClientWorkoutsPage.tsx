@@ -108,16 +108,24 @@ const ClientWorkoutsPage = () => {
 	}
 
 	return (
-		<div className="p-8 w-full flex flex-col items-center">
-			<div className="max-w-lg w-full">
-				<div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-					<div className="flex justify-between items-center">
-						<h1 className="text-3xl font-bold text-gray-800">אימונים</h1>
+		<div className="min-h-screen bg-trainer p-4 lg:p-8">
+			<div className="max-w-4xl mx-auto">
+				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{/* Header */}
+					<div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<div className="flex  items-center gap-3">
+							<span className="text-2xl">💪</span>
+							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">אימונים</h1>
+							<span className="text-lg text-trainer-primary font-semibold">
+								({workouts.length})
+							</span>
+						</div>
 						<button
 							onClick={handleAddModalState}
-							className="px-4 py-2 shadow rounded bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+							className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
 							type="button"
 						>
+							<span>➕</span>
 							אימון חדש
 						</button>
 					</div>
@@ -137,57 +145,64 @@ const ClientWorkoutsPage = () => {
 						/>
 					)}
 
+					{/* Workouts List */}
 					<div className="flex flex-col gap-4">
 						{!workouts || workouts.length === 0 ? (
-							<p className="text-center text-gray-500">אין אימונים עדיין</p>
+							<div className="text-center py-12">
+								<p className="text-text-light text-lg">אין אימונים עדיין</p>
+							</div>
 						) : (
 							workouts.map((workout) => (
 								<div
 									key={workout._id}
-									className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+									className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all cursor-pointer"
 									onClick={() =>
 										navigate(`/dashboard/clients/${id}/workouts/${workout._id}`)
 									}
 								>
 									<div className="flex justify-between items-start mb-4">
 										<div className="flex-1">
-											{workout.notes && (
-												<p className="text-gray-700 font-medium">{workout.notes}</p>
+											{workout.workoutName && (
+												<div className="flex items-center gap-2 mb-3">
+													<span className="text-xl">📝</span>
+													<p className="text-text-dark font-semibold">{workout.workoutName}</p>
+												</div>
 											)}
 										</div>
 										<div className="flex gap-2">
 											<button
 												onClick={(e) => handleEditModalState(e, workout)}
-												className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all"
 											>
-												עריכה
+												✏️ עריכה
 											</button>
 											<button
 												onClick={(e) => handleDeleteWorkout(workout._id!, e)}
-												className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all"
 											>
-												מחק
+												🗑️ מחק
 											</button>
 										</div>
 									</div>
 
 									{workout.exercises && workout.exercises.length > 0 && (
-										<div className="flex flex-col gap-3 mt-3">
-											{workout.exercises.map((exercise) => (
+										<div className="flex flex-col gap-2">
+											{workout.exercises.map((exercise, index) => (
 												<div
-													key={exercise._id}
-													className="bg-white rounded-lg p-3 border border-gray-100"
+													key={exercise._id || index}
+													className="bg-gray-50 rounded-lg p-3 border-r-4 border-trainer-primary"
 												>
-													<h3 className="font-semibold text-gray-800 mb-2">
+													<h3 className="font-bold text-trainer-dark mb-2 flex items-center gap-2">
+														<span className="text-lg">🏋️</span>
 														{exercise.name}
 													</h3>
-													<div className="flex gap-6 text-sm text-gray-600">
-														<span>סטים: {exercise.sets}</span>
-														<span>חזרות: {exercise.reps}</span>
+													<div className="flex gap-4 text-sm text-text-medium mr-7">
+														<span>🔢 {exercise.sets} סטים</span>
+														<span>🔁 {exercise.reps} חזרות</span>
 														{exercise.rest >= 60 ? (
-															<span>מנוחה: {exercise.rest / 60} דקות</span>
+															<span>⏱️ {exercise.rest / 60} דקות מנוחה</span>
 														) : (
-															<span>מנוחה: {exercise.rest} שניות</span>
+															<span>⏱️ {exercise.rest} שניות מנוחה</span>
 														)}
 													</div>
 												</div>
