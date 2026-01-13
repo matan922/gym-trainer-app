@@ -16,7 +16,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
 
         const todaySessions = await Session.find({
             trainerId: trainer?.id,
-            sessionDate: { $gte: today, $lt: tomorrow },
+            startTime: { $gte: today, $lt: tomorrow },
         }).populate('clientId')
         
         
@@ -46,7 +46,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
 
         const weekSessions = await Session.find({
             trainerId: trainer?.id,
-            sessionDate: { $gte: weekStart, $lt: weekEnd },
+            startTime: { $gte: weekStart, $lt: weekEnd },
         })
 
         const clientIdsThisWeek = weekSessions.map(session => session.clientId.toString())
@@ -82,7 +82,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
 
         const monthlySessions = await Session.find({
             trainerId: trainer?.id,
-            sessionDate: { $gte: monthStart, $lte: monthEnd }
+            startTime: { $gte: monthStart, $lte: monthEnd }
         })
 
         const completed = monthlySessions.filter(session => session.status === 'Completed').length
@@ -96,7 +96,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
             total,
             cancelled: cancelled.map(session => ({
                 clientName: (session.clientId as any)?.firstName,
-                date: session.sessionDate
+                date: session.startTime
             }))
         }
 

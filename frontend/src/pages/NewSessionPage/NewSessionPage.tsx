@@ -13,9 +13,9 @@ import { useNavigate } from "react-router"
 
 const NewSessionPage = () => {
 	const [clients, setClients] = useState<Client[]>([])
-	const [startDate, setStartDate] = useState<Date | null>(null)
-	const [startTime, setStartTime] = useState<Date | null>(null)
-	const [endTime, setEndTime] = useState<Date | null>(null)
+	const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+	const [selectedStartTime, setSelectedStartTime] = useState<Date | null>(null)
+	const [selectedEndTime, setSelectedEndTime] = useState<Date | null>(null)
 	const [oneHourCheckbox, setOneHourCheckbox] = useState<boolean>(false)
 	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 	const [sessionType, setSessionType] = useState<string>("Studio")
@@ -65,42 +65,43 @@ const NewSessionPage = () => {
 		e: React.FormEvent<HTMLFormElement>,
 	) => {
 		e.preventDefault()
-		if (!token || !selectedClient?._id) return null
+		if (!token || !selectedClient?._id || !selectedDate || !selectedStartTime) return null
+
 		const trainerId = token
 		const clientId = selectedClient?._id
-		if (!startDate || !startTime) return null
 
-		const sessionStart = new Date(
-			startDate.getFullYear(),
-			startDate.getMonth(),
-			startDate.getDate(),
-			startTime.getHours(),
-			startTime.getMinutes(),
-			0, // seconds
+		// Combine selected date with selected start time
+		const startTime = new Date(
+			selectedDate.getFullYear(),
+			selectedDate.getMonth(),
+			selectedDate.getDate(),
+			selectedStartTime.getHours(),
+			selectedStartTime.getMinutes(),
+			0
 		)
 
-		const sessionEnd = endTime
+		// Combine selected date with selected end time, or default to 1 hour after start
+		const endTime = selectedEndTime
 			? new Date(
-				startDate.getFullYear(),
-				startDate.getMonth(),
-				startDate.getDate(),
-				endTime.getHours(),
-				endTime.getMinutes(),
-				0,
+				selectedDate.getFullYear(),
+				selectedDate.getMonth(),
+				selectedDate.getDate(),
+				selectedEndTime.getHours(),
+				selectedEndTime.getMinutes(),
+				0
 			)
-			: null
+			: new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
 
 		const newSessionData = {
 			trainerId: trainerId,
 			clientId: clientId,
-			sessionDate: startDate,
-			startTime: sessionStart,
-			endTime: sessionEnd,
+			startTime: startTime,
+			endTime: endTime,
 			sessionType: sessionType,
+			workoutId: selectedWorkout?._id,
 			workoutName: selectedWorkout?.workoutName,
 			status: "Scheduled",
 		}
-		console.log()
 
 		try {
 			const response = await postSessions(newSessionData)
@@ -129,7 +130,7 @@ const NewSessionPage = () => {
 							{/* Client and Date Selection */}
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+									<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
 										<span className="text-lg">👤</span>
 										מתאמן
 									</label>
@@ -203,8 +204,9 @@ const NewSessionPage = () => {
 										name="date"
 										placeholderText="בחר תאריך"
 										className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
-										selected={startDate}
-										onChange={(date) => setStartDate(date)}
+										selected={selectedDate}
+										onChange={(date) => setSelectedDate(date)}
+										dateFormat="dd/MM/yyyy"
 										isClearable
 										minDate={new Date()}
 										withPortal
@@ -288,10 +290,10 @@ const NewSessionPage = () => {
 										dateFormat="HH:mm"
 										timeFormat="HH:mm"
 										showTimeCaption={false}
-										selected={startTime}
-										onChange={(date) => setStartTime(date)}
+										selected={selectedStartTime}
+										onChange={(date) => setSelectedStartTime(date)}
 										filterTime={(time) => {
-											if (startDate && startDate.toDateString() === new Date().toDateString()) {
+											if (selectedDate && selectedDate.toDateString() === new Date().toDateString()) {
 												return time.getTime() > new Date().getTime();
 											}
 											return true;
@@ -317,10 +319,10 @@ const NewSessionPage = () => {
 											dateFormat="HH:mm"
 											timeFormat="HH:mm"
 											showTimeCaption={false}
-											selected={endTime}
-											onChange={(date) => setEndTime(date)}
+											selected={selectedEndTime}
+											onChange={(date) => setSelectedEndTime(date)}
 											minTime={
-												startTime || new Date(new Date().setHours(0, 0, 0, 0))
+												selectedStartTime || new Date(new Date().setHours(0, 0, 0, 0))
 											}
 											maxTime={new Date(new Date().setHours(23, 45, 0, 0))}
 											popperPlacement="bottom"

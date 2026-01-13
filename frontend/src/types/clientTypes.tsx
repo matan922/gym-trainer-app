@@ -42,13 +42,12 @@ export interface Session {
 		firstName: string
 		lastName: string
 	}
-	sessionDate: Date
 	startTime: Date
 	endTime: Date
 	sessionType: string
 	workoutName?: string
 	status: string
-	workoutId?: Workout
+	workoutId?: Workout | string
 }
 
 export interface SessionRequest extends Omit<Session, "clientId" | "endTime"> {

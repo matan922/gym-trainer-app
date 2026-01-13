@@ -5,21 +5,88 @@ import TrainerClientRelation from "../../models/TrainerClientRelation.js";
 export const getSessions = async (req: Request, res: Response) => {
     try {
         const user = req.user
+        const { filter } = req.query
 
-        // Get ALL sessions for this trainer
-        const sessions = await Session.find({ trainerId: user?.id }).populate({ path: "clientId", select: "profiles.client" }).populate({ path: "workoutId" })
+        const now = new Date()
+        const today = new Date() // normal get request
+        today.setHours(0, 0, 0, 0)
 
-        console.log(sessions)
+        let query: any = { trainerId: user?.id }
+
+        if (!filter) {
+            const nextWeek = new Date(today)
+            nextWeek.setDate(today.getDate() + 7)
+            query.startTime = { $gte: today, $lt: nextWeek }
+        }
+
+        // If filter is specified, apply different logic
+        else if (filter === 'overdue') {
+            query.status = 'Scheduled'
+            query.startTime = { $lt: now }
+        }
+        else if (filter === 'upcoming') {
+            query.status = 'Scheduled'
+            query.startTime = { $gte: now }
+        }
+        else if (filter === 'completed') {
+            query.status = 'Completed'
+        }
+        else if (filter === 'cancelled') {
+            query.status = 'Cancelled'
+        }
+
+        // Get ALL sessions for this trainer from today onwards
+        const sessions = await Session.find(query).populate({ path: "clientId" }).populate({ path: "workoutId" }).sort({ startTime: 1 })
         res.status(200).json(sessions)
     } catch (error) {
         return res.status(500).json({ "error": error })
     }
 }
 
+export const getSessionsOfClient = async (req: Request, res: Response) => {
+    try {
+        const user = req.user
+        const { clientId } = req.params
+        const { filter } = req.query
+
+        const now = new Date()
+        const today = new Date() // normal get request
+        today.setHours(0, 0, 0, 0)
+
+        let query: any = { trainerId: user?.id, clientId: clientId }
+        if (!filter) {
+            const nextWeek = new Date(today)
+            nextWeek.setDate(today.getDate() + 7)
+            query.startTime = { $gte: today, $lt: nextWeek }
+        }
+        // If filter is specified, apply different logic
+        else if (filter === 'overdue') {
+            query.status = 'Scheduled'
+            query.startTime = { $lt: now }
+        }
+        else if (filter === 'upcoming') {
+            query.status = 'Scheduled'
+            query.startTime = { $gte: now }
+        }
+        else if (filter === 'completed') {
+            query.status = 'Completed'
+        }
+        else if (filter === 'cancelled') {
+            query.status = 'Cancelled'
+        }
+
+        const sessions = await Session.find(query).populate({ path: "clientId" }).populate({ path: "workoutId" }).sort({ startTime: 1 })
+        res.status(200).json(sessions)
+    } catch (error) {
+        return res.status(500).json(error)
+    }
+
+}
+
 export const postSession = async (req: Request, res: Response) => {
     try {
         const user = req.user
-        const { clientId, startTime, sessionDate, endTime, sessionType, status, workoutName, workoutId } = req.body
+        const { clientId, startTime, endTime, sessionType, status, workoutName, workoutId } = req.body
 
         const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
         if (!relation) {
@@ -32,11 +99,11 @@ export const postSession = async (req: Request, res: Response) => {
         const session = new Session({
             trainerId: user?.id,
             clientId: clientId,
-            sessionDate: new Date(sessionDate),
             startTime: new Date(startTime),
             endTime: sessionEndTime,
             sessionType: sessionType,
             status: status,
+            workoutId: workoutId,
             workoutName: workoutName
         })
 
@@ -53,8 +120,7 @@ export const updateSession = async (req: Request, res: Response) => {
     try {
         const user = req.user
         const { sessionId } = req.params
-        const { clientId, startTime, sessionDate, endTime, sessionType, status, workoutName, workoutId } = req.body
-
+        const { clientId, startTime, endTime, sessionType, status, workoutName, workoutId } = req.body
         const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: 'active' })
         if (!relation) {
             return res.status(400).json({ message: "No relation between this client and you" })
@@ -66,7 +132,6 @@ export const updateSession = async (req: Request, res: Response) => {
         }
 
         session.startTime = startTime || session.startTime
-        session.sessionDate = sessionDate || session.sessionDate
         session.endTime = endTime || session.endTime
         session.sessionType = sessionType || session.sessionType
         session.status = status || session.status

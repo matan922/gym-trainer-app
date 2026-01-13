@@ -217,9 +217,26 @@ export const deleteWorkout = async (clientId: string, workoutId: string) => {
 }
 // ---------------- SESSIONS DATA ----------------
 
-export const getSessions = async () => {
+export const getSessions = async (filter?: string) => {
 	try {
-		const response = await api.get('/sessions')
+		const url = filter ? `/sessions?filter=${filter}` : '/sessions'
+		const response = await api.get(url)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				return error.response.data
+			}
+			return { success: false, message: "Cannot connect to server" }
+		}
+		return { success: false, message: "Something went wrong" }
+	}
+}
+
+export const getSessionsOfClient = async (clientId: string, filter?: string) => {
+	try {
+		const url = filter ? `/sessions/${clientId}?filter=${filter}` : `/sessions/${clientId}`
+		const response = await api.get(url)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {

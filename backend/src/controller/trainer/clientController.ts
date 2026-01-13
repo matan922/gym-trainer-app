@@ -19,7 +19,7 @@ export const getClients = async (req: Request, res: Response) => {
 
         const clientIdArray = relations.map((relation) => relation.clientId);
         const clientUsers = await User.find({ _id: { $in: clientIdArray }, 'profiles.client': { $exists: true } })
-        const completedSessions = await Session.find({ trainerId: user?.id, clientId: { $in: clientIdArray }, status: 'Completed' }).sort({ sessionDate: -1 })
+        const completedSessions = await Session.find({ trainerId: user?.id, clientId: { $in: clientIdArray }, status: 'Completed' }).sort({ startTime: -1 })
 
         const clientsData = clientUsers.map(user => {
             const lastSession = completedSessions.find(session => session.clientId.toString() === user._id.toString())
@@ -27,12 +27,12 @@ export const getClients = async (req: Request, res: Response) => {
             return {
                 _id: user._id,
                 firstName: user.firstName,
-                lastName: user.lastName,    
+                lastName: user.lastName,
                 age: user.profiles.client?.age,
                 weight: user.profiles.client?.weight,
                 goal: user.profiles.client?.goal,
                 notes: user.profiles.client?.notes,
-                lastSessionDate: lastSession?.sessionDate || null
+                lastSessionDate: lastSession?.startTime || null
             }
         })
 

@@ -1,21 +1,32 @@
 import { useEffect, useState } from "react"
-import { getSessions, updateSessionStatus, updateSession } from "../services/api"
+import { getSessions, updateSessionStatus, updateSession, getSessionsOfClient } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"
 import SessionStatusBadge from "../components/session/SessionStatusBadge"
 import EditSessionModal from "../components/session/EditSessionModal"
+import { useNavigate, useParams, useSearchParams } from "react-router"
+
 
 const SessionsPage = () => {
 	const [sessionsData, setSessionsData] = useState<Session[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [editingSession, setEditingSession] = useState<Session | null>(null)
+	const navigate = useNavigate()
+	const [searchParams, setSearchParams] = useSearchParams()
+	const filter = searchParams.get('filter') || undefined
+	const { clientId } = useParams()
 
 	useEffect(() => {
 		const getSessionsData = async () => {
 			try {
-				const response = await getSessions()
+				let response
+				if (clientId) {
+					response = await getSessionsOfClient(clientId, filter)
+				} else {
+					response = await getSessions(filter)
+				}
+
 				if (response) {
-					console.log(response)
 					setSessionsData(response)
 					setError(null)
 				} else {
@@ -28,7 +39,7 @@ const SessionsPage = () => {
 		}
 
 		getSessionsData()
-	}, [])
+	}, [filter])
 
 	const handleStatusChange = async (sessionId: string, newStatus: string) => {
 		try {
@@ -48,10 +59,18 @@ const SessionsPage = () => {
 		}
 	}
 
+	const handleFilterChange = (newFilter: string) => {
+		setSearchParams({ filter: newFilter })
+	}
+
+	const handleClearFilter = () => {
+		setSearchParams({})
+	}
+
 	const handleSaveSession = async (sessionId: string, updatedData: Partial<Session>) => {
 		try {
 			const response = await updateSession(sessionId, updatedData)
-			if (response.success) {
+			if (response.session) {
 				// Update local state
 				setSessionsData(prevSessions =>
 					prevSessions.map(session =>
@@ -67,7 +86,7 @@ const SessionsPage = () => {
 		}
 	}
 
-
+	console.log(sessionsData)
 	return (
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
@@ -76,7 +95,7 @@ const SessionsPage = () => {
 					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<span className="text-4xl">📅</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
-							אימונים
+							{clientId ? 'היסטורייה מפגשים' : 'אימונים השבוע'}
 						</h1>
 						<span className="text-lg text-trainer-primary font-semibold">
 							({sessionsData.length})
@@ -90,11 +109,43 @@ const SessionsPage = () => {
 								{error}
 							</div>
 						)}
+						<div className="flex gap-2 mb-4 flex-wrap">
+							<button
+								onClick={handleClearFilter}
+								className={`px-4 py-2 rounded-lg font-semibold transition-all ${!filter ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+							>
+								הכל
+							</button>
+							<button
+								onClick={() => handleFilterChange("overdue")}
+								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'overdue' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+							>
+								ממתין לסיום
+							</button>
+							<button
+								onClick={() => handleFilterChange("upcoming")}
+								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'upcoming' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+							>
+								מתוכנן
+							</button>
+							<button
+								onClick={() => handleFilterChange("completed")}
+								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+							>
+								הושלם
+							</button>
+							<button
+								onClick={() => handleFilterChange("cancelled")}
+								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+							>
+								בוטל
+							</button>
+						</div>
 						{sessionsData.length > 0 ? (
 							sessionsData.map((session, index) => (
 								<div
 									key={index}
-									className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"
+									onClick={() => navigate(`/dashboard/client/${session.clientId._id}/`)} className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"
 								>
 									{/* Header with client name and actions */}
 									<div className="flex justify-between items-start mb-4 pb-3 border-b border-trainer-primary/10">
@@ -107,7 +158,10 @@ const SessionsPage = () => {
 										<div className="flex gap-2 items-center">
 											<SessionStatusBadge session={session} editable={true} onStatusChange={handleStatusChange} />
 											<button
-												onClick={() => setEditingSession(session)}
+												onClick={(e) => {
+													e.stopPropagation()
+													setEditingSession(session)
+												}}
 												className="px-3 py-1 bg-trainer-primary hover:bg-trainer-dark text-white rounded-lg text-sm font-medium transition-all"
 											>
 												✏️ עריכה
@@ -123,7 +177,7 @@ const SessionsPage = () => {
 											<div className="flex flex-col">
 												<span className="text-xs text-text-medium">תאריך</span>
 												<span className="text-sm font-semibold text-text-dark">
-													{dayjs(session.sessionDate).format("DD/MM/YY")}
+													{dayjs(session.startTime).format("DD/MM/YY")}
 												</span>
 											</div>
 										</div>
@@ -151,13 +205,15 @@ const SessionsPage = () => {
 										</div>
 
 										{/* Workout */}
-										{session.workoutId ? (
+										{session.workoutId || session.workoutName ? (
 											<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
 												<span className="text-lg">💪</span>
 												<div className="flex flex-col">
 													<span className="text-xs text-text-medium">אימון</span>
 													<span className="text-sm font-semibold text-text-dark">
-														{session.workoutId.workoutName || `${session.workoutId.exercises?.length || 0} תרגילים`}
+														{typeof session.workoutId === 'object' && session.workoutId?.workoutName
+															? session.workoutId.workoutName
+															: session.workoutName || 'אימון מוגדר'}
 													</span>
 												</div>
 											</div>

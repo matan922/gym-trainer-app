@@ -41,6 +41,7 @@ function App() {
 			>
 				<Route index element={<DashboardMainPage />} />
 				<Route path="/dashboard/sessions" element={<SessionsPage />} />
+				<Route path="/dashboard/sessions/:clientId" element={<SessionsPage />} />
 				<Route path="/dashboard/clients" element={<ClientsPage />} />
 				<Route path="/dashboard/new-client" element={<InviteClientPage />} />
 				<Route path="/dashboard/client/:id" element={<ClientDetailsPage />} />

@@ -103,7 +103,7 @@ function DashboardLayout() {
 						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
 					>
 						<span className="text-2xl">📅</span>
-						<span className="flex-1 text-right">אימונים</span>
+						<span className="flex-1 text-right">אימונים השבוע</span>
 					</button>
 
 					<button
