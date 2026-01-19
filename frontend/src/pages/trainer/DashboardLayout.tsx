@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router"
-import { logout } from "../services/api"
-import { useAuthStore } from "../store/authStore"
+import { logout } from "../../services/api"
+import { useAuthStore } from "../../store/authStore"
 
 function DashboardLayout() {
 	const navigate = useNavigate()

@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { getSessions, updateSessionStatus, updateSession, getClient } from "../services/api"
-import type { Session } from "../types/clientTypes"
+import { getSessions, updateSessionStatus, updateSession, getClient } from "../../services/api"
+import type { Session } from "../../types/clientTypes"
 import dayjs from "dayjs"
-import SessionStatusBadge from "../components/session/SessionStatusBadge"
-import EditSessionModal from "../components/session/EditSessionModal"
+import SessionStatusBadge from "../../components/session/SessionStatusBadge"
+import EditSessionModal from "../../components/session/EditSessionModal"
 import { useNavigate, useParams, useSearchParams } from "react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import DatePicker from "react-datepicker"
@@ -178,30 +178,30 @@ const SessionsPage = () => {
 								>
 									הכל
 								</button>
-							<button
-								onClick={() => handleFilterChange("overdue")}
-								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'overdue' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
-							>
-								ממתין לסיום
-							</button>
-							<button
-								onClick={() => handleFilterChange("upcoming")}
-								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'upcoming' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
-							>
-								מתוכנן
-							</button>
-							<button
-								onClick={() => handleFilterChange("completed")}
-								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
-							>
-								הושלם
-							</button>
-							<button
-								onClick={() => handleFilterChange("cancelled")}
-								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
-							>
-								בוטל
-							</button>
+								<button
+									onClick={() => handleFilterChange("overdue")}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'overdue' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									ממתין לסיום
+								</button>
+								<button
+									onClick={() => handleFilterChange("upcoming")}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'upcoming' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									מתוכנן
+								</button>
+								<button
+									onClick={() => handleFilterChange("completed")}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									הושלם
+								</button>
+								<button
+									onClick={() => handleFilterChange("cancelled")}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									בוטל
+								</button>
 							</div>
 						</div>
 						{sessions.length > 0 ? (

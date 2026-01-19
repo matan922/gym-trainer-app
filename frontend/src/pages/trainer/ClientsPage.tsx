@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router"
-import ClientCard from "../components/client/ClientCard"
-import { getClients } from "../services/api"
+import ClientCard from "../../components/client/ClientCard"
+import { getClients } from "../../services/api"
 import { useQuery } from "@tanstack/react-query"
 
 function ClientsPage() {

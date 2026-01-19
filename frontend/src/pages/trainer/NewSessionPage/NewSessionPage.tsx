@@ -1,71 +1,73 @@
 import TextField from "@mui/material/TextField"
 import React, { useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
-import { getClient, getClients, postSessions } from "../../services/api"
-import type { Client, Workout } from "../../types/clientTypes"
+import { getClient, getClients, postSessions } from "../../../services/api"
+import type { Client, Workout } from "../../../types/clientTypes"
 import "react-datepicker/dist/react-datepicker.css"
 import { CacheProvider } from "@emotion/react"
 import Autocomplete from "@mui/material/Autocomplete"
 import { ThemeProvider } from "@mui/material/styles"
-import { useAuthStore } from "../../store/authStore"
+import { useAuthStore } from "../../../store/authStore"
 import { rtlCache, theme } from "./theme"
 import { useNavigate } from "react-router"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const NewSessionPage = () => {
-	const [clients, setClients] = useState<Client[]>([])
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 	const [selectedStartTime, setSelectedStartTime] = useState<Date | null>(null)
 	const [selectedEndTime, setSelectedEndTime] = useState<Date | null>(null)
 	const [oneHourCheckbox, setOneHourCheckbox] = useState<boolean>(false)
 	const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 	const [sessionType, setSessionType] = useState<string>("Studio")
-	const [workouts, setWorkouts] = useState<Workout[]>([])
 	const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
 	const navigate = useNavigate()
 	const token = useAuthStore((state) => state.token)
+	const queryClient = useQueryClient()
 
-	useEffect(() => {
-		const getClientsData = async () => {
-			try {
-				const response = await getClients()
-				setClients(response.data)
-			} catch (error) {
-				console.log(error)
-			}
-		}
-
-		getClientsData()
-	}, [])
+	// Fetch clients list
+	const { data: clients = [], isPending: clientsLoading } = useQuery({
+		queryKey: ['clients'],
+		queryFn: () => getClients(),
+		staleTime: 1000 * 60 * 5, // 5 minutes
+	})
 
 	// Fetch workouts when client is selected
-	useEffect(() => {
-		const fetchWorkouts = async () => {
-			if (selectedClient?._id) {
-				try {
-					const response = await getClient(selectedClient._id)
-					setWorkouts(response.data.workouts || [])
-				} catch (error) {
-					console.log("Error fetching workouts:", error)
-					setWorkouts([])
-				}
-			} else {
-				setWorkouts([])
-				setSelectedWorkout(null)
-			}
-		}
+	const { data: clientData } = useQuery({
+		queryKey: ['client', selectedClient?._id],
+		queryFn: () => getClient(selectedClient?._id!),
+		enabled: !!selectedClient?._id,
+	})
 
-		fetchWorkouts()
+	const workouts = clientData?.workouts || []
+
+	// Clear selected workout when client changes
+	useEffect(() => {
+		if (!selectedClient) {
+			setSelectedWorkout(null)
+		}
 	}, [selectedClient])
 
 	const handleCheckbox = () => {
 		setOneHourCheckbox(!oneHourCheckbox)
 	}
 
-	const handleNewSessionSubmit = async (
-		e: React.FormEvent<HTMLFormElement>,
-	) => {
+	// Create session mutation
+	const createSessionMutation = useMutation({
+		mutationFn: (sessionData: any) => postSessions(sessionData),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['sessions'] })
+			queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+			navigate("/dashboard")
+		},
+		onError: (error) => {
+			console.error("Error creating session:", error)
+			alert("שגיאה ביצירת האימון")
+		}
+	})
+
+	const handleNewSessionSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		if (!token || !selectedClient?._id || !selectedDate || !selectedStartTime) return null
+		if (!token || !selectedClient?._id || !selectedDate || !selectedStartTime) return
 
 		const trainerId = token
 		const clientId = selectedClient?._id
@@ -103,13 +105,7 @@ const NewSessionPage = () => {
 			status: "Scheduled",
 		}
 
-		try {
-			const response = await postSessions(newSessionData)
-			navigate("/dashboard")
-			return response.data
-		} catch (error) {
-			console.log("Error creating session: ", error)
-		}
+		createSessionMutation.mutate(newSessionData)
 	}
 
 	return (
@@ -170,8 +166,8 @@ const NewSessionPage = () => {
 													getOptionLabel={(client) =>
 														`${client.firstName} ${client.lastName}`
 													}
-													options={Array.isArray(clients) ? clients : []}
-													noOptionsText="אין מתאמנים"
+													options={clientsLoading ? [] : clients}
+													noOptionsText={clientsLoading ? "טוען מתאמנים..." : "אין מתאמנים"}
 													slotProps={{
 														popper: {
 															sx: {
@@ -335,11 +331,15 @@ const NewSessionPage = () => {
 							{/* Submit Button */}
 							<div className="flex justify-center pt-4 border-t-2 border-trainer-primary/20">
 								<button
-									className="px-8 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
+									disabled={createSessionMutation.isPending}
+									className={`px-8 py-3 rounded-lg font-semibold shadow-md transition-all flex items-center gap-2 ${createSessionMutation.isPending
+										? 'bg-trainer-disabled-bg text-trainer-disabled-text border border-trainer-disabled-border cursor-not-allowed'
+										: 'bg-trainer-primary hover:bg-trainer-dark text-white'
+										}`}
 									type="submit"
 								>
-									<span>✅</span>
-									אישור
+									<span>{createSessionMutation.isPending ? '⏳' : '✅'}</span>
+									{createSessionMutation.isPending ? 'שומר...' : 'אישור'}
 								</button>
 							</div>
 						</div>

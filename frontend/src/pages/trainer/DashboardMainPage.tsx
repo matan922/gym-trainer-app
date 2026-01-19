@@ -1,5 +1,5 @@
-import { getDashboard } from "../services/api"
-import { useAuthStore } from "../store/authStore"
+import { getDashboard } from "../../services/api"
+import { useAuthStore } from "../../store/authStore"
 import dayjs from "dayjs"
 import { useQuery } from "@tanstack/react-query"
 

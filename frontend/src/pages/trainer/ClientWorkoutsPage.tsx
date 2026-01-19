@@ -1,14 +1,14 @@
 import { useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
-import EditWorkoutModal from "../components/client/EditWorkoutModal"
-import NewWorkoutModal from "../components/client/NewWorkoutModal"
+import EditWorkoutModal from "../../components/client/EditWorkoutModal"
+import NewWorkoutModal from "../../components/client/NewWorkoutModal"
 import {
 	deleteWorkout,
 	getClient,
 	postWorkout,
 	putWorkout,
-} from "../services/api"
-import type { Workout } from "../types/clientTypes"
+} from "../../services/api"
+import type { Workout } from "../../types/clientTypes"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const ClientWorkoutsPage = () => {

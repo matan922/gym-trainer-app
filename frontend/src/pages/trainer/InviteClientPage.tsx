@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState } from "react"
-import { sendClientInvite } from "../services/api"
-import type { ClientInvite } from "../types/clientTypes"
+import { sendClientInvite } from "../../services/api"
+import type { ClientInvite } from "../../types/clientTypes"
 import { useNavigate } from "react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
