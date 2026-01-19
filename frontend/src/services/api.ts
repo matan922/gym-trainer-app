@@ -274,14 +274,28 @@ export const deleteWorkout = async (clientId: string, workoutId: string): Promis
 }
 // ---------------- SESSIONS DATA ----------------
 
-export const getSessions = async (filter?: string, clientId?: string): Promise<Session[]> => {
+export const getSessions = async (
+	filter?: string,
+	clientId?: string,
+	timeRange?: string,
+	specificDate?: Date | null
+): Promise<Session[]> => {
 	try {
-		let url
-		if (clientId) {
-			url = filter ? `/sessions/${clientId}?filter=${filter}` : `/sessions/${clientId}`
-		} else {
-			url = filter ? `/sessions?filter=${filter}` : '/sessions'
+		const params = new URLSearchParams()
+
+		if (filter) params.append('filter', filter)
+		if (timeRange) params.append('timeRange', timeRange)
+		if (specificDate) {
+			// Format date as YYYY-MM-DD for backend
+			const year = specificDate.getFullYear()
+			const month = String(specificDate.getMonth() + 1).padStart(2, '0')
+			const day = String(specificDate.getDate()).padStart(2, '0')
+			params.append('specificDate', `${year}-${month}-${day}`)
 		}
+
+		const queryString = params.toString()
+		let url = clientId ? `/sessions/${clientId}` : '/sessions'
+		if (queryString) url += `?${queryString}`
 
 		const response = await api.get<Session[]>(url)
 		return response.data

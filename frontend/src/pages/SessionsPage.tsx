@@ -6,10 +6,14 @@ import SessionStatusBadge from "../components/session/SessionStatusBadge"
 import EditSessionModal from "../components/session/EditSessionModal"
 import { useNavigate, useParams, useSearchParams } from "react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 
 const SessionsPage = () => {
 	const [editingSession, setEditingSession] = useState<Session | null>(null)
+	const [timeRange, setTimeRange] = useState<'today' | 'week' | 'month'>('week')
+	const [specificDate, setSpecificDate] = useState<Date | null>(null)
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
 	const filter = searchParams.get('filter') || undefined
@@ -18,8 +22,8 @@ const SessionsPage = () => {
 	const queryClient = useQueryClient()
 
 	const { isPending, isError, data, error } = useQuery<Session[]>({
-		queryKey: ['sessions', filter, clientId],
-		queryFn: () => getSessions(filter, clientId)
+		queryKey: ['sessions', filter, clientId, timeRange, specificDate?.toISOString()],
+		queryFn: () => getSessions(filter, clientId, timeRange, specificDate)
 	})
 
 	const { data: clientData } = useQuery({
@@ -66,6 +70,15 @@ const SessionsPage = () => {
 		sessionMutation.mutate({ sessionId, updatedData })
 	}
 
+	const handleTimeRangeChange = (newTimeRange: 'today' | 'week' | 'month') => {
+		setTimeRange(newTimeRange)
+		setSpecificDate(null) // Clear specific date when changing time range
+	}
+
+	const handleDateChange = (date: Date | null) => {
+		setSpecificDate(date)
+	}
+
 	if (isPending) {
 		return <span>טוען...</span>
 	}
@@ -86,7 +99,7 @@ const SessionsPage = () => {
 					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<span className="text-4xl">📅</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
-							{clientId && clientName ? `היסטוריית מפגשים של ${clientName}` : 'אימונים השבוע'}
+							{clientId && clientName ? `היסטוריית מפגשים של ${clientName}` : 'היסטוריית מפגשים'}
 						</h1>
 						<span className="text-lg text-trainer-primary font-semibold">
 							({sessions.length})
@@ -100,13 +113,71 @@ const SessionsPage = () => {
 								{error}
 							</div>
 						)}
-						<div className="flex gap-2 mb-4 flex-wrap">
-							<button
-								onClick={handleClearFilter}
-								className={`px-4 py-2 rounded-lg font-semibold transition-all ${!filter ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
-							>
-								הכל
-							</button>
+
+						{/* Time Range Filters */}
+						<div className="mb-2">
+							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+								<span className="text-lg">📅</span>
+								טווח זמן
+							</label>
+							<div className="flex gap-2 flex-wrap">
+								<button
+									onClick={() => handleTimeRangeChange('today')}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${timeRange === 'today' && !specificDate ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									היום
+								</button>
+								<button
+									onClick={() => handleTimeRangeChange('week')}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${timeRange === 'week' && !specificDate ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									השבוע
+								</button>
+								<button
+									onClick={() => handleTimeRangeChange('month')}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${timeRange === 'month' && !specificDate ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									החודש
+								</button>
+							</div>
+						</div>
+
+						{/* Specific Date Picker */}
+						<div className="mb-4">
+							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+								<span className="text-lg">🗓️</span>
+								או בחר תאריך ספציפי
+							</label>
+							<DatePicker
+								wrapperClassName="w-full max-w-xs"
+								placeholderText="בחר תאריך ספציפי"
+								className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+								selected={specificDate}
+								onChange={handleDateChange}
+								dateFormat="dd/MM/yyyy"
+								isClearable
+								withPortal
+							/>
+							{specificDate && (
+								<p className="text-xs text-trainer-primary mt-1 text-right">
+									מציג מפגשים ל-{dayjs(specificDate).format('DD/MM/YYYY')}
+								</p>
+							)}
+						</div>
+
+						{/* Status Filters */}
+						<div>
+							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+								<span className="text-lg">🏷️</span>
+								סטטוס
+							</label>
+							<div className="flex gap-2 mb-4 flex-wrap">
+								<button
+									onClick={handleClearFilter}
+									className={`px-4 py-2 rounded-lg font-semibold transition-all ${!filter ? 'bg-trainer-primary text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
+								>
+									הכל
+								</button>
 							<button
 								onClick={() => handleFilterChange("overdue")}
 								className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === 'overdue' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-text-dark hover:bg-gray-300'}`}
@@ -131,6 +202,7 @@ const SessionsPage = () => {
 							>
 								בוטל
 							</button>
+							</div>
 						</div>
 						{sessions.length > 0 ? (
 							sessions.map((session, index) => (
