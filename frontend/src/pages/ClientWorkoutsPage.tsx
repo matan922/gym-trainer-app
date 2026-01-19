@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import EditWorkoutModal from "../components/client/EditWorkoutModal"
 import NewWorkoutModal from "../components/client/NewWorkoutModal"
@@ -8,32 +8,25 @@ import {
 	postWorkout,
 	putWorkout,
 } from "../services/api"
-import type { Client, Workout } from "../types/clientTypes"
+import type { Workout } from "../types/clientTypes"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const ClientWorkoutsPage = () => {
 	const { id } = useParams()
-	const [client, setClient] = useState<Client | null>(null)
-	const [workouts, setWorkouts] = useState<Workout[] | []>([])
+	const queryClient = useQueryClient()
 	const [isAddOpen, setIsAddOpen] = useState<boolean>(false)
 	const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
 	const currWorkout = useRef<Workout | null>(null)
 	const navigate = useNavigate()
 
-	useEffect(() => {
-		const getClientData = async () => {
-			try {
-				if (id) {
-					const response = await getClient(id)
-					setClient(response.data.client)
-					setWorkouts(response.data.workouts)
-				}
-			} catch (error) {
-				console.error("Error fetching client:", error)
-			}
-		}
+	const { data: clientData, isPending, isError } = useQuery({
+		queryKey: ['client', id],
+		queryFn: () => getClient(id!),
+		enabled: !!id
+	})
 
-		getClientData()
-	}, [id])
+	const client = clientData?.client
+	const workouts = clientData?.workouts || []
 
 	const handleAddModalState = () => {
 		setIsAddOpen(!isAddOpen)
@@ -48,64 +41,65 @@ const ClientWorkoutsPage = () => {
 		currWorkout.current = workout
 	}
 
-	const handleAddWorkout = async (
-		workoutData: Workout,
-	): Promise<Workout | unknown> => {
-		try {
-			if (client?._id) {
-				console.log(client._id, workoutData)
-				const response = await postWorkout(client._id, workoutData)
-				setWorkouts([...workouts, response.data])
-				setIsAddOpen(false)
-				return
-			}
-		} catch (error) {
-			console.log(error)
-			return error
+	const addWorkoutMutation = useMutation({
+		mutationFn: ({ clientId, workoutData }: { clientId: string; workoutData: Workout }) => postWorkout(clientId, workoutData),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['client', id] })
+			setIsAddOpen(false)
+		},
+		onError: (error) => {
+			console.error("Error adding workout:", error)
+		}
+	})
+
+	const handleAddWorkout = (workoutData: Workout) => {
+		if (client?._id) {
+			addWorkoutMutation.mutate({ clientId: client._id, workoutData })
 		}
 	}
 
-	const handleEditWorkout = async (workoutData: Workout) => {
-		try {
-			if (client?._id && workoutData._id) {
-				console.log(workoutData._id)
-				const response = await putWorkout(
-					client._id,
-					workoutData,
-					workoutData._id,
-				)
-				setWorkouts(
-					workouts.map((workout) =>
-						workout._id === response._id ? response : workout,
-					),
-				)
-				setIsEditOpen(false)
-			}
-		} catch (error) {
-			console.log(error)
-			return error
+	const editWorkoutMutation = useMutation({
+		mutationFn: ({ clientId, workoutData, workoutId }: { clientId: string; workoutData: Workout; workoutId: string; }) =>
+			putWorkout(clientId, workoutData, workoutId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['client', id] })
+			setIsEditOpen(false)
+		},
+		onError: (error) => {
+			console.error("Error editing workout:", error)
+		}
+	})
+
+	const handleEditWorkout = (workoutData: Workout) => {
+		if (client?._id && workoutData._id) {
+
+			editWorkoutMutation.mutate({ clientId: client._id, workoutData, workoutId: workoutData._id })
 		}
 	}
 
-	const handleDeleteWorkout = async (
+	const deleteWorkoutMutation = useMutation({
+		mutationFn: ({ clientId, workoutId }: { clientId: string; workoutId: string; }) => deleteWorkout(clientId, workoutId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['client', id] })
+		},
+		onError: (error) => {
+			console.error("Error deleting workout:", error)
+		}
+	})
+
+	const handleDeleteWorkout = (
 		workoutId: string,
 		e: React.MouseEvent<Element, MouseEvent>,
 	) => {
 		e.stopPropagation()
-		try {
-			console.log(workoutId)
-			if (client?._id) {
-				await deleteWorkout(client._id, workoutId)
-				setWorkouts(workouts.filter((w) => w._id !== workoutId))
-			}
-		} catch (error) {
-			console.error("Error deleting workout:", error)
+		if (client?._id) {
+			deleteWorkoutMutation.mutate({ clientId: client._id, workoutId })
 		}
 	}
 
-	if (!client) {
-		return <div>טוען...</div>
-	}
+	if (isPending) return <div>טוען...</div>
+	if (isError) return <div>שגיאה בטעינת נתונים</div>
+	if (!client) return <div>לקוח לא נמצא</div>
 
 	return (
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">

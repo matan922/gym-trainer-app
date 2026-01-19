@@ -6,6 +6,10 @@
 	--color-trainer-primary: #EF4444;
 	--color-trainer-secondary: #F87171;
 	--color-trainer-dark: #B91C1C;
+	--color-trainer-disabled-bg: #FECACA;     /* Soft muted red */
+	--color-trainer-disabled-text: #991B1B;   /* Dark desaturated red */
+	--color-trainer-disabled-border: #FCA5A5;
+
 
 	/* Client - Ocean Teal */
 	--color-client-primary: #14B8A6;

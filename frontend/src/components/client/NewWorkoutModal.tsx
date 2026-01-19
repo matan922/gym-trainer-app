@@ -11,7 +11,7 @@ const NewWorkoutModal = ({
 }) => {
 
 	const [workout, setWorkout] = useState<Workout>({
-		notes: "",
+		workoutName: "",
 		exercises: [],
 	})
 
@@ -178,7 +178,7 @@ const NewWorkoutModal = ({
 
 							{/* Notes */}
 							<div>
-								<label className="block text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+								<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
 									<span className="text-lg">📝</span>
 									הערות לאימון
 								</label>

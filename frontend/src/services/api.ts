@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "../store/authStore"
-import type { Client, ClientInvite, SessionRequest, Workout } from "../types/clientTypes"
+import type { Client, ClientInvite, Session, SessionRequest, Workout } from "../types/clientTypes"
 import type { Dashboard } from "../types/dashboardTypes"
 
 
@@ -70,290 +70,325 @@ api.interceptors.response.use(
 )
 
 // ---------------- CLIENT DATA ----------------
-export const getClients = async () => {
+export const getClients = async (): Promise<Client[]> => {
 	try {
 		const response = await api.get<Client[]>(`/clients`)
-		return response
+		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }
 
-export const getClient = async (id: string) => {
+export const getClient = async (id: string): Promise<{ client: Client; workouts: Workout[] }> => {
 	try {
 		const response = await api.get<{ client: Client; workouts: Workout[] }>(
 			`/clients/${id}`,
 		)
-		return response
+		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }
 
-export const sendClientInvite = async (clientData: ClientInvite) => {
+export const sendClientInvite = async (clientData: ClientInvite): Promise<ClientInvite> => {
 	try {
 		const response = await api.post<ClientInvite>(`/auth/send-client-invite`, clientData)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }
 
-export const validateClientInvite = async (inviteToken: string) => {
+export const validateClientInvite = async (inviteToken: string): Promise<any> => {
 	try {
 		const response = await api.post('/auth/validate-invite-token', { inviteToken })
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const acceptInviteAuthenticated = async (inviteToken: string) => {
+export const acceptInviteAuthenticated = async (inviteToken: string): Promise<any> => {
 	try {
 		const response = await api.post('/auth/invite-accept-authenticated', { inviteToken })
 		return response.data
-	}
-	catch (error) {
+	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }
-export const putClient = async (clientData: Client, id: string) => {
+
+// may need to remove put client or change it entirely
+export const putClient = async (clientData: Client, id: string): Promise<{ client: Client; success: boolean }> => {
 	try {
 		const response = await api.put<{ client: Client; success: boolean }>(
 			`/clients/${id}`,
 			clientData,
 		)
-		return response
+		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }
 
-export const deleteClient = async (id: string) => {
-	const response = await api.delete<Client>(`/clients/${id}`)
-	return response
+// may need to remove delete client or change it entirely
+export const deleteClient = async (id: string): Promise<Client> => {
+	try {
+		const response = await api.delete<Client>(`/clients/${id}`)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 
 // ---------------- WORKOUTS DATA ----------------
 
-export const getWorkouts = async (clientId: string) => {
-	const response = await api.get<Workout[]>(`/clients/${clientId}/workouts`)
-	return response
+export const getWorkouts = async (clientId: string): Promise<Workout[]> => {
+	try {
+		const response = await api.get<Workout[]>(`/clients/${clientId}/workouts`)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 
-export const getWorkout = async (clientId: string, workoutId: string) => {
-	const response = await api.get<Workout>(
-		`/clients/${clientId}/workouts/${workoutId}`,
-	)
-	return response.data
+export const getWorkout = async (clientId: string, workoutId: string): Promise<Workout> => {
+	try {
+		const response = await api.get<Workout>(
+			`/clients/${clientId}/workouts/${workoutId}`,
+		)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 
-export const postWorkout = async (clientId: string, workoutData: Workout) => {
-	const response = await api.post<Workout>(
-		`/clients/${clientId}/workouts`,
-		workoutData,
-	)
-	return response
+export const postWorkout = async (clientId: string, workoutData: Workout): Promise<Workout> => {
+	try {
+		const response = await api.post<Workout>(
+			`/clients/${clientId}/workouts`,
+			workoutData,
+		)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 
 export const putWorkout = async (
 	clientId: string,
 	workoutData: Workout,
 	workoutId: string,
-) => {
-	const response = await api.put<Workout>(
-		`/clients/${clientId}/workouts/${workoutId}`,
-		workoutData,
-	)
-	return response.data
+): Promise<Workout> => {
+	try {
+		const response = await api.put<Workout>(
+			`/clients/${clientId}/workouts/${workoutId}`,
+			workoutData,
+		)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 
-export const deleteWorkout = async (clientId: string, workoutId: string) => {
-	const response = await api.delete<Workout>(
-		`/clients/${clientId}/workouts/${workoutId}`,
-	)
-	return response
+export const deleteWorkout = async (clientId: string, workoutId: string): Promise<Workout> => {
+	try {
+		const response = await api.delete<Workout>(
+			`/clients/${clientId}/workouts/${workoutId}`,
+		)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
 }
 // ---------------- SESSIONS DATA ----------------
 
-export const getSessions = async (filter?: string) => {
+export const getSessions = async (filter?: string, clientId?: string): Promise<Session[]> => {
 	try {
-		const url = filter ? `/sessions?filter=${filter}` : '/sessions'
-		const response = await api.get(url)
+		let url
+		if (clientId) {
+			url = filter ? `/sessions/${clientId}?filter=${filter}` : `/sessions/${clientId}`
+		} else {
+			url = filter ? `/sessions?filter=${filter}` : '/sessions'
+		}
+
+		const response = await api.get<Session[]>(url)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const getSessionsOfClient = async (clientId: string, filter?: string) => {
-	try {
-		const url = filter ? `/sessions/${clientId}?filter=${filter}` : `/sessions/${clientId}`
-		const response = await api.get(url)
-		return response.data
-	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			if (error.response) {
-				return error.response.data
-			}
-			return { success: false, message: "Cannot connect to server" }
-		}
-		return { success: false, message: "Something went wrong" }
-	}
-}
-
-export const postSessions = async (sessionData: SessionRequest) => {
+export const postSessions = async (sessionData: SessionRequest): Promise<any> => {
 	try {
 		const response = await api.post('/sessions', sessionData)
-		console.log(response)
 		return response.data
-	}
-	catch (error) {
+	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const updateSessionStatus = async (sessionId: string, status: string) => {
+export const updateSessionStatus = async (sessionId: string, status: string): Promise<any> => {
 	try {
 		const response = await api.patch(`/sessions/${sessionId}`, { status })
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const updateSession = async (sessionId: string, sessionData: any) => {
+export const updateSession = async (sessionId: string, sessionData: any): Promise<any> => {
 	try {
 		const response = await api.put(`/sessions/${sessionId}`, sessionData)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
 
 // ---------------- DASHBOARD ---------------------
 
-export const getDashboard = async (): Promise<Dashboard | { message: string }> => {
+export const getDashboard = async (): Promise<Dashboard> => {
 	try {
-		const response = await api.get('/trainer/dashboard')
+		const response = await api.get<Dashboard>('/trainer/dashboard')
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			return { message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		return { message: "Something went wrong" }
-
+		throw new Error("Something went wrong")
 	}
 }
 
 
 // ---------------- AUTHENTICATION ----------------
 
-export const login = async (userData: { email: string; password: string }) => {
+export const login = async (userData: { email: string; password: string }): Promise<any> => {
 	try {
 		const response = await api.post(`/auth/login`, userData)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const refresh = async () => {
+export const refresh = async (): Promise<any> => {
 	try {
 		const response = await api.post(`/auth/token`)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
@@ -363,7 +398,7 @@ export const register = async (userData: {
 	email: string
 	password: string
 	inviteToken?: string
-}) => {
+}): Promise<any> => {
 	try {
 		const response = await api.post(`/auth/register`, userData)
 		console.log(response.data)
@@ -371,37 +406,31 @@ export const register = async (userData: {
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const logout = async () => {
+export const logout = async (): Promise<any> => {
 	try {
 		const response = await api.delete(`/auth/logout`)
 		return response.data
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
 				console.log(error)
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
 }
 
-export const verifyEmail = async (token: string) => {
+export const verifyEmail = async (token: string): Promise<any> => {
 	try {
 		console.log(token)
 		const response = await api.post(`/auth/verify-email`, { token: token })
@@ -409,15 +438,11 @@ export const verifyEmail = async (token: string) => {
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
-				// Server responded with error
 				console.log(error)
-				return error.response.data
+				throw new Error(error.response.data?.message || "Server error")
 			}
-			// Network error
-			return { success: false, message: "Cannot connect to server" }
+			throw new Error("Cannot connect to server")
 		}
-		// Unexpected error
-		return { success: false, message: "Something went wrong" }
+		throw new Error("Something went wrong")
 	}
-
 }

@@ -3,22 +3,29 @@ import { useState } from "react"
 import { sendClientInvite } from "../services/api"
 import type { ClientInvite } from "../types/clientTypes"
 import { useNavigate } from "react-router"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 function InviteClientPage() {
+	const queryClient = useQueryClient()
 	const [clientData, setClientData] = useState<ClientInvite>({
 		email: ""
 	})
 	const navigate = useNavigate()
+	const sendInviteMutation = useMutation({
+		mutationFn: (clientData: ClientInvite) => sendClientInvite(clientData),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['clients'] }) // check if fine
+			navigate('/dashboard')
+		},
+		onError: (error) => {
+			console.log(error)
+		}
+
+	})
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		try {
-			const response = await sendClientInvite(clientData)
-			navigate('/dashboard')
-			return response
-		} catch (error) {
-			console.error("Error inviting client:", error)
-		}
+		sendInviteMutation.mutate(clientData)
 	}
 
 	const handleInputChange = (
@@ -33,8 +40,9 @@ function InviteClientPage() {
 		}))
 	}
 
+	const sendInvitePendingDisabledStyle = sendInviteMutation.isPending ? "disabled disabled:bg-trainer-disabled-bg disabled:text-trainer-disabled-text disabled:border-trainer-disabled-border disabled:cursor-not-allowed" : ""
 	return (
-		<div className="flex justify-center items-center p-6">
+		<div className="flex justify-center items-center p-6" >
 			<div className="w-full max-w-md shadow-xl rounded-xl bg-surface border border-border-light p-8">
 
 				<div className="text-center mb-6">
@@ -55,13 +63,14 @@ function InviteClientPage() {
 
 					<button
 						type="submit"
-						className="px-6 py-2 rounded-lg bg-primary-button hover:brightness-90 text-white font-semibold transition shadow-md self-end"
+						disabled={sendInviteMutation.isPending}
+						className={`px-6 py-2 rounded-lg bg-primary-button hover:brightness-90 text-white font-semibold transition shadow-md self-end ${sendInvitePendingDisabledStyle}`}
 					>
 						שלח הזמנה
 					</button>
 				</form>
 			</div>
-		</div>
+		</div >
 	)
 }
 

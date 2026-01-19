@@ -1,62 +1,57 @@
-import { useEffect, useState } from "react"
-import { getSessions, updateSessionStatus, updateSession, getSessionsOfClient } from "../services/api"
+import { useState } from "react"
+import { getSessions, updateSessionStatus, updateSession, getClient } from "../services/api"
 import type { Session } from "../types/clientTypes"
 import dayjs from "dayjs"
 import SessionStatusBadge from "../components/session/SessionStatusBadge"
 import EditSessionModal from "../components/session/EditSessionModal"
 import { useNavigate, useParams, useSearchParams } from "react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 
 const SessionsPage = () => {
-	const [sessionsData, setSessionsData] = useState<Session[]>([])
-	const [error, setError] = useState<string | null>(null)
 	const [editingSession, setEditingSession] = useState<Session | null>(null)
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
 	const filter = searchParams.get('filter') || undefined
 	const { clientId } = useParams()
 
-	useEffect(() => {
-		const getSessionsData = async () => {
-			try {
-				let response
-				if (clientId) {
-					response = await getSessionsOfClient(clientId, filter)
-				} else {
-					response = await getSessions(filter)
-				}
+	const queryClient = useQueryClient()
 
-				if (response) {
-					setSessionsData(response)
-					setError(null)
-				} else {
-					setError(response.message)
-				}
-			} catch (error) {
-				console.log(error)
-				setError("שגיאה בטעינת האימונים")
-			}
-		}
+	const { isPending, isError, data, error } = useQuery<Session[]>({
+		queryKey: ['sessions', filter, clientId],
+		queryFn: () => getSessions(filter, clientId)
+	})
 
-		getSessionsData()
-	}, [filter])
+	const { data: clientData } = useQuery({
+		queryKey: ['client', clientId],
+		queryFn: () => getClient(clientId!),
+		enabled: !!clientId
+	})
 
-	const handleStatusChange = async (sessionId: string, newStatus: string) => {
-		try {
-			const response = await updateSessionStatus(sessionId, newStatus)
-			if (response.success) {
-				// Update local state
-				setSessionsData(prevSessions =>
-					prevSessions.map(session =>
-						session._id === sessionId
-							? { ...session, status: newStatus }
-							: session
-					)
-				)
-			}
-		} catch (error) {
+
+	const statusMutation = useMutation({
+		mutationFn: ({ sessionId, newStatus }: { sessionId: string; newStatus: string }) => updateSessionStatus(sessionId, newStatus),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['sessions'] })
+		},
+		onError: (error) => {
 			console.error("Error updating session status:", error)
 		}
+	})
+
+	const sessionMutation = useMutation({
+		mutationFn: ({ sessionId, updatedData }: { sessionId: string; updatedData: Partial<Session> }) => updateSession(sessionId, updatedData),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['sessions'] })
+			setEditingSession(null)
+		},
+		onError: (error) => {
+			console.error("Error updating session:", error)
+		}
+	})
+
+	const handleStatusChange = (sessionId: string, newStatus: string) => {
+		statusMutation.mutate({ sessionId, newStatus })
 	}
 
 	const handleFilterChange = (newFilter: string) => {
@@ -67,26 +62,22 @@ const SessionsPage = () => {
 		setSearchParams({})
 	}
 
-	const handleSaveSession = async (sessionId: string, updatedData: Partial<Session>) => {
-		try {
-			const response = await updateSession(sessionId, updatedData)
-			if (response.session) {
-				// Update local state
-				setSessionsData(prevSessions =>
-					prevSessions.map(session =>
-						session._id === sessionId
-							? { ...session, ...updatedData }
-							: session
-					)
-				)
-				setEditingSession(null)
-			}
-		} catch (error) {
-			console.error("Error updating session:", error)
-		}
+	const handleSaveSession = (sessionId: string, updatedData: Partial<Session>) => {
+		sessionMutation.mutate({ sessionId, updatedData })
 	}
 
-	console.log(sessionsData)
+	if (isPending) {
+		return <span>טוען...</span>
+	}
+
+	if (isError) {
+		return <span>Error: {error.message}</span>
+	}
+
+	const sessions = data ?? []
+	const clientName = clientData?.client
+		? `${clientData.client.firstName} ${clientData.client.lastName}`
+		: ''
 	return (
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
@@ -95,10 +86,10 @@ const SessionsPage = () => {
 					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<span className="text-4xl">📅</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
-							{clientId ? 'היסטורייה מפגשים' : 'אימונים השבוע'}
+							{clientId && clientName ? `היסטוריית מפגשים של ${clientName}` : 'אימונים השבוע'}
 						</h1>
 						<span className="text-lg text-trainer-primary font-semibold">
-							({sessionsData.length})
+							({sessions.length})
 						</span>
 					</div>
 
@@ -141,8 +132,8 @@ const SessionsPage = () => {
 								בוטל
 							</button>
 						</div>
-						{sessionsData.length > 0 ? (
-							sessionsData.map((session, index) => (
+						{sessions.length > 0 ? (
+							sessions.map((session, index) => (
 								<div
 									key={index}
 									onClick={() => navigate(`/dashboard/client/${session.clientId._id}/`)} className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"

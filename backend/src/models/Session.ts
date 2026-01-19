@@ -12,7 +12,6 @@ const sessionSchema = new Schema({
   sessionType: { type: String, required: true, enum: ["Studio", "Online"] },
   workoutName: { type: String },
   status: { type: String, required: true, enum: ["Scheduled", "Completed", "Cancelled"] }
-
 });
 
 

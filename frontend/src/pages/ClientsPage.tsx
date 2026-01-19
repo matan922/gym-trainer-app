@@ -1,39 +1,48 @@
-import { useEffect, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 import ClientCard from "../components/client/ClientCard"
 import { getClients } from "../services/api"
-import type { Client } from "../types/clientTypes"
+import { useQuery } from "@tanstack/react-query"
 
 function ClientsPage() {
-	const [clients, setClients] = useState<Client[]>([])
-	// const [error, setError] = useState<string>("")
-	const originalClientsList = useRef<Client[]>([])
+	const [searchQuery, setSearchQuery] = useState("")
 	const navigate = useNavigate()
 
-	useEffect(() => {
-		const getClientsData = async () => {
-			try {
-				const response = await getClients()
-				setClients(response.data)
-				originalClientsList.current = response.data
-			} catch (error) {
-				console.log(error)
-			}
-		}
+	const { data, isPending, isError, error } = useQuery({
+		queryKey: ['clients'],
+		queryFn: () => getClients(),
+		staleTime: 1000 * 60 * 5, // 5 minutes
+	})
 
-		getClientsData()
-	}, [])
+	// Filter clients based on search query
+	const filteredClients = useMemo(() => {
+		if (!data) return []
+		if (!searchQuery) return data
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { value } = e.target
-		if (!value) return setClients(originalClientsList.current)
-
-		const filteredClients = originalClientsList.current.filter((client) => {
+		return data.filter((client) => {
 			const clientFullName = `${client.firstName} ${client.lastName}`
-			return clientFullName.includes(value)
+			return clientFullName.includes(searchQuery)
 		})
+	}, [data, searchQuery])
 
-		setClients(filteredClients)
+	if (isPending) {
+		return (
+			<div className="min-h-screen bg-trainer p-4 lg:p-8 flex items-center justify-center">
+				<span className="text-2xl text-trainer-dark">טוען...</span>
+			</div>
+		)
+	}
+
+	if (isError) {
+		return (
+			<div className="min-h-screen bg-trainer p-4 lg:p-8">
+				<div className="max-w-4xl mx-auto">
+					<div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg text-right">
+						שגיאה: {error.message}
+					</div>
+				</div>
+			</div>
+		)
 	}
 
 	return (
@@ -47,7 +56,7 @@ function ClientsPage() {
 							מתאמנים
 						</h1>
 						<span className="text-lg text-trainer-primary font-semibold mr-auto">
-							({clients.length})
+							({filteredClients.length})
 						</span>
 					</div>
 
@@ -56,18 +65,19 @@ function ClientsPage() {
 						<div className="relative">
 							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">🔍</span>
 							<input
-								onChange={(e) => handleSearchChange(e)}
+								onChange={(e) => setSearchQuery(e.target.value)}
 								className="w-full pr-12 pl-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
 								placeholder="חיפוש לפי שם..."
 								type="text"
+								value={searchQuery}
 							/>
 						</div>
 					</div>
 
 					{/* Clients Grid */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-						{clients.length > 0 ? (
-							clients.map((client) => (
+						{filteredClients.length > 0 ? (
+							filteredClients.map((client) => (
 								<ClientCard
 									key={client._id}
 									client={client}

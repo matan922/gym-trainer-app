@@ -1,51 +1,24 @@
-import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router"
-import ClientEdit from "../components/client/ClientEdit"
 import DeleteClientButton from "../components/client/DeleteClientButton"
-import { getClient, putClient } from "../services/api"
-import type { Client } from "../types/clientTypes"
+import { getClient } from "../services/api"
+import { useQuery } from "@tanstack/react-query"
 
 const ClientDetailsPage = () => {
-	const [client, setClient] = useState<Client | null>(null)
-	const [clientId, setClientId] = useState<string>('')
 	const { id } = useParams()
 	const navigate = useNavigate()
-	const [editMode, setEditMode] = useState<boolean>(false)
 
-	useEffect(() => {
-		const getClientData = async () => {
-			try {
-				if (id) {
-					const response = await getClient(id)
-					console.log(response.data.client.profiles.client)
-					setClient(response.data.client.profiles.client)
-					setClientId(response.data.client._id)
-				}
-			} catch (error) {
-				console.error("Error fetching client:", error)
-			}
-		}
+	const { data: clientData, isPending, isError } = useQuery({
+		queryKey: ['client', id],
+		queryFn: () => getClient(id!),
+		enabled: !!id
+	})
 
-		getClientData()
-	}, [id])
+	console.log(clientData)
+	const client = clientData?.client
+	const clientId = clientData?.client._id
 
-	const handleEdit = () => {
-		setEditMode(!editMode)
-	}
-
-	const handleSubmit = async (editData: Client) => {
-		try {
-			if (editData?._id) {
-				const response = await putClient(editData, editData._id)
-				setClient(response.data.client) // Update the client state with new data
-				handleEdit()
-				return response.data.success
-			}
-		} catch (error) {
-			console.error("Error creating client:", error)
-		}
-	}
-
+	if (isPending) return <div>טוען...</div>
+	if (isError) return <div>שגיאה בטעינת הלקוח</div>
 	if (!client) return <div>לקוח לא נמצא</div>
 
 	// TODO FUTURE: PUT IT ALL IN COMPONENTS
@@ -54,31 +27,14 @@ const ClientDetailsPage = () => {
 			<div className="max-w-4xl mx-auto">
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
 					{/* Header */}
-					<div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<div className="flex items-center gap-3">
-							<span className="text-4xl">👤</span>
-							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
-								{client.firstName} {client.lastName}
-							</h1>
-						</div>
-						<button
-							type="button"
-							onClick={handleEdit}
-							className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
-						>
-							{editMode ? "ביטול" : "✏️ עריכה"}
-						</button>
+					<div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
+						<span className="text-4xl">👤</span>
+						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
+							{client.firstName} {client.lastName}
+						</h1>
 					</div>
 
-					{editMode ? (
-						<ClientEdit
-							editMode={handleEdit}
-							onSubmit={handleSubmit}
-							client={client}
-						/>
-					) : (
-						<>
-							{/* Client Info */}
+					{/* Client Info */}
 							<div className="flex flex-col gap-4 mb-6">
 								{/* Age Card */}
 								<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
@@ -146,8 +102,6 @@ const ClientDetailsPage = () => {
 									clientId={clientId!}
 								/>
 							</div>
-						</>
-					)}
 				</div>
 			</div>
 		</div>

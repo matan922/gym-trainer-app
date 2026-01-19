@@ -6,20 +6,23 @@ export const getSessions = async (req: Request, res: Response) => {
     try {
         const user = req.user
         const { filter } = req.query
+        const { clientId } = req.params // This will be undefined if not in the route
 
         const now = new Date()
-        const today = new Date() // normal get request
+        const today = new Date()
         today.setHours(0, 0, 0, 0)
 
         let query: any = { trainerId: user?.id }
-
-        if (!filter) {
-            const nextWeek = new Date(today)
-            nextWeek.setDate(today.getDate() + 7)
-            query.startTime = { $gte: today, $lt: nextWeek }
+        
+        // Add clientId filter if provided
+        if (clientId) {
+            query.clientId = clientId
         }
 
-        // If filter is specified, apply different logic
+        // Apply time/status filters
+        if (!filter) {
+            
+        }
         else if (filter === 'overdue') {
             query.status = 'Scheduled'
             query.startTime = { $lt: now }
@@ -34,53 +37,15 @@ export const getSessions = async (req: Request, res: Response) => {
         else if (filter === 'cancelled') {
             query.status = 'Cancelled'
         }
-
-        // Get ALL sessions for this trainer from today onwards
-        const sessions = await Session.find(query).populate({ path: "clientId" }).populate({ path: "workoutId" }).sort({ startTime: 1 })
+        const sessions = await Session.find(query)
+        .populate({ path: "clientId" })
+        .populate({ path: "workoutId" })
+        .sort({ startTime: 1 })
+        console.log(sessions)
         res.status(200).json(sessions)
     } catch (error) {
-        return res.status(500).json({ "error": error })
+        return res.status(500).json({ error })
     }
-}
-
-export const getSessionsOfClient = async (req: Request, res: Response) => {
-    try {
-        const user = req.user
-        const { clientId } = req.params
-        const { filter } = req.query
-
-        const now = new Date()
-        const today = new Date() // normal get request
-        today.setHours(0, 0, 0, 0)
-
-        let query: any = { trainerId: user?.id, clientId: clientId }
-        if (!filter) {
-            const nextWeek = new Date(today)
-            nextWeek.setDate(today.getDate() + 7)
-            query.startTime = { $gte: today, $lt: nextWeek }
-        }
-        // If filter is specified, apply different logic
-        else if (filter === 'overdue') {
-            query.status = 'Scheduled'
-            query.startTime = { $lt: now }
-        }
-        else if (filter === 'upcoming') {
-            query.status = 'Scheduled'
-            query.startTime = { $gte: now }
-        }
-        else if (filter === 'completed') {
-            query.status = 'Completed'
-        }
-        else if (filter === 'cancelled') {
-            query.status = 'Cancelled'
-        }
-
-        const sessions = await Session.find(query).populate({ path: "clientId" }).populate({ path: "workoutId" }).sort({ startTime: 1 })
-        res.status(200).json(sessions)
-    } catch (error) {
-        return res.status(500).json(error)
-    }
-
 }
 
 export const postSession = async (req: Request, res: Response) => {

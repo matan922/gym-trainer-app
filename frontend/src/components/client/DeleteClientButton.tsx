@@ -1,18 +1,25 @@
 import { deleteClient } from "../../services/api"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 const DeleteClientButton = ({ clientId, onDelete }: { clientId: string, onDelete:() => void }) => {
-	
-	const handleClientDeletion = async () => {
-		if (!confirm("האם אתה בטוח שברצונך למחוק לקוח זה?")) return
+	const queryClient = useQueryClient()
 
-		try {
-			await deleteClient(clientId)
+	const deleteMutation = useMutation({
+		mutationFn: () => deleteClient(clientId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['clients'] })
+			queryClient.invalidateQueries({ queryKey: ['client'] })
 			onDelete()
-		} catch (error) {
+		},
+		onError: (error) => {
 			console.error("Error deleting client:", error)
 			alert("שגיאה במחיקת הלקוח")
-			console.log("NAVIGATE WHY")
 		}
+	})
+
+	const handleClientDeletion = () => {
+		if (!confirm("האם אתה בטוח שברצונך למחוק לקוח זה?")) return
+		deleteMutation.mutate()
 	}
 
 	return (
