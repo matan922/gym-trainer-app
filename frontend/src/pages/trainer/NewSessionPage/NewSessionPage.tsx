@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField"
 import React, { useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
-import { getClient, getClients, postSessions } from "../../../services/api"
+import { getClient, getClients, postSessions } from "../../../services/trainerApi"
 import type { Client, Workout } from "../../../types/clientTypes"
 import "react-datepicker/dist/react-datepicker.css"
 import { CacheProvider } from "@emotion/react"

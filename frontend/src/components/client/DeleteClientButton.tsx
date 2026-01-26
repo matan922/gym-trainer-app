@@ -1,4 +1,4 @@
-import { deleteClient } from "../../services/api"
+import { deleteClient } from "../../services/trainerApi"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 const DeleteClientButton = ({ clientId, onDelete }: { clientId: string, onDelete:() => void }) => {

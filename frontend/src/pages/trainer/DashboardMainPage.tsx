@@ -1,4 +1,4 @@
-import { getDashboard } from "../../services/api"
+import { getTrainerDashboard } from "../../services/trainerApi"
 import { useAuthStore } from "../../store/authStore"
 import dayjs from "dayjs"
 import { useQuery } from "@tanstack/react-query"
@@ -8,7 +8,7 @@ const DashboardMainPage = () => {
 
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ['dashboard'],
-		queryFn: () => getDashboard(),
+		queryFn: () => getTrainerDashboard(),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	})
 

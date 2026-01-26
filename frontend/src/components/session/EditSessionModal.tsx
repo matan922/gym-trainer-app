@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import type { Session, Workout } from "../../types/clientTypes"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { getClient } from "../../services/api"
+import { getClient } from "../../services/trainerApi"
 
 interface EditSessionModalProps {
 	session: Session

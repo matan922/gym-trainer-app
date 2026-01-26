@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { getSessions, updateSessionStatus, updateSession, getClient } from "../../services/api"
+import { getSessions, updateSessionStatus, updateSession, getClient } from "../../services/trainerApi"
 import type { Session } from "../../types/clientTypes"
 import dayjs from "dayjs"
 import SessionStatusBadge from "../../components/session/SessionStatusBadge"

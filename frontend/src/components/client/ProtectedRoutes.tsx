@@ -1,7 +1,7 @@
 import { Navigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { useEffect, useState } from "react"
-import { refresh } from "../../services/api"
+import { refresh } from "../../services/authApi"
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
 	const token = useAuthStore((state) => state.token)

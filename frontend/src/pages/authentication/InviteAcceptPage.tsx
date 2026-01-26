@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
-import { validateClientInvite } from "../../services/api"
+import { validateClientInvite } from "../../services/authApi"
 
 const InviteAcceptPage = () => {
     const [searchParams] = useSearchParams()

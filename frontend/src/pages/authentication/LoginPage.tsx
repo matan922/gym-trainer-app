@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { acceptInviteAuthenticated, login } from "../../services/api"
+import { acceptInviteAuthenticated, login } from "../../services/authApi"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 

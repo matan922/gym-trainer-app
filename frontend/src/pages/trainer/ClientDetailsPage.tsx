@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router"
 import DeleteClientButton from "../../components/client/DeleteClientButton"
-import { getClient } from "../../services/api"
+import { getClient } from "../../services/trainerApi"
 import { useQuery } from "@tanstack/react-query"
 
 const ClientDetailsPage = () => {

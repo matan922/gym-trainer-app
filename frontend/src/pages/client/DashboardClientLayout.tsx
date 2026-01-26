@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router"
 import { logout } from "../../services/authApi"
 import { useAuthStore } from "../../store/authStore"
 
-function DashboardLayout() {
+function DashboardClientLayout() {
 	const navigate = useNavigate()
 	const clearToken = useAuthStore((state) => state.clearToken)
 
@@ -73,7 +73,7 @@ function DashboardLayout() {
 					<button
 						type="button"
 						onClick={() => handleNavigation("/dashboard")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
 					>
 						<span className="text-2xl">🏠</span>
 						<span className="flex-1 text-right">לוח ראשי</span>
@@ -81,38 +81,20 @@ function DashboardLayout() {
 
 					<button
 						type="button"
-						onClick={() => handleNavigation("/clients")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						onClick={() => handleNavigation("/workouts")}
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
 					>
-						<span className="text-2xl">👥</span>
-						<span className="flex-1 text-right">מתאמנים</span>
-					</button>
-
-					<button
-						type="button"
-						onClick={() => handleNavigation("/new-client")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
-					>
-						<span className="text-2xl">📧</span>
-						<span className="flex-1 text-right">הזמן מתאמן</span>
+						<span className="text-2xl">💪</span>
+						<span className="flex-1 text-right">האימונים שלי</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/sessions")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
 					>
 						<span className="text-2xl">📅</span>
 						<span className="flex-1 text-right">יומן אימונים</span>
-					</button>
-
-					<button
-						type="button"
-						onClick={() => handleNavigation("/new-session")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
-					>
-						<span className="text-2xl">⚡</span>
-						<span className="flex-1 text-right">קביעת אימון</span>
 					</button>
 				</nav>
 
@@ -128,13 +110,13 @@ function DashboardLayout() {
 			</div>
 
 			{/* Main Content Area - Scrollable */}
-			<div className="relative min-h-screen bg-trainer sm:h-screen sm:overflow-y-auto">
+			<div className="relative min-h-screen bg-client sm:h-screen sm:overflow-y-auto">
 				{/* Mobile Menu Button - Sticky */}
 				<div className="sm:hidden sticky top-4 z-30 flex justify-end p-4">
 					<button
 						type="button"
 						onClick={handleHamburger}
-						className="p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition"
+						className="p-3 rounded-lg bg-client-primary text-white shadow-lg hover:bg-client-dark transition"
 					>
 						<svg
 							className="w-6 h-6"
@@ -158,4 +140,4 @@ function DashboardLayout() {
 		</div>)
 }
 
-export default DashboardLayout
+export default DashboardClientLayout

@@ -1,4 +1,4 @@
-export interface Dashboard {
+export interface TrainerDashboard {
     todayStats: {
         percentage: number
         totalSessionsToday: number
@@ -22,3 +22,25 @@ export interface Dashboard {
     }
 }
 
+export interface ClientDashboard {
+    trainer: {
+        id: string
+        firstName: string
+        lastName: string
+    },
+    nextSession: {
+        id: string
+        workoutId: string
+        workoutName: string
+        date: Date
+        status: string
+    },
+    previousSession: {
+        id: string
+        workoutId: string
+        workoutName: string
+        date: Date
+        status: string
+    }
+
+}

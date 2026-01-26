@@ -1,8 +1,8 @@
 import express from 'express';
-import { endRelation, getClient, getClients } from '../controller/trainer/clientController.js';
+import { endRelation, getClient, getClients } from '../../controller/trainer/clientController.js';
 import workoutRoutes from './workoutRoutes.js';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
-import { apiLimiter } from '../middlewares/rateLimitersMiddleware.js';
+import { authenticateToken } from '../../middlewares/authMiddleware.js';
+import { apiLimiter } from '../../middlewares/rateLimitersMiddleware.js';
 const router = express.Router();
 
 router.use(apiLimiter)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
-import { register } from "../../services/api"
+import { register } from "../../services/authApi"
 import RoleSelectionView from "../../components/authentication/RoleSelectionView"
 import Register from "../../components/authentication/Register"
 import type { RegisterData } from "../../types/clientTypes"

@@ -1,7 +1,7 @@
 import express from 'express';
-import { deleteWorkout, getWorkout, getWorkouts, postWorkout, putWorkout } from '../controller/trainer/workoutController.js';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
-import { apiLimiter } from '../middlewares/rateLimitersMiddleware.js';
+import { deleteWorkout, getWorkout, getWorkouts, postWorkout, putWorkout } from '../../controller/trainer/workoutController.js';
+import { authenticateToken } from '../../middlewares/authMiddleware.js';
+import { apiLimiter } from '../../middlewares/rateLimitersMiddleware.js';
 
 const router = express.Router({ mergeParams: true });
 

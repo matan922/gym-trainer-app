@@ -7,6 +7,23 @@ export interface ClientInvite {
 	email: string
 }
 
+export interface User {
+	activeProfile: string
+	createdAt?: string
+	email: string
+	emailVerified: boolean
+	firstName: string
+	lastName: string
+	profiles: {
+		trainer: Trainer
+		client: Client
+	}
+}
+
+export interface Trainer {
+	trainerType: string
+}
+
 export interface Client {
 	_id?: string
 	firstName: string

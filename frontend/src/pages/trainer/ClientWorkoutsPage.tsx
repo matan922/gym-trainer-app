@@ -7,7 +7,7 @@ import {
 	getClient,
 	postWorkout,
 	putWorkout,
-} from "../../services/api"
+} from "../../services/trainerApi"
 import type { Workout } from "../../types/clientTypes"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { deleteWorkout, getWorkout, putWorkout } from "../../services/api"
+import { deleteWorkout, getWorkout, putWorkout } from "../../services/trainerApi"
 import { useNavigate, useParams } from "react-router"
 import type { Workout } from "../../types/clientTypes"
 import EditWorkoutModal from "../../components/client/EditWorkoutModal"

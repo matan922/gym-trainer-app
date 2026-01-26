@@ -1,7 +1,7 @@
 import express from 'express';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
-import { getSessions, postSession, updateSession, updateSessionStatus } from '../controller/trainer/sessionController.js';
-import { apiLimiter } from '../middlewares/rateLimitersMiddleware.js';
+import { authenticateToken } from '../../middlewares/authMiddleware.js';
+import { getSessions, postSession, updateSession, updateSessionStatus } from '../../controller/trainer/sessionController.js';
+import { apiLimiter } from '../../middlewares/rateLimitersMiddleware.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.get("/:clientId", authenticateToken, getSessions) // get sessions of spec
 router.post("/", authenticateToken, postSession)
 router.patch("/:sessionId", authenticateToken, updateSessionStatus)
 router.put("/:sessionId", authenticateToken, updateSession)
-router.delete("/:sessionId", authenticateToken, )
+router.delete("/:sessionId", authenticateToken,)
 
 
 export default router;
