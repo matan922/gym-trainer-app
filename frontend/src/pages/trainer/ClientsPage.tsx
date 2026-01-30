@@ -81,7 +81,7 @@ function ClientsPage() {
 								<ClientCard
 									key={client._id}
 									client={client}
-									onCard={() => navigate(`/dashboard/client/${client._id}`)}
+									onCard={() => navigate(`/clients/${client._id}`)}
 								/>
 							))
 						) : (

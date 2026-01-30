@@ -68,7 +68,7 @@ export const register = async (req: Request, res: Response) => {
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         await transporter.sendMail({
-            from: "Personal Trainer App",
+            from: "Merkaz Imunim",
             to: email,
             subject: "Email Verification",
             html: `<b>${frontendUrl}/auth/verify-email?token=${token}</b>`

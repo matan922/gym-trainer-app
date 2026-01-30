@@ -39,33 +39,35 @@ function App() {
 
 			{user && user.activeProfile === 'trainer' ? (
 				<Route
+					path="*"
 					element={
 						<ProtectedRoutes>
 							<DashboardLayout />
 						</ProtectedRoutes>
 					}
 				>
-					<Route path="/dashboard" element={<DashboardMainPage />} />
-					<Route path="/sessions" element={<SessionsPage />} />
-					<Route path="/sessions/:clientId" element={<SessionsPage />} />
-					<Route path="/clients" element={<ClientsPage />} />
-					<Route path="/new-client" element={<InviteClientPage />} />
-					<Route path="/client/:id" element={<ClientDetailsPage />} />
-					<Route path="/clients/:id/workouts" element={<ClientWorkoutsPage />} />
-					<Route path="/clients/:id/workouts/:workoutId" element={<WorkoutPage />} />
+					<Route path="dashboard" element={<DashboardMainPage />} />
+					<Route path="sessions" element={<SessionsPage />} />
+					<Route path="sessions/:clientId" element={<SessionsPage />} />
+					<Route path="clients" element={<ClientsPage />} />
+					<Route path="new-client" element={<InviteClientPage />} />
+					<Route path="clients/:id" element={<ClientDetailsPage />} />
+					<Route path="clients/:id/workouts" element={<ClientWorkoutsPage />} />
+					<Route path="clients/:id/workouts/:workoutId" element={<WorkoutPage />} />
 					<Route path="new-session" element={<NewSessionPage />} />
 				</Route>
 			) : (
 				<Route
+					path="*"
 					element={
 						<ProtectedRoutes>
 							<DashboardClientLayout />
 						</ProtectedRoutes>
 					}
 				>
-					<Route path="/dashboard" element={<DashboardClientPage />} />
-					<Route path="/sessions" element={<SessionsClientPage />} />
-					<Route path="/workouts" element={<WorkoutsClientPage />} />
+					<Route path="dashboard" element={<DashboardClientPage />} />
+					<Route path="sessions" element={<SessionsClientPage />} />
+					<Route path="workouts" element={<WorkoutsClientPage />} />
 				</Route>
 			)}
 		</Routes>

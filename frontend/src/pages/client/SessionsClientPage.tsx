@@ -29,6 +29,7 @@ const SessionsClientPage = () => {
         )
     }
 
+    console.log(sessions.map((session) => session))
     return (
         <div className="min-h-screen bg-client p-4 lg:p-8">
             <div className="max-w-6xl mx-auto">
@@ -55,7 +56,7 @@ const SessionsClientPage = () => {
                                 <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-client-primary/20">
                                     <span className="text-3xl">📋</span>
                                     <h2 className="text-xl font-bold text-client-dark flex-1 text-right">
-                                        {new Date(session.date).toLocaleDateString('he-IL')}
+                                        {new Date(session.startTime).toLocaleDateString('he-IL')}
                                     </h2>
                                 </div>
 
@@ -64,7 +65,7 @@ const SessionsClientPage = () => {
                                     <div className="flex items-center justify-between p-3 bg-client-primary/5 rounded-lg">
                                         <span className="text-sm text-text-medium">תאריך</span>
                                         <span className="text-sm font-bold text-client-primary">
-                                            {new Date(session.date).toLocaleDateString('he-IL', {
+                                            {new Date(session.startTime).toLocaleDateString('he-IL', {
                                                 weekday: 'long',
                                                 year: 'numeric',
                                                 month: 'long',
@@ -73,10 +74,10 @@ const SessionsClientPage = () => {
                                         </span>
                                     </div>
 
-                                    {session.notes && (
+                                    {session.workoutName && (
                                         <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                                             <p className="text-sm text-text-medium text-right">
-                                                {session.notes}
+                                                {session.workoutName}
                                             </p>
                                         </div>
                                     )}

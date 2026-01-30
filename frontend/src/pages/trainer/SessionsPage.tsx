@@ -208,7 +208,7 @@ const SessionsPage = () => {
 							sessions.map((session, index) => (
 								<div
 									key={index}
-									onClick={() => navigate(`/dashboard/client/${session.clientId._id}/`)} className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"
+									onClick={() => navigate(`/clients/${session.clientId._id}`)} className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all"
 								>
 									{/* Header with client name and actions */}
 									<div className="flex justify-between items-start mb-4 pb-3 border-b border-trainer-primary/10">
