@@ -59,9 +59,19 @@ export const getClient = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Client not found' })
         }
 
+        // Flatten the client data structure for frontend
+        const clientData = {
+            _id: relatedClient._id,
+            firstName: relatedClient.firstName,
+            lastName: relatedClient.lastName,
+            age: relatedClient.profiles.client?.age,
+            weight: relatedClient.profiles.client?.weight,
+            goal: relatedClient.profiles.client?.goal,
+            notes: relatedClient.profiles.client?.notes
+        }
 
         const relatedWorkouts = await Workout.find({ trainerId: user?.id, clientId: clientId })
-        return res.status(200).json({ client: relatedClient, workouts: relatedWorkouts })
+        return res.status(200).json({ client: clientData, workouts: relatedWorkouts })
     } catch (error) {
         res.status(400).json({ message: error instanceof Error ? error.message : String(error) })
     }

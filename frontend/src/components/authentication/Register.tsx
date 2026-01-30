@@ -14,6 +14,7 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit,
     const isTrainer = registerType === "trainer";
     const focusRing = isTrainer ? "focus:ring-trainer-primary" : "focus:ring-client-primary";
     const buttonBg = isTrainer ? "bg-trainer-button hover:bg-trainer-button-hover" : "bg-client-button hover:bg-client-button-hover";
+    
 
     return (
         <div className="bg-surface flex flex-col p-10 rounded-3xl shadow-2xl w-full max-w-md gap-6">

@@ -41,5 +41,5 @@
   },
   "include": [
     "src/**/*"
-  ]
+, "../frontend/src/supabaseClient.ts"  ]
 }

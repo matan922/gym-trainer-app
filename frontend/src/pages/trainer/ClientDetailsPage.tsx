@@ -80,7 +80,7 @@ const ClientDetailsPage = () => {
 						<button
 							type="button"
 							onClick={() => {
-								navigate(`/dashboard/clients/${clientId}/workouts`)
+								navigate(`/clients/${clientId}/workouts`)
 							}}
 							className="flex-1 flex items-center justify-center gap-2 bg-trainer-primary hover:bg-trainer-dark text-white py-3 px-4 rounded-lg font-semibold shadow-md transition-all"
 						>
@@ -90,7 +90,7 @@ const ClientDetailsPage = () => {
 						<button
 							type="button"
 							onClick={() => {
-								navigate(`/dashboard/sessions/${clientId}`)
+								navigate(`/sessions/${clientId}`)
 							}}
 							className="flex-1 flex items-center justify-center gap-2 bg-trainer-primary hover:bg-trainer-dark text-white py-3 px-4 rounded-lg font-semibold shadow-md transition-all"
 						>

@@ -41,7 +41,7 @@ const WorkoutPage = () => {
 			deleteWorkout(clientId, workoutId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['client', id] })
-			navigate(`/dashboard/clients/${id}/workouts`)
+			navigate(`/clients/${id}/workouts`)
 		},
 		onError: (error) => {
 			console.error("Error deleting workout:", error)

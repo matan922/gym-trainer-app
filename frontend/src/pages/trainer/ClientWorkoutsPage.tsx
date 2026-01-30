@@ -151,7 +151,7 @@ const ClientWorkoutsPage = () => {
 									key={workout._id}
 									className="bg-white rounded-xl shadow-md border border-trainer-primary/20 p-5 hover:shadow-lg hover:border-trainer-primary/30 transition-all cursor-pointer"
 									onClick={() =>
-										navigate(`/dashboard/clients/${id}/workouts/${workout._id}`)
+										navigate(`/clients/${id}/workouts/${workout._id}`)
 									}
 								>
 									<div className="flex justify-between items-start mb-4">
