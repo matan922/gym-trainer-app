@@ -4,7 +4,6 @@ import { register } from "../../services/authApi"
 import RoleSelectionView from "../../components/authentication/RoleSelectionView"
 import Register from "../../components/authentication/Register"
 import type { RegisterData } from "../../types/clientTypes"
-import { supabase } from "../../supabaseClient"
 
 const RegisterPage = () => {
 	const [registerData, setRegisterData] = useState<RegisterData>({
@@ -63,13 +62,6 @@ const RegisterPage = () => {
 		if (hasPendingInvite) return
 
 		setRegisterType(null)
-	}
-
-	const supabaseSignup = async () => {
-		const { data, error } = await supabase.auth.signUp({
-			email: "",
-			password: ""
-		})
 	}
 
 	return (
