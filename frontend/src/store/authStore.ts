@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { jwtDecode } from 'jwt-decode'
 
 interface User {
   id: string
@@ -13,6 +12,7 @@ interface AuthState {
   token: string | null
   user: User | null,
   setToken: (token: string) => void
+  setUser: (user: User) => void  // NEW
   clearToken: () => void
 }
 
@@ -20,12 +20,10 @@ export const useAuthStore = create((set): AuthState => ({
   token: null,
   user: null,
   setToken: (newToken: string) => {
-    const decoded = jwtDecode<User>(newToken)
-
-    set({
-      token: newToken,
-      user: decoded
-    })
+    set({ token: newToken })
   },
-  clearToken: () => set({ token: null })
+  setUser: (user: User) => {
+    set({ user })
+  },
+  clearToken: () => set({ token: null, user: null })
 }))

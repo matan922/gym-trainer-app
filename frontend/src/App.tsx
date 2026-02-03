@@ -37,6 +37,7 @@ function App() {
 			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
 			<Route path="/invite-accept" element={<InviteAcceptPage />} />
 
+
 			{user && user.activeProfile === 'trainer' ? (
 				<Route
 					path="*"

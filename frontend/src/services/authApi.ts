@@ -4,6 +4,22 @@ import type { ClientInvite } from "../types/clientTypes"
 
 // ---------------- AUTHENTICATION ----------------
 
+export const syncUser = async (): Promise<any> => {
+	try {
+		const response = await api.get('/auth/sync-user')  // Backend verifies Clerk token, returns MongoDB user
+		console.log(response.data)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
+}
+
 export const login = async (userData: { email: string; password: string }): Promise<any> => {
 	try {
 		const response = await api.post(`/auth/login`, userData)

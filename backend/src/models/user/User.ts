@@ -5,11 +5,10 @@ import clientProfileSchema from './Client';
 const Schema = mongoose.Schema;
 
 export interface IUser {
+  clerkId: string;
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
-  emailVerified: boolean;
   profiles: {
     trainer?: {
       trainerType: string;
@@ -28,6 +27,11 @@ export interface IUser {
 }
 
 const userSchema = new Schema({
+  clerkId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   email: {
     type: String,
     required: true,

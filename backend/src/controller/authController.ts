@@ -12,6 +12,18 @@ import { isValidProfileType, validateInvite } from "../helper/authHelper.js";
 import ClientInviteToken from "../models/ClientInviteToken.js";
 import TrainerClientRelation from "../models/TrainerClientRelation.js";
 
+
+export const syncUser = async (req: Request, res: Response) => {
+    const clerkId = req.clerkId
+
+    const user = await User.findOne({ clerkId })
+    if (!user) {
+        return res.status(404).json({ message: "User not found. Please register first." }) // getting to this error because no account on mongo!
+    }
+    console.log(user)
+    res.status(201).json({ user });
+}
+
 export const register = async (req: Request, res: Response) => {
     try {
         const profileType = req.body.profileType;

@@ -1,21 +1,54 @@
 import { useState } from "react"
-import { acceptInviteAuthenticated, login } from "../../services/authApi"
+import { useSignIn, useAuth } from "@clerk/clerk-react"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
-
-interface User {
-	email: string
-	password: string
-}
+import { syncUser, acceptInviteAuthenticated } from "../../services/authApi"
+import { useMutation } from "@tanstack/react-query"
 
 const LoginPage = () => {
+	const { signIn, isLoaded, setActive } = useSignIn()
+	const { getToken } = useAuth()
+	const setUser = useAuthStore((state) => state.setUser)
 	const setToken = useAuthStore((state) => state.setToken)
 	const [error, setError] = useState<string>("")
-	const [userData, setUserData] = useState<User>({
+	const [userData, setUserData] = useState({
 		email: "",
 		password: "",
 	})
 	const navigate = useNavigate()
+
+	// React Query mutation for syncing MongoDB user
+	const syncUserMutation = useMutation({
+		mutationFn: syncUser,
+		onSuccess: async (data) => {
+			if (!data.success) {
+				setError(data.message || "Failed to sync user")
+				return
+			}
+
+			// Store MongoDB user in zustand
+			setUser(data.user)
+
+			// Check for pending invite token
+			const pendingToken = localStorage.getItem("pendingInviteToken")
+			if (pendingToken) {
+				try {
+					const inviteResponse = await acceptInviteAuthenticated(pendingToken)
+					if (inviteResponse.success) {
+						localStorage.removeItem("pendingInviteToken")
+						console.log("הצטרפת בהצלחה למאמן!")
+					}
+				} catch (error) {
+					console.error("Error accepting invite:", error)
+				}
+			}
+
+			navigate("/dashboard")
+		},
+		onError: (err: any) => {
+			setError(err.message || "Failed to sync with server")
+		}
+	})
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
@@ -24,37 +57,37 @@ const LoginPage = () => {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		const response = await login(userData)
+		setError("")
 
-		if (!response.success) {
-			setError(response.message || "התחברות נכשלה")
-			return
-		}
+		if (!isLoaded) return
 
-		if (response.accessToken) {
-			setToken(response.accessToken)
+		try {
+			// 1. Sign in with Clerk
+			const result = await signIn.create({
+				identifier: userData.email,
+				password: userData.password,
+			})
 
-			// CHECK FOR PENDING INVITE TOKEN
-			const pendingToken = localStorage.getItem("pendingInviteToken")
+			if (result.status === "complete") {
+				// 2. Set the active Clerk session
+				await setActive({ session: result.createdSessionId })
 
-			if (pendingToken) {
-				try {
-					const inviteResponse = await acceptInviteAuthenticated(pendingToken)
-
-					if (inviteResponse.success) {
-						localStorage.removeItem("pendingInviteToken")
-						// Optional: Show success message
-						console.log("הצטרפת בהצלחה למאמן!")
-					}
-				} catch (error) {
-					// Don't block login if invite acceptance fails
-					console.error("Error accepting invite:", error)
+				// 3. Get and store Clerk token in zustand
+				const clerkToken = await getToken()
+				if (clerkToken) {
+					setToken(clerkToken)
 				}
-			}
 
-			navigate("/dashboard")
+				// 4. Sync with MongoDB using React Query
+				syncUserMutation.mutate()
+			}
+		} catch (err: any) {
+			console.error("Error:", err)
+			setError(err.errors?.[0]?.message || "התחברות נכשלה")
 		}
 	}
+
+	const isLoading = !isLoaded || syncUserMutation.isPending
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-sunset">
@@ -85,7 +118,8 @@ const LoginPage = () => {
 							name="email"
 							id="email"
 							type="email"
-							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
+							disabled={isLoading}
+							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition disabled:opacity-50"
 							placeholder="your@email.com"
 						/>
 					</div>
@@ -102,16 +136,18 @@ const LoginPage = () => {
 							name="password"
 							id="password"
 							type="password"
-							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition"
+							disabled={isLoading}
+							className="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:ring-client-primary focus:border-transparent outline-none transition disabled:opacity-50"
 							placeholder="••••••••"
 						/>
 					</div>
 
 					<button
 						type="submit"
-						className="w-full text-white py-3 rounded-lg font-semibold transition duration-200 shadow-xl bg-primary-button hover:bg-primary-button-hover"
+						disabled={isLoading}
+						className="w-full text-white py-3 rounded-lg font-semibold transition duration-200 shadow-xl bg-primary-button hover:bg-primary-button-hover disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						התחבר
+						{isLoading ? "מתחבר..." : "התחבר"}
 					</button>
 				</form>
 
