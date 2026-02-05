@@ -17,11 +17,12 @@ api.interceptors.request.use(
 		// no need to send access token if the request is to any of the authUrls routes
 		if (!isAuthEndpoint) {
 			const token = useAuthStore.getState().token
+			console.log('Token being sent:', token)
 			if (token) {
 				config.headers["Authorization"] = `Bearer ${token}`
 			}
 		}
-		
+
 		return config
 	},
 	(error) => {

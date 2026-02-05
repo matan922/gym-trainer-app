@@ -20,6 +20,32 @@ export const syncUser = async (): Promise<any> => {
 	}
 }
 
+export const createProfile = async (profileData: {
+	firstName: string
+	lastName: string
+	email: string
+	profileType: 'trainer' | 'client'
+	age?: string
+	weight?: string
+	goal?: string
+	notes?: string
+	trainerType?: string
+	inviteToken?: string
+}): Promise<any> => {
+	try {
+		const response = await api.post('/auth/create-profile', profileData)
+		return response.data
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				throw new Error(error.response.data?.message || "Server error")
+			}
+			throw new Error("Cannot connect to server")
+		}
+		throw new Error("Something went wrong")
+	}
+}
+
 export const login = async (userData: { email: string; password: string }): Promise<any> => {
 	try {
 		const response = await api.post(`/auth/login`, userData)

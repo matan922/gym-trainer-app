@@ -13,15 +13,76 @@ import ClientInviteToken from "../models/ClientInviteToken.js";
 import TrainerClientRelation from "../models/TrainerClientRelation.js";
 
 
+export const createProfile = async (req: Request, res: Response) => {
+    try {
+        const clerkId = req.clerkId
+        const { firstName, lastName, email, profileType, age, weight, goal, notes, trainerType, inviteToken } = req.body
+
+        if (!clerkId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+
+        if (!isValidProfileType(profileType)) {
+            return res.status(400).json({ success: false, message: "Invalid profile type" })
+        }
+
+        // Check if user already exists
+        const existing = await User.findOne({ clerkId })
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Profile already exists" })
+        }
+
+        // Create MongoDB user
+        const user = new User({
+            clerkId,
+            email,
+            firstName,
+            lastName,
+            activeProfile: profileType
+        })
+
+        if (profileType === 'trainer') {
+            user.profiles.trainer = { trainerType: trainerType || 'personal' }
+        } else {
+            user.profiles.client = { age, weight, goal, notes }
+        }
+
+        await user.save()
+
+        // Handle invite token if present
+        if (inviteToken) {
+            const inviteTokenInDb = await ClientInviteToken.findOne({ token: inviteToken })
+            if (inviteTokenInDb) {
+                await TrainerClientRelation.create({
+                    clientId: user._id,
+                    trainerId: inviteTokenInDb.userTrainerId,
+                    status: "active"
+                })
+                inviteTokenInDb.usedAt = new Date()
+                await inviteTokenInDb.save()
+            }
+        }
+
+        res.status(201).json({ success: true, user })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: "Something went wrong" })
+    }
+}
+
 export const syncUser = async (req: Request, res: Response) => {
     const clerkId = req.clerkId
 
+    if (!clerkId) {
+        return res.status(401).json({ success: false, message: "Unauthorized" })
+    }
+
     const user = await User.findOne({ clerkId })
     if (!user) {
-        return res.status(404).json({ message: "User not found. Please register first." }) // getting to this error because no account on mongo!
+        return res.status(404).json({ success: false, message: "User not found. Please register first." })
     }
-    console.log(user)
-    res.status(201).json({ user });
+
+    res.json({ success: true, user });
 }
 
 export const register = async (req: Request, res: Response) => {

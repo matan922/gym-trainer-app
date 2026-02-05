@@ -8,12 +8,12 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
     try {
         const trainer = req.user
         const allClients = await TrainerClientRelation.find({ trainerId: trainer?.id })
-
+        
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const tomorrow = new Date(today)
         tomorrow.setDate(tomorrow.getDate() + 1)
-
+        
         const todaySessions = await Session.find({
             trainerId: trainer?.id,
             startTime: { $gte: today, $lt: tomorrow },
@@ -24,7 +24,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
         const trainingToday = uniqueClientIds.size
         const percentageToday = allClients.length > 0 ? (trainingToday / allClients.length) * 100 : 0
         console.log(trainingToday)
-
+        
         const todayStats = {
             trainingToday,
             totalSessionsToday: todaySessions.length,
@@ -35,28 +35,28 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
                 time: session.startTime
             }))
         }
-
+        
         const currentDay = today.getDay() // 0 = Sunday, 1 = Monday, etc.
         const weekStart = new Date(today)
         weekStart.setDate(today.getDate() - currentDay)
         weekStart.setHours(0, 0, 0, 0)
-
+        
         const weekEnd = new Date(weekStart)
         weekEnd.setDate(weekStart.getDate() + 7)
-
+        
         const weekSessions = await Session.find({
             trainerId: trainer?.id,
             startTime: { $gte: weekStart, $lt: weekEnd },
         })
-
+        
         const clientIdsThisWeek = weekSessions.map(session => session.clientId.toString())
         const uniqueClientIdsWeek = new Set(clientIdsThisWeek)
         const percentageWeek = allClients.length > 0 ? (uniqueClientIdsWeek.size / allClients.length) * 100 : 0
-
+        
         const allClientIds = allClients.map(relation => relation.clientId.toString())
         const missingClientIds = allClientIds.filter(id => !uniqueClientIdsWeek.has(id))
         const missingClients = await User.find({ _id: { $in: missingClientIds } })
-
+        
         const activeClientIds = Array.from(uniqueClientIdsWeek)
         const activeClients = await User.find({ _id: { $in: activeClientIds } })
 
@@ -75,21 +75,21 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
                 `${(client as any).firstName} ${(client as any).lastName}`
             )
         }
-
-
+        
+        
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
         const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
-
+        
         const monthlySessions = await Session.find({
             trainerId: trainer?.id,
             startTime: { $gte: monthStart, $lte: monthEnd }
         })
-
+        
         const completed = monthlySessions.filter(session => session.status === 'Completed').length
         const cancelled = monthlySessions.filter(session => session.status === 'Cancelled')
         const total = monthlySessions.length
         const monthlyPercentage = total > 0 ? (completed / total) * 100 : 0
-
+        
         const monthlyCompletionRate = {
             percentage: Math.round(monthlyPercentage),
             completed,
@@ -99,7 +99,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
                 date: session.startTime
             }))
         }
-
+        
         return res.json({ todayStats, weekStats, monthlyCompletionRate })
     } catch (error) {
         console.log(error)

@@ -47,15 +47,6 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-  },
-  emailVerified: {
-    type: Boolean,
-    default: false
-  },
   profiles: {
     trainer: { type: trainerProfileSchema, default: null },
     client: { type: clientProfileSchema, default: null }

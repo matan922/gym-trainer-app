@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, validateInviteToken, sendClientInvite, syncUser } from '../controller/authController.js';
+import { login, register, generateNewAccessToken, logout, forgotPassword, resetPassword, verifyEmail, validateInviteToken, sendClientInvite, syncUser, createProfile } from '../controller/authController.js';
 import { apiLimiter, loginLimiter, logoutLimiter, refreshLimiter } from '../middlewares/rateLimitersMiddleware.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { requireAuth, verifyClerkToken } from '../middlewares/clerkAuthMiddleware.js';
@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/register', apiLimiter, register)
 router.post('/login', loginLimiter, login)
 router.get('/sync-user', verifyClerkToken, requireAuth, syncUser)
+router.post('/create-profile', verifyClerkToken, requireAuth, createProfile)
 router.post('/token', refreshLimiter, generateNewAccessToken) // used to generate new access token from refresh token
 router.post('/verify-email', apiLimiter, verifyEmail)
 router.delete('/logout', logoutLimiter, logout)
