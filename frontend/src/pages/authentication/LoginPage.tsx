@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSignIn, useAuth } from "@clerk/clerk-react"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
@@ -7,15 +7,20 @@ import { useMutation } from "@tanstack/react-query"
 
 const LoginPage = () => {
 	const { signIn, isLoaded, setActive } = useSignIn()
-	const { getToken } = useAuth()
+	const { isSignedIn, isLoaded: isAuthLoaded } = useAuth()
 	const setUser = useAuthStore((state) => state.setUser)
-	const setToken = useAuthStore((state) => state.setToken)
 	const [error, setError] = useState<string>("")
 	const [userData, setUserData] = useState({
 		email: "",
 		password: "",
 	})
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (isAuthLoaded && isSignedIn) {
+			navigate("/dashboard", { replace: true })
+		}
+	}, [isAuthLoaded, isSignedIn, navigate])
 
 	// React Query mutation for syncing MongoDB user
 	const syncUserMutation = useMutation({
@@ -72,13 +77,8 @@ const LoginPage = () => {
 				// 2. Set the active Clerk session
 				await setActive({ session: result.createdSessionId })
 
-				// 3. Get and store Clerk token in zustand
-				const clerkToken = await getToken()
-				if (clerkToken) {
-					setToken(clerkToken)
-				}
-
-				// 4. Sync with MongoDB using React Query
+				// 3. Sync with MongoDB using React Query
+				// Token is automatically handled by tokenProvider in axios interceptor
 				syncUserMutation.mutate()
 			}
 		} catch (err: any) {

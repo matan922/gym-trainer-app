@@ -7,7 +7,7 @@ import Session from "../../models/Session";
 export const getTrainerDashboard = async (req: Request, res: Response) => {
     try {
         const trainer = req.user
-        const allClients = await TrainerClientRelation.find({ trainerId: trainer?.id })
+        const allClients = await TrainerClientRelation.find({ trainerId: trainer?.mongoUserId })
         
         const today = new Date()
         today.setHours(0, 0, 0, 0)
@@ -15,7 +15,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
         tomorrow.setDate(tomorrow.getDate() + 1)
         
         const todaySessions = await Session.find({
-            trainerId: trainer?.id,
+            trainerId: trainer?.mongoUserId,
             startTime: { $gte: today, $lt: tomorrow },
         }).populate('clientId')
         
@@ -45,7 +45,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
         weekEnd.setDate(weekStart.getDate() + 7)
         
         const weekSessions = await Session.find({
-            trainerId: trainer?.id,
+            trainerId: trainer?.mongoUserId,
             startTime: { $gte: weekStart, $lt: weekEnd },
         })
         
@@ -81,7 +81,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
         const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
         
         const monthlySessions = await Session.find({
-            trainerId: trainer?.id,
+            trainerId: trainer?.mongoUserId,
             startTime: { $gte: monthStart, $lte: monthEnd }
         })
         

@@ -3,7 +3,7 @@ import { useState } from "react"
 import { sendClientInvite } from "../../services/authApi"
 import type { ClientInvite } from "../../types/clientTypes"
 import { useNavigate } from "react-router"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 function InviteClientPage() {
 	const queryClient = useQueryClient()

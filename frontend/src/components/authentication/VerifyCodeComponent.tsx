@@ -5,10 +5,11 @@ interface VerifyCodeComponentProps {
     onVerify: (code: string) => Promise<void>
     onResend: () => Promise<void>
     error?: string
+    successMessage?: string
     isLoading?: boolean
 }
 
-const VerifyCodeComponent = ({ email, onVerify, onResend, error, isLoading }: VerifyCodeComponentProps) => {
+const VerifyCodeComponent = ({ email, onVerify, onResend, error, successMessage, isLoading }: VerifyCodeComponentProps) => {
     const [code, setCode] = useState("")
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,6 +62,12 @@ const VerifyCodeComponent = ({ email, onVerify, onResend, error, isLoading }: Ve
                 {error && (
                     <div className="text-center text-sm text-red-500">
                         {error}
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div className="text-center text-sm text-green-600">
+                        {successMessage}
                     </div>
                 )}
 

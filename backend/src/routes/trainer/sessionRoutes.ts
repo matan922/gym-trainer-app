@@ -1,17 +1,17 @@
 import express from 'express';
-import { authenticateToken } from '../../middlewares/authMiddleware.js';
+import { verifyClerkToken, requireAuth } from '../../middlewares/clerkAuthMiddleware.js';
 import { getSessions, postSession, updateSession, updateSessionStatus } from '../../controller/trainer/sessionController.js';
 import { apiLimiter } from '../../middlewares/rateLimitersMiddleware.js';
 
 const router = express.Router();
 
 router.use(apiLimiter)
-router.get("/", authenticateToken, getSessions)
-router.get("/:clientId", authenticateToken, getSessions) // get sessions of specific client.
-router.post("/", authenticateToken, postSession)
-router.patch("/:sessionId", authenticateToken, updateSessionStatus)
-router.put("/:sessionId", authenticateToken, updateSession)
-router.delete("/:sessionId", authenticateToken,)
+router.get("/", verifyClerkToken, requireAuth, getSessions)
+router.get("/:clientId", verifyClerkToken, requireAuth, getSessions) // get sessions of specific client.
+router.post("/", verifyClerkToken, requireAuth, postSession)
+router.patch("/:sessionId", verifyClerkToken, requireAuth, updateSessionStatus)
+router.put("/:sessionId", verifyClerkToken, requireAuth, updateSession)
+router.delete("/:sessionId", verifyClerkToken, requireAuth,)
 
 
 export default router;

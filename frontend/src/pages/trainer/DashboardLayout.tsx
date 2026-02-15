@@ -1,12 +1,11 @@
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router"
-import { logout } from "../../services/authApi"
 import { useAuthStore } from "../../store/authStore"
 import { useClerk } from "@clerk/clerk-react"
 
 function DashboardLayout() {
 	const navigate = useNavigate()
-	const clearToken = useAuthStore((state) => state.clearToken)
+	const clearUser = useAuthStore((state) => state.clearUser)
 	const { signOut } = useClerk()
 	const [hamburgerOpen, setHamburgerOpen] = useState<boolean>(false)
 
@@ -22,11 +21,11 @@ function DashboardLayout() {
 	const handleLogout = async () => {
 		try {
 			if (confirm("אישור התנתקות")) {
+				// Sign out from Clerk (handles session cleanup)
 				await signOut()
-				await logout()
-				clearToken()
+				// Clear local user data
+				clearUser()
 				setHamburgerOpen(false)
-
 				navigate("/")
 			}
 		} catch (error) {

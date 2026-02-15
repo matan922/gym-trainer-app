@@ -22,18 +22,51 @@ import InviteAcceptPage from "./pages/authentication/InviteAcceptPage"
 import { useAuthStore } from "./store/authStore"
 import SessionsClientPage from "./pages/client/SessionsClientPage"
 import WorkoutsClientPage from "./pages/client/WorkoutsClientPage"
+import { useAuth } from "@clerk/clerk-react"
+import { useEffect } from "react"
+import { setClerkTokenGetter } from "./utils/tokenProvider"
+import { syncUser } from "./services/authApi"
+import { useMutation } from "@tanstack/react-query"
 
 dayjs.extend(relativeTime)
 dayjs.locale('he')
 
 function App() {
 	const user = useAuthStore((state) => state.user)
+	const setUser = useAuthStore((state) => state.setUser)
+	const { getToken, isSignedIn, isLoaded } = useAuth()
+
+	// Mutation for syncing user data
+	const syncUserMutation = useMutation({
+		mutationFn: syncUser,
+		onSuccess: (data) => {
+			if (data.success) {
+				setUser(data.user)
+			}
+		},
+		onError: (err: any) => {
+			console.error('Failed to sync user:', err)
+		}
+	})
+
+	// Register Clerk token getter and auto-sync user data
+	useEffect(() => {
+		// Register token getter for axios interceptor
+		setClerkTokenGetter(getToken)
+
+		// Auto-sync: If Clerk says user is signed in but we don't have user data, fetch it
+		if (isLoaded && isSignedIn && !user) {
+			syncUserMutation.mutate()
+		}
+	}, [getToken, isSignedIn, isLoaded, user])
+
+	if (!isLoaded) return null
 
 	return (
 		<Routes>
-			<Route path="/" element={<Navigate to="/register" replace />} />
-			<Route path="/login" element={<LoginPage />} />
-			<Route path="/register" element={<RegisterPage />} />
+			<Route path="/" element={<Navigate to={isSignedIn ? "/dashboard" : "/register"} replace />} />
+			<Route path="/login" element={isSignedIn ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+			<Route path="/register" element={isSignedIn ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
 			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
 			<Route path="/invite-accept" element={<InviteAcceptPage />} />
 
