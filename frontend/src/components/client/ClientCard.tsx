@@ -16,16 +16,14 @@ function ClientCard({ client, onCard }: ClientCardProps) {
 		>
 			<div className="flex flex-col gap-3">
 				{/* Client Name */}
-				<div className="flex items-center gap-2 pb-3 border-b-2 border-trainer-primary/20">
-					<span className="text-2xl">👤</span>
+				<div className="pb-3 border-b-2 border-trainer-primary/20">
 					<h3 className="text-xl font-bold text-trainer-dark">
 						{client.firstName} {client.lastName}
 					</h3>
 				</div>
 
 				{/* Goal */}
-				<div className="flex items-center gap-2">
-					<span className="text-lg">🎯</span>
+				<div>
 					<span className="text-sm text-text-medium font-medium">{client.goal}</span>
 				</div>
 

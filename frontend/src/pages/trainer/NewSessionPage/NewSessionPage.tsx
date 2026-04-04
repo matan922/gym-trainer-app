@@ -7,10 +7,10 @@ import "react-datepicker/dist/react-datepicker.css"
 import { CacheProvider } from "@emotion/react"
 import Autocomplete from "@mui/material/Autocomplete"
 import { ThemeProvider } from "@mui/material/styles"
-import { useAuthStore } from "../../../store/authStore"
 import { rtlCache, theme } from "./theme"
 import { useNavigate } from "react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useUser } from "@clerk/clerk-react"
 
 const NewSessionPage = () => {
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -21,7 +21,7 @@ const NewSessionPage = () => {
 	const [sessionType, setSessionType] = useState<string>("Studio")
 	const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
 	const navigate = useNavigate()
-	const token = useAuthStore((state) => state.token)
+	const { user } = useUser()
 	const queryClient = useQueryClient()
 
 	// Fetch clients list
@@ -67,9 +67,9 @@ const NewSessionPage = () => {
 
 	const handleNewSessionSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		if (!token || !selectedClient?._id || !selectedDate || !selectedStartTime) return
+		if (!user?.id || !selectedClient?._id || !selectedDate || !selectedStartTime) return
 
-		const trainerId = token
+		const trainerId = user.id
 		const clientId = selectedClient?._id
 
 		// Combine selected date with selected start time

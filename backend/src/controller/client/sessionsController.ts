@@ -5,7 +5,7 @@ import { AppError } from "../../helper/errors.js";
 
 export const getSessions = async (req: Request, res: Response) => {
     try {
-        const userId = req.user?.id!;
+        const userId = req.user?.mongoUserId!;
         const filter = typeof req.query.filter === 'string' ? req.query.filter : '';
         const timeRange = typeof req.query.timeRange === 'string' ? req.query.timeRange : '';
         const specificDate = typeof req.query.specificDate === 'string' ? req.query.specificDate : '';

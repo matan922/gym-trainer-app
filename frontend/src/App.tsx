@@ -36,37 +36,27 @@ function App() {
 	const setUser = useAuthStore((state) => state.setUser)
 	const { getToken, isSignedIn, isLoaded } = useAuth()
 
-	// Mutation for syncing user data
-	const syncUserMutation = useMutation({
-		mutationFn: syncUser,
-		onSuccess: (data) => {
-			if (data.success) {
-				setUser(data.user)
-			}
-		},
-		onError: (err: any) => {
-			console.error('Failed to sync user:', err)
-		}
-	})
-
-	// Register Clerk token getter and auto-sync user data
-	useEffect(() => {
-		// Register token getter for axios interceptor
-		setClerkTokenGetter(getToken)
-
-		// Auto-sync: If Clerk says user is signed in but we don't have user data, fetch it
-		if (isLoaded && isSignedIn && !user) {
-			syncUserMutation.mutate()
-		}
-	}, [getToken, isSignedIn, isLoaded, user])
+	setClerkTokenGetter(getToken)
 
 	if (!isLoaded) return null
 
+	// Show loading while user data is being fetched
+	console.log(user)
+	// if (isSignedIn && !user) {
+	// 	return (
+	// 		<div className="min-h-screen flex items-center justify-center bg-gray-50">
+	// 			<div className="text-center">
+	// 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+	// 				<p className="text-text-medium">טוען נתונים...</p>
+	// 			</div>
+	// 		</div>
+	// 	)
+	// }
 	return (
 		<Routes>
 			<Route path="/" element={<Navigate to={isSignedIn ? "/dashboard" : "/register"} replace />} />
-			<Route path="/login" element={isSignedIn ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
-			<Route path="/register" element={isSignedIn ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+			<Route path="/login" element={<LoginPage />} />
+			<Route path="/register" element={<RegisterPage />} />
 			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
 			<Route path="/invite-accept" element={<InviteAcceptPage />} />
 

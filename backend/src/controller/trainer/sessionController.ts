@@ -4,7 +4,7 @@ import TrainerClientRelation from "../../models/TrainerClientRelation.js";
 import { getSessionsForTrainer } from "../helper/sessionHelper.js";
 
 export const getSessions = async (req: Request, res: Response) => {
-    const userId = req.user?.id!
+    const userId = req.user?.mongoUserId!
     const filter = typeof req.query.filter === 'string' ? req.query.filter : ''
     const timeRange = typeof req.query.timeRange === 'string' ? req.query.timeRange : ''
     const specificDate = typeof req.query.specificDate === 'string' ? req.query.specificDate : ''
@@ -21,7 +21,7 @@ export const postSession = async (req: Request, res: Response) => {
         const user = req.user
         const { clientId, startTime, endTime, sessionType, status, workoutName, workoutId } = req.body
 
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             return res.status(400).json({ message: "No relation between this client and you" })
         }
@@ -30,7 +30,7 @@ export const postSession = async (req: Request, res: Response) => {
         const sessionEndTime = endTime ? new Date(endTime) : new Date(sessionStartTime.getTime() + 60 * 60 * 1000)
 
         const session = new Session({
-            trainerId: user?.id,
+            trainerId: user?.mongoUserId,
             clientId: clientId,
             startTime: new Date(startTime),
             endTime: sessionEndTime,
@@ -54,7 +54,7 @@ export const updateSession = async (req: Request, res: Response) => {
         const user = req.user
         const { sessionId } = req.params
         const { clientId, startTime, endTime, sessionType, status, workoutName, workoutId } = req.body
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: 'active' })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: 'active' })
         if (!relation) {
             return res.status(400).json({ message: "No relation between this client and you" })
         }
@@ -86,13 +86,13 @@ export const updateSessionStatus = async (req: Request, res: Response) => {
         const { status } = req.body
 
         // Find session and verify ownership
-        const session = await Session.findOne({ _id: sessionId, trainerId: user?.id })
+        const session = await Session.findOne({ _id: sessionId, trainerId: user?.mongoUserId })
 
         if (!session) {
             return res.status(404).json({ success: false, message: "Session not found" })
         }
 
-        const relation = await TrainerClientRelation.findOne({ clientId: session.clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: session.clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             return res.status(403).json({ message: "Not authorized" })
         }

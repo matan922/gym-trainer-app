@@ -12,6 +12,7 @@ export const syncUser = async (): Promise<any> => {
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			if (error.response) {
+				console.log("error", error.response.data?.message)
 				throw new Error(error.response.data?.message || "Server error")
 			}
 			throw new Error("Cannot connect to server")

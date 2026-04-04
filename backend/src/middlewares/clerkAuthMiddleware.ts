@@ -7,6 +7,7 @@ export const verifyClerkToken = clerkMiddleware({ secretKey: process.env.CLERK_S
 // Custom middleware to require authentication
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = getAuth(req)
+    console.log(userId)
 
     if (!userId) {
         return res.status(401).json({

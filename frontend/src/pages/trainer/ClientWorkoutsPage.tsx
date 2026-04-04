@@ -10,6 +10,7 @@ import {
 } from "../../services/trainerApi"
 import type { Workout } from "../../types/clientTypes"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { EditIcon, PlusIcon } from "../../components/icons/Icons"
 
 const ClientWorkoutsPage = () => {
 	const { id } = useParams()
@@ -108,7 +109,6 @@ const ClientWorkoutsPage = () => {
 					{/* Header */}
 					<div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<div className="flex  items-center gap-3">
-							<span className="text-2xl">💪</span>
 							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">אימונים</h1>
 							<span className="text-lg text-trainer-primary font-semibold">
 								({workouts.length})
@@ -119,7 +119,7 @@ const ClientWorkoutsPage = () => {
 							className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
 							type="button"
 						>
-							<span>➕</span>
+							<PlusIcon className="w-6 h-6" />
 							אימון חדש
 						</button>
 					</div>
@@ -158,7 +158,6 @@ const ClientWorkoutsPage = () => {
 										<div className="flex-1">
 											{workout.workoutName && (
 												<div className="flex items-center gap-2 mb-3">
-													<span className="text-xl">📝</span>
 													<p className="text-text-dark font-semibold">{workout.workoutName}</p>
 												</div>
 											)}
@@ -168,7 +167,7 @@ const ClientWorkoutsPage = () => {
 												onClick={(e) => handleEditModalState(e, workout)}
 												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all"
 											>
-												✏️ עריכה
+												עריכה <EditIcon className="w-6 h-6" />
 											</button>
 											<button
 												onClick={(e) => handleDeleteWorkout(workout._id!, e)}

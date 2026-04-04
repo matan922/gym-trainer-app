@@ -9,7 +9,7 @@ export const getClients = async (req: Request, res: Response) => {
     try {
         const user = req.user;
         const relations = await TrainerClientRelation.find({
-            trainerId: user?.id,
+            trainerId: user?.mongoUserId,
             status: 'active'
         });
 
@@ -19,7 +19,7 @@ export const getClients = async (req: Request, res: Response) => {
 
         const clientIdArray = relations.map((relation) => relation.clientId);
         const clientUsers = await User.find({ _id: { $in: clientIdArray }, 'profiles.client': { $exists: true } })
-        const completedSessions = await Session.find({ trainerId: user?.id, clientId: { $in: clientIdArray }, status: 'Completed' }).sort({ startTime: -1 })
+        const completedSessions = await Session.find({ trainerId: user?.mongoUserId, clientId: { $in: clientIdArray }, status: 'Completed' }).sort({ startTime: -1 })
 
         const clientsData = clientUsers.map(user => {
             const lastSession = completedSessions.find(session => session.clientId.toString() === user._id.toString())
@@ -49,7 +49,7 @@ export const getClient = async (req: Request, res: Response) => {
     try {
         const user = req.user
         const { clientId } = req.params
-        const relation = await TrainerClientRelation.findOne({ trainerId: user?.id, clientId: clientId, status: 'active' })
+        const relation = await TrainerClientRelation.findOne({ trainerId: user?.mongoUserId, clientId: clientId, status: 'active' })
         if (!relation) {
             return res.status(403).json({ message: 'Not authorized' })
         }
@@ -70,7 +70,7 @@ export const getClient = async (req: Request, res: Response) => {
             notes: relatedClient.profiles.client?.notes
         }
 
-        const relatedWorkouts = await Workout.find({ trainerId: user?.id, clientId: clientId })
+        const relatedWorkouts = await Workout.find({ trainerId: user?.mongoUserId, clientId: clientId })
         return res.status(200).json({ client: clientData, workouts: relatedWorkouts })
     } catch (error) {
         res.status(400).json({ message: error instanceof Error ? error.message : String(error) })
@@ -89,7 +89,7 @@ export const endRelation = async (req: Request, res: Response) => {
         const { clientId } = req.params
 
         const relation = await TrainerClientRelation.findOne({
-            trainerId: user?.id,
+            trainerId: user?.mongoUserId,
             clientId: clientId
         });
         if (!relation) {

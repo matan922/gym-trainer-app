@@ -6,14 +6,12 @@ export interface TrainerDashboard {
         totalClients: number
         trainingToday: number
     },
-    weekStats: {
-        active: []
-        missing: []
-        percentageWeek: number
-        totalClients: number
-        totalSessions: number
-        trainingWeek: number
-    },
+    upcomingSessions: {
+        clientName: string
+        date: Date
+        time: Date
+        sessionType: string
+    }[],
     monthlyCompletionRate: {
         cancelled: []
         completed: number

@@ -2,6 +2,7 @@ import { getTrainerDashboard } from "../../services/trainerApi"
 import { useAuthStore } from "../../store/authStore"
 import dayjs from "dayjs"
 import { useQuery } from "@tanstack/react-query"
+import { CalendarIcon, CheckIcon, ClockIcon } from "../../components/icons/Icons"
 
 const DashboardMainPage = () => {
 	const user = useAuthStore((state) => state.user)
@@ -32,7 +33,7 @@ const DashboardMainPage = () => {
 		)
 	}
 
-	const { todayStats, weekStats, monthlyCompletionRate } = data
+	const { todayStats, upcomingSessions, monthlyCompletionRate } = data
 	const totalSessionsToday = todayStats.totalSessionsToday
 	const sessions = todayStats.sessions
 
@@ -43,7 +44,7 @@ const DashboardMainPage = () => {
 				{/* Welcome Section */}
 				<div className="mb-8">
 					<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark mb-2">
-						🔥 שלום, {user?.firstName}!
+						שלום, {user?.firstName}!
 					</h1>
 					<p className="text-text-dark text-lg font-medium">
 						{totalSessionsToday === 0 && "אין אימונים היום"}
@@ -59,7 +60,7 @@ const DashboardMainPage = () => {
 					<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:col-span-1">
 						{/* Header */}
 						<div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-trainer-primary/20">
-							<span className="text-3xl">🔥</span>
+							<ClockIcon className="w-8 h-8 text-trainer-dark" />
 							<h2 className="text-xl font-bold text-trainer-dark">אימונים היום</h2>
 							<span className="text-base text-trainer-primary font-semibold mr-auto">
 								({totalSessionsToday})
@@ -102,70 +103,57 @@ const DashboardMainPage = () => {
 						)}
 					</div>
 
-					{/* Card 2: Week's Active Clients - Enhanced */}
+					{/* Card 2: Upcoming Sessions This Week */}
 					<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6">
 						{/* Header */}
 						<div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-trainer-primary/20">
-							<span className="text-3xl">💪</span>
-							<h2 className="text-xl font-bold text-trainer-dark">השבוע</h2>
+							<CalendarIcon className="w-8 h-8 text-trainer-dark" />
+							<h2 className="text-xl font-bold text-trainer-dark">אימונים קרובים</h2>
 							<span className="text-base text-trainer-primary font-semibold mr-auto">
-								({weekStats.trainingWeek})
+								({upcomingSessions.length})
 							</span>
 						</div>
 
-						{/* Stats Summary */}
-						<div className="mb-4">
-							<div className="text-2xl font-bold text-trainer-primary mb-1">
-								{weekStats.trainingWeek}/{weekStats.totalClients}
+						{/* Upcoming Sessions List */}
+						{upcomingSessions.length > 0 ? (
+							<div className="space-y-2">
+								{upcomingSessions.map((session, i) => (
+									<div
+										key={i}
+										className="flex items-center justify-between p-3 bg-white rounded-lg border-r-4 border-trainer-primary hover:shadow-md hover:bg-sidebar-item-hover-trainer transition-all"
+									>
+										<div className="flex flex-col">
+											<span className="font-semibold text-text-dark">
+												{session.clientName}
+											</span>
+											<span className="text-xs text-text-medium">
+												{session.sessionType === 'Online' ? 'אונליין' : 'סטודיו'}
+											</span>
+										</div>
+										<div className="flex flex-col items-end">
+											<span className="text-trainer-primary font-bold">
+												{dayjs(session.date).format("DD/MM")}
+											</span>
+											<span className="text-sm text-text-medium">
+												{dayjs(session.time).format("HH:mm")}
+											</span>
+										</div>
+									</div>
+								))}
 							</div>
-							<div className="text-sm text-text-medium mb-3">
-								{weekStats.percentageWeek}% מהלקוחות אומנו השבוע
+						) : (
+							<div className="text-center py-8">
+								<p className="text-text-light text-sm">אין אימונים מתוכננים השבוע</p>
 							</div>
-
-							{/* Progress Bar */}
-							<div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-								<div
-									className="bg-trainer-primary h-2 rounded-full transition-all"
-									style={{ width: `${weekStats.percentageWeek}%` }}
-								></div>
-							</div>
-						</div>
-
-						{/* Breakdown */}
-						<div className="space-y-2">
-							<div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-								<span className="text-sm text-text-medium">אימנו</span>
-								<span className="text-sm font-bold text-green-700">
-									{weekStats.trainingWeek}
-								</span>
-							</div>
-							{weekStats.missing.length > 0 && (
-								<div className="flex items-center justify-between p-2 bg-orange-50 rounded-lg">
-									<span className="text-sm text-text-medium">לא אומנו</span>
-									<span className="text-sm font-bold text-orange-700">
-										{weekStats.missing.length}
-									</span>
-								</div>
-							)}
-							<div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-								<span className="text-sm text-text-medium">סה"כ אימונים</span>
-								<span className="text-sm font-bold text-blue-700">
-									{weekStats.totalSessions}
-								</span>
-							</div>
-						</div>
+						)}
 					</div>
 
 					{/* Card 3: Monthly Completion Rate - Enhanced */}
 					<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6">
 						{/* Header */}
 						<div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-trainer-primary/20">
-							<span className="text-3xl">✅</span>
+							<CheckIcon className="w-8 h-8 text-trainer-dark" />
 							<h2 className="text-xl font-bold text-trainer-dark">החודש</h2>
-							<span className="text-2xl mr-auto">
-								{monthlyCompletionRate.percentage >= 90 ? '🟢' :
-									monthlyCompletionRate.percentage >= 75 ? '🟡' : '🔴'}
-							</span>
 						</div>
 
 						{/* Stats Summary */}
@@ -191,21 +179,21 @@ const DashboardMainPage = () => {
 						{/* Breakdown */}
 						<div className="space-y-2">
 							<div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-								<span className="text-sm text-text-medium">✅ הושלמו</span>
+								<span className="text-sm text-text-medium">הושלמו</span>
 								<span className="text-sm font-bold text-green-700">
 									{monthlyCompletionRate.completed}
 								</span>
 							</div>
 							{monthlyCompletionRate.cancelled.length > 0 && (
 								<div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-									<span className="text-sm text-text-medium">❌ בוטלו</span>
+									<span className="text-sm text-text-medium">בוטלו</span>
 									<span className="text-sm font-bold text-red-700">
 										{monthlyCompletionRate.cancelled.length}
 									</span>
 								</div>
 							)}
 							<div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-								<span className="text-sm text-text-medium">📊 סה"כ</span>
+								<span className="text-sm text-text-medium">סה"כ</span>
 								<span className="text-sm font-bold text-blue-700">
 									{monthlyCompletionRate.total}
 								</span>

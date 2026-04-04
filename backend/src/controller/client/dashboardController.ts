@@ -11,7 +11,7 @@ export const getDashboard = async (req: Request, res: Response) => {
 
         const now = new Date()
 
-        const relation = await TrainerClientRelation.findOne({ clientId: user.id })
+        const relation = await TrainerClientRelation.findOne({ clientId: user.mongoUserId })
         if (!relation) {
             return res.status(403).json({ message: 'Not authorized' })
         }
@@ -21,9 +21,9 @@ export const getDashboard = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Trainer not found' })
         }
 
-        const upcomingSession = await Session.findOne({ clientId: user.id, startTime: { $gte: now } }).sort({ startTime: 1 })
+        const upcomingSession = await Session.findOne({ clientId: user.mongoUserId, startTime: { $gte: now } }).sort({ startTime: 1 })
 
-        const lastSession = await Session.findOne({ clientId: user.id, startTime: { $lt: now } }).sort({ startTime: -1 })
+        const lastSession = await Session.findOne({ clientId: user.mongoUserId, startTime: { $lt: now } }).sort({ startTime: -1 })
 
         const dashboardData = {
             trainer: relatedTrainer ? {

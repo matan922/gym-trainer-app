@@ -4,9 +4,6 @@
  * This module provides a bridge between React hooks (useAuth) and axios interceptors.
  * Since hooks can only be called in React components, we use a provider pattern
  * to make the Clerk getToken function accessible to axios.
- *
- * Industry-standard approach: Always get fresh tokens from auth provider,
- * never store tokens in localStorage.
  */
 
 type TokenGetter = () => Promise<string | null>

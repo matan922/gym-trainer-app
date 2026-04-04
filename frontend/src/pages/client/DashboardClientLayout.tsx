@@ -1,14 +1,18 @@
 import { useState } from "react"
-import { Outlet, useNavigate } from "react-router"
+import { Outlet, useNavigate, useLocation } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { useClerk } from "@clerk/clerk-react"
+import { HomeIcon, HomeIconSolid, DumbbellIcon, DumbbellIconSolid, CalendarIcon, CalendarIconSolid, LogOutIcon } from "../../components/icons/Icons"
 
 
 function DashboardClientLayout() {
 	const navigate = useNavigate()
+	const location = useLocation()
 	const clearUser = useAuthStore((state) => state.clearUser)
 	const { signOut } = useClerk()
 	const [hamburgerOpen, setHamburgerOpen] = useState<boolean>(false)
+
+	const isActive = (path: string) => location.pathname === path
 
 	const handleNavigation = (path: string) => {
 		navigate(path)
@@ -76,27 +80,48 @@ function DashboardClientLayout() {
 					<button
 						type="button"
 						onClick={() => handleNavigation("/dashboard")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/dashboard")
+								? "bg-client-primary text-white shadow-lg border-client-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md border-transparent hover:border-sidebar-border-client"
+							}`}
 					>
-						<span className="text-2xl">🏠</span>
+						{isActive("/dashboard") ? (
+							<HomeIconSolid className="w-6 h-6" />
+						) : (
+							<HomeIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">לוח ראשי</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/workouts")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/workouts")
+								? "bg-client-primary text-white shadow-lg border-client-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md border-transparent hover:border-sidebar-border-client"
+							}`}
 					>
-						<span className="text-2xl">💪</span>
+						{isActive("/workouts") ? (
+							<DumbbellIconSolid className="w-6 h-6" />
+						) : (
+							<DumbbellIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">האימונים שלי</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/sessions")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-client"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/sessions")
+								? "bg-client-primary text-white shadow-lg border-client-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-client hover:text-client-dark hover:shadow-md border-transparent hover:border-sidebar-border-client"
+							}`}
 					>
-						<span className="text-2xl">📅</span>
+						{isActive("/sessions") ? (
+							<CalendarIconSolid className="w-6 h-6" />
+						) : (
+							<CalendarIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">יומן אימונים</span>
 					</button>
 				</nav>
@@ -107,7 +132,7 @@ function DashboardClientLayout() {
 					onClick={handleLogout}
 					className="w-full flex items-center gap-4 px-5 py-4 mt-auto rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md transition-all font-medium border border-transparent hover:border-red-200"
 				>
-					<span className="text-2xl">🚪</span>
+					<LogOutIcon className="w-6 h-6" />
 					<span className="flex-1 text-right">התנתקות</span>
 				</button>
 			</div>

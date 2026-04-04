@@ -1,13 +1,17 @@
 import { useState } from "react"
-import { Outlet, useNavigate } from "react-router"
+import { Outlet, useNavigate, useLocation } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { useClerk } from "@clerk/clerk-react"
+import { CalendarIcon, CirclePlusIcon, HomeIcon, UserPlusIcon, UsersIcon, CalendarIconSolid, CirclePlusIconSolid, HomeIconSolid, UserPlusIconSolid, UsersIconSolid, LogOutIcon } from "../../components/icons/Icons"
 
 function DashboardLayout() {
 	const navigate = useNavigate()
+	const location = useLocation()
 	const clearUser = useAuthStore((state) => state.clearUser)
 	const { signOut } = useClerk()
 	const [hamburgerOpen, setHamburgerOpen] = useState<boolean>(false)
+
+	const isActive = (path: string) => location.pathname === path
 
 	const handleNavigation = (path: string) => {
 		navigate(path)
@@ -75,45 +79,80 @@ function DashboardLayout() {
 					<button
 						type="button"
 						onClick={() => handleNavigation("/dashboard")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/dashboard")
+								? "bg-trainer-primary text-white shadow-lg border-trainer-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md border-transparent hover:border-sidebar-border-trainer"
+							}`}
 					>
-						<span className="text-2xl">🏠</span>
+						{isActive("/dashboard") ? (
+							<HomeIconSolid className="w-6 h-6" />
+						) : (
+							<HomeIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">לוח ראשי</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/clients")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/clients")
+								? "bg-trainer-primary text-white shadow-lg border-trainer-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md border-transparent hover:border-sidebar-border-trainer"
+							}`}
 					>
-						<span className="text-2xl">👥</span>
+						{isActive("/clients") ? (
+							<UsersIconSolid className="w-6 h-6" />
+						) : (
+							<UsersIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">מתאמנים</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/new-client")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/new-client")
+								? "bg-trainer-primary text-white shadow-lg border-trainer-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md border-transparent hover:border-sidebar-border-trainer"
+							}`}
 					>
-						<span className="text-2xl">📧</span>
+						{isActive("/new-client") ? (
+							<UserPlusIconSolid className="w-6 h-6" />
+						) : (
+							<UserPlusIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">הזמן מתאמן</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/sessions")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/sessions")
+								? "bg-trainer-primary text-white shadow-lg border-trainer-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md border-transparent hover:border-sidebar-border-trainer"
+							}`}
 					>
-						<span className="text-2xl">📅</span>
+						{isActive("/sessions") ? (
+							<CalendarIconSolid className="w-6 h-6" />
+						) : (
+							<CalendarIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">יומן אימונים</span>
 					</button>
 
 					<button
 						type="button"
 						onClick={() => handleNavigation("/new-session")}
-						className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md transition-all font-medium border border-transparent hover:border-sidebar-border-trainer"
+						className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-medium transition-all border ${isActive("/new-session")
+								? "bg-trainer-primary text-white shadow-lg border-trainer-primary"
+								: "text-text-medium hover:bg-sidebar-item-hover-trainer hover:text-trainer-dark hover:shadow-md border-transparent hover:border-sidebar-border-trainer"
+							}`}
 					>
-						<span className="text-2xl">⚡</span>
+						{isActive("/new-session") ? (
+							<CirclePlusIconSolid className="w-6 h-6" />
+						) : (
+							<CirclePlusIcon className="w-6 h-6" />
+						)}
 						<span className="flex-1 text-right">קביעת אימון</span>
 					</button>
 				</nav>
@@ -124,7 +163,7 @@ function DashboardLayout() {
 					onClick={handleLogout}
 					className="w-full flex items-center gap-4 px-5 py-4 mt-auto rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md transition-all font-medium border border-transparent hover:border-red-200"
 				>
-					<span className="text-2xl">🚪</span>
+					<LogOutIcon className="w-6 h-6" />
 					<span className="flex-1 text-right">התנתקות</span>
 				</button>
 			</div>
@@ -157,7 +196,7 @@ function DashboardLayout() {
 				{/* Page Content */}
 				<Outlet />
 			</div>
-		</div>)
+		</div >)
 }
 
 export default DashboardLayout

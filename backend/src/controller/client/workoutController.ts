@@ -6,7 +6,7 @@ import TrainerClientRelation from "../../models/TrainerClientRelation.js";
 
 export const getWorkouts = async (req: Request, res: Response) => {
     try {
-        const user = req.user?.id
+        const user = req.user?.mongoUserId
 
         // Find the client's trainer (for now, get the first active relation)
         const relation = await TrainerClientRelation.findOne({ clientId: user, status: "active" })

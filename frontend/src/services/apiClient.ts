@@ -16,11 +16,13 @@ api.interceptors.request.use(
 		// Get fresh token from Clerk for non-auth endpoints
 		if (!isAuthEndpoint) {
 			const token = await getClerkToken()
+			console.log('interceptor got token?', token)
 			if (token) {
 				config.headers["Authorization"] = `Bearer ${token}`
 			}
 		}
 
+		console.log('config',config)
 		return config
 	},
 	(error) => {

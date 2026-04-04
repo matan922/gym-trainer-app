@@ -75,8 +75,10 @@ export const createProfile = async (req: Request, res: Response) => {
 
 export const syncUser = async (req: Request, res: Response) => {
     const clerkId = req.clerkId
+    console.log('clerkId',clerkId)
 
     if (!clerkId) {
+        console.log("something")
         return res.status(401).json({ success: false, message: "Unauthorized" })
     }
 

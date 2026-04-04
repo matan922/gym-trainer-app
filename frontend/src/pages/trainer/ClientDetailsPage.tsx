@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router"
 import DeleteClientButton from "../../components/client/DeleteClientButton"
 import { getClient } from "../../services/trainerApi"
 import { useQuery } from "@tanstack/react-query"
+import { CalendarSolidIcon, ClipBoardSolidIcon } from "../../components/icons/Icons"
 
 const ClientDetailsPage = () => {
 	const { id } = useParams()
@@ -28,7 +29,6 @@ const ClientDetailsPage = () => {
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
 					{/* Header */}
 					<div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<span className="text-4xl">👤</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
 							{client.firstName} {client.lastName}
 						</h1>
@@ -38,7 +38,6 @@ const ClientDetailsPage = () => {
 					<div className="flex flex-col gap-4 mb-6">
 						{/* Age Card */}
 						<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
-							<span className="text-2xl">📅</span>
 							<div className="flex flex-col gap-1 flex-1">
 								<span className="text-sm text-text-medium font-medium">גיל</span>
 								<span className="text-lg font-bold text-trainer-primary">{client.age}</span>
@@ -47,7 +46,6 @@ const ClientDetailsPage = () => {
 
 						{/* Weight Card */}
 						<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
-							<span className="text-2xl">⚖️</span>
 							<div className="flex flex-col gap-1 flex-1">
 								<span className="text-sm text-text-medium font-medium">משקל</span>
 								<span className="text-lg font-bold text-trainer-primary">{client.weight} ק"ג</span>
@@ -56,7 +54,6 @@ const ClientDetailsPage = () => {
 
 						{/* Goal Card */}
 						<div className="flex items-center gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
-							<span className="text-2xl">🎯</span>
 							<div className="flex flex-col gap-1 flex-1">
 								<span className="text-sm text-text-medium font-medium">מטרה</span>
 								<span className="text-lg font-bold text-trainer-primary">{client.goal}</span>
@@ -66,7 +63,6 @@ const ClientDetailsPage = () => {
 						{/* Notes Card */}
 						{client.notes && (
 							<div className="flex items-start gap-3 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
-								<span className="text-2xl">📝</span>
 								<div className="flex flex-col gap-1 flex-1">
 									<span className="text-sm text-text-medium font-medium">הערות</span>
 									<p className="text-base text-text-dark text-right">{client.notes}</p>
@@ -84,7 +80,7 @@ const ClientDetailsPage = () => {
 							}}
 							className="flex-1 flex items-center justify-center gap-2 bg-trainer-primary hover:bg-trainer-dark text-white py-3 px-4 rounded-lg font-semibold shadow-md transition-all"
 						>
-							<span className="text-xl">📅</span>
+							<ClipBoardSolidIcon className="w-6 h-6" />
 							תוכניות
 						</button>
 						<button
@@ -94,7 +90,7 @@ const ClientDetailsPage = () => {
 							}}
 							className="flex-1 flex items-center justify-center gap-2 bg-trainer-primary hover:bg-trainer-dark text-white py-3 px-4 rounded-lg font-semibold shadow-md transition-all"
 						>
-							<span className="text-xl">💪</span>
+							<CalendarSolidIcon className="w-6 h-6" />
 							פגישות
 						</button>
 						<DeleteClientButton

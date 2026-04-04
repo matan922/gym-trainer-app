@@ -6,7 +6,7 @@ import { AppError, ForbiddenError, NotFoundError } from "../../helper/errors.js"
 
 export const getWorkouts = async (req: Request, res: Response) => {
     try {
-        const user = req.user?.id
+        const user = req.user?.mongoUserId
         const { clientId } = req.params;
 
         const workouts = await getWorkoutsForTrainer(user!, clientId!)
@@ -26,12 +26,12 @@ export const getWorkout = async (req: Request, res: Response) => {
         const { clientId, workoutId } = req.params;
 
 
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             throw new ForbiddenError("No relation between you and the client")
         }
 
-        const workout = await Workout.findOne({ _id: workoutId, clientId: clientId, trainerId: user?.id })
+        const workout = await Workout.findOne({ _id: workoutId, clientId: clientId, trainerId: user?.mongoUserId })
         if (!workout) {
             throw new NotFoundError("Workout not found")
         }
@@ -51,7 +51,7 @@ export const postWorkout = async (req: Request, res: Response) => {
         const { clientId } = req.params;
         const workoutData = req.body;
 
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             throw new ForbiddenError("No relation between you and the client")
         }
@@ -59,7 +59,7 @@ export const postWorkout = async (req: Request, res: Response) => {
         const newWorkout = await Workout.create({
             ...workoutData,
             clientId: clientId,
-            trainerId: user?.id
+            trainerId: user?.mongoUserId
         });
 
         return res.status(201).json(newWorkout)
@@ -77,13 +77,13 @@ export const putWorkout = async (req: Request, res: Response) => {
         const { clientId, workoutId } = req.params;
         const workoutData = req.body;
 
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             throw new ForbiddenError("No relation between you and the client")
         }
 
         const editWorkout = await Workout.findOneAndUpdate(
-            { _id: workoutId, clientId: clientId, trainerId: user?.id },
+            { _id: workoutId, clientId: clientId, trainerId: user?.mongoUserId },
             { ...workoutData },
             { new: true }
         )
@@ -106,7 +106,7 @@ export const deleteWorkout = async (req: Request, res: Response) => {
         const user = req.user
         const { clientId, workoutId } = req.params;
 
-        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.id, status: "active" })
+        const relation = await TrainerClientRelation.findOne({ clientId: clientId, trainerId: user?.mongoUserId, status: "active" })
         if (!relation) {
             throw new ForbiddenError("No relation between you and the client")
         }
@@ -114,7 +114,7 @@ export const deleteWorkout = async (req: Request, res: Response) => {
         const workout = await Workout.findOneAndDelete({
             _id: workoutId,
             clientId: clientId,
-            trainerId: user?.id
+            trainerId: user?.mongoUserId
         });
 
         if (!workout) {

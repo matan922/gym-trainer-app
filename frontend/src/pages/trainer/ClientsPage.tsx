@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 import ClientCard from "../../components/client/ClientCard"
 import { getClients } from "../../services/trainerApi"
 import { useQuery } from "@tanstack/react-query"
+import { SearchIcon } from "../../components/icons/Icons"
 
 function ClientsPage() {
 	const [searchQuery, setSearchQuery] = useState("")
@@ -51,7 +52,6 @@ function ClientsPage() {
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
 					{/* Header */}
 					<div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<span className="text-4xl">💪</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">
 							מתאמנים
 						</h1>
@@ -63,7 +63,7 @@ function ClientsPage() {
 					{/* Search */}
 					<div className="mb-6">
 						<div className="relative">
-							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">🔍</span>
+							<SearchIcon className="w-6 h-6 absolute right-3 top-1/2 -translate-y-1/2" />
 							<input
 								onChange={(e) => setSearchQuery(e.target.value)}
 								className="w-full pr-12 pl-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"

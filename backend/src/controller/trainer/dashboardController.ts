@@ -60,23 +60,25 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
         const activeClientIds = Array.from(uniqueClientIdsWeek)
         const activeClients = await User.find({ _id: { $in: activeClientIds } })
 
-        const weekStats = {
-            trainingWeek: uniqueClientIdsWeek.size,
-            totalSessions: weekSessions.length,
-            totalClients: allClients.length,
-            percentageWeek: Math.round(percentageWeek),
-            active: activeClients.map(client => ({
-                name: `${(client as any).firstName} ${(client as any).lastName}`,
-                sessionCount: weekSessions.filter(s =>
-                    s.clientId.toString() === client._id.toString()
-                ).length
-            })),
-            missing: missingClients.map(client =>
-                `${(client as any).firstName} ${(client as any).lastName}`
-            )
-        }
-        
-        
+        // Get upcoming sessions this week (future only)
+        const now = new Date()
+        const upcomingSessions = await Session.find({
+            trainerId: trainer?.mongoUserId,
+            startTime: { $gte: now, $lt: weekEnd },
+            status: 'Scheduled'
+        })
+            .populate('clientId')
+            .sort({ startTime: 1 })
+            .limit(10)
+
+        const upcomingSessionsData = upcomingSessions.map(session => ({
+            clientName: `${(session.clientId as any).firstName} ${(session.clientId as any).lastName}`,
+            date: session.startTime,
+            time: session.startTime,
+            sessionType: session.sessionType
+        }))
+
+
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
         const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
         
@@ -100,7 +102,7 @@ export const getTrainerDashboard = async (req: Request, res: Response) => {
             }))
         }
         
-        return res.json({ todayStats, weekStats, monthlyCompletionRate })
+        return res.json({ todayStats, upcomingSessions: upcomingSessionsData, monthlyCompletionRate })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "failed" })
