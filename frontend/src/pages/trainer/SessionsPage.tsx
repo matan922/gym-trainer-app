@@ -8,6 +8,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import { CalendarIcon, UserIcon, EditIcon, ClockIcon } from "../../components/icons/Icons"
 
 
 const SessionsPage = () => {
@@ -97,7 +98,6 @@ const SessionsPage = () => {
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
 					{/* Header */}
 					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<span className="text-4xl">📅</span>
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
 							{clientId && clientName ? `היסטוריית מפגשים של ${clientName}` : 'היסטוריית מפגשים'}
 						</h1>
@@ -117,7 +117,7 @@ const SessionsPage = () => {
 						{/* Time Range Filters */}
 						<div className="mb-2">
 							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-								<span className="text-lg">📅</span>
+								<CalendarIcon className="w-5 h-5 text-trainer-primary" />
 								טווח זמן
 							</label>
 							<div className="flex gap-2 flex-wrap">
@@ -145,7 +145,7 @@ const SessionsPage = () => {
 						{/* Specific Date Picker */}
 						<div className="mb-4">
 							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-								<span className="text-lg">🗓️</span>
+								<CalendarIcon className="w-5 h-5 text-trainer-primary" />
 								או בחר תאריך ספציפי
 							</label>
 							<DatePicker
@@ -168,7 +168,6 @@ const SessionsPage = () => {
 						{/* Status Filters */}
 						<div>
 							<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-								<span className="text-lg">🏷️</span>
 								סטטוס
 							</label>
 							<div className="flex gap-2 mb-4 flex-wrap">
@@ -213,7 +212,7 @@ const SessionsPage = () => {
 									{/* Header with client name and actions */}
 									<div className="flex justify-between items-start mb-4 pb-3 border-b border-trainer-primary/10">
 										<div className="flex items-center gap-2">
-											<span className="text-2xl">👤</span>
+											<UserIcon className="w-6 h-6 text-trainer-primary" />
 											<h3 className="text-xl font-bold text-trainer-dark">
 												{session.clientId.firstName} {session.clientId.lastName}
 											</h3>
@@ -225,9 +224,9 @@ const SessionsPage = () => {
 													e.stopPropagation()
 													setEditingSession(session)
 												}}
-												className="px-3 py-1 bg-trainer-primary hover:bg-trainer-dark text-white rounded-lg text-sm font-medium transition-all"
+												className="px-3 py-2 bg-trainer-primary hover:bg-trainer-dark text-white rounded-lg text-sm font-medium transition-all flex items-center gap-1.5"
 											>
-												✏️ עריכה
+												<EditIcon className="w-4 h-4" /> עריכה
 											</button>
 										</div>
 									</div>
@@ -236,7 +235,7 @@ const SessionsPage = () => {
 									<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 										{/* Date */}
 										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-											<span className="text-lg">📅</span>
+											<CalendarIcon className="w-5 h-5 text-trainer-primary" />
 											<div className="flex flex-col">
 												<span className="text-xs text-text-medium">תאריך</span>
 												<span className="text-sm font-semibold text-text-dark">
@@ -247,7 +246,7 @@ const SessionsPage = () => {
 
 										{/* Time */}
 										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-											<span className="text-lg">🕐</span>
+											<ClockIcon className="w-5 h-5 text-trainer-primary" />
 											<div className="flex flex-col">
 												<span className="text-xs text-text-medium">שעה</span>
 												<span className="text-sm font-semibold text-text-dark">
@@ -258,7 +257,6 @@ const SessionsPage = () => {
 
 										{/* Session Type */}
 										<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-											<span className="text-lg">{session.sessionType === 'Online' ? '💻' : '🏋️'}</span>
 											<div className="flex flex-col">
 												<span className="text-xs text-text-medium">סוג</span>
 												<span className="text-sm font-semibold text-text-dark">
@@ -270,7 +268,6 @@ const SessionsPage = () => {
 										{/* Workout */}
 										{session.workoutId || session.workoutName ? (
 											<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-												<span className="text-lg">💪</span>
 												<div className="flex flex-col">
 													<span className="text-xs text-text-medium">אימון</span>
 													<span className="text-sm font-semibold text-text-dark">
@@ -282,7 +279,6 @@ const SessionsPage = () => {
 											</div>
 										) : (
 											<div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg opacity-50">
-												<span className="text-lg">💪</span>
 												<div className="flex flex-col">
 													<span className="text-xs text-text-medium">אימון</span>
 													<span className="text-sm font-semibold text-text-dark">

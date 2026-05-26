@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react"
-import { useSignIn, useAuth } from "@clerk/clerk-react"
+import { useSignIn, useAuth, useUser } from "@clerk/react"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { syncUser, acceptInviteAuthenticated } from "../../services/authApi"
 import { useMutation } from "@tanstack/react-query"
 
 const LoginPage = () => {
-	const { signIn, isLoaded, setActive } = useSignIn()
-	const { isSignedIn, isLoaded: isAuthLoaded } = useAuth()
+	const { signIn, fetchStatus } = useSignIn()
+	// const { isLoaded, isSignedIn } = useUser()
+	const { isSignedIn, isLoaded } = useAuth()
 	const setUser = useAuthStore((state) => state.setUser)
 	const [error, setError] = useState<string>("")
 	const [userData, setUserData] = useState({
@@ -18,26 +19,13 @@ const LoginPage = () => {
 
 	// Redirect if already signed in with user data (e.g., direct URL access to /login)
 	useEffect(() => {
-		if (isAuthLoaded && isSignedIn && useAuthStore.getState().user) {
-			console.log("nav")
+		if (isLoaded && isSignedIn && useAuthStore.getState().user) {
 			navigate("/dashboard", { replace: true })
 		}
-	}, [isAuthLoaded, isSignedIn, navigate])
+	}, [isLoaded, isSignedIn, navigate])
 
-	// React Query mutation for syncing MongoDB user with retry logic
 	const syncUserMutation = useMutation({
 		mutationFn: syncUser,
-		// retry: (failureCount, error: any) => {
-		// 	// Retry up to 3 times, but only for auth errors (token not ready)
-		// 	if (error.message?.includes("Unauthorized") && failureCount < 3) {
-		// 		return true
-		// 	}
-		// 	return false
-		// },
-		// retryDelay: (attemptIndex) => {
-		// 	// Exponential backoff: 200ms, 400ms, 800ms
-		// 	return Math.min(1000, 200 * Math.pow(2, attemptIndex))
-		// },
 		onSuccess: async (data) => {
 			if (!data.success) {
 				setError(data.message || "Failed to sync user")
@@ -45,6 +33,7 @@ const LoginPage = () => {
 			}
 
 			// Store MongoDB user in zustand
+			console.log(data.user)
 			setUser(data.user)
 
 			// Check for pending invite token
@@ -60,8 +49,7 @@ const LoginPage = () => {
 					console.error("Error accepting invite:", error)
 				}
 			}
-
-			navigate("/dashboard")
+			navigate("/dashboard", { replace: true })
 		},
 		onError: (err: any) => {
 			setError(err.message || "Failed to sync with server")
@@ -81,27 +69,30 @@ const LoginPage = () => {
 
 		try {
 			// 1. Sign in with Clerk
-			const result = await signIn.create({
-				identifier: userData.email,
-				password: userData.password,
+			const { error } = await signIn.password({
+				emailAddress: userData.email,
+				password: userData.password
 			})
-			
-			if (result.status === "complete") {
-				// 2. Set the active Clerk session
-				console.log("is it true already? (before setactive)",isSignedIn)
-				await setActive({ session: result.createdSessionId })
-				console.log("is it true after setactive?",isSignedIn)
+			console.log('right after login', isSignedIn)
 
-				// 3. Sync with MongoDB (component stays mounted now!)
+			if (error) {
+				console.log(error)
+				return
+			}
+
+			if (signIn.status === 'complete') {
+				await signIn.finalize()
 				syncUserMutation.mutate()
 			}
+
 		} catch (err: any) {
 			console.error("Error:", err)
 			setError(err.errors?.[0]?.message || "התחברות נכשלה")
 		}
 	}
 
-	const isLoading = !isLoaded || syncUserMutation.isPending
+
+	const isLoading = !isLoaded
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-sunset">

@@ -2,13 +2,13 @@ import type { Request, Response } from "express";
 import TrainerClientRelation from "../../models/TrainerClientRelation";
 import User from "../../models/user/User";
 import Session from "../../models/Session";
+import { clerkClient } from "@clerk/express";
 
 
 export const getTrainerDashboard = async (req: Request, res: Response) => {
     try {
         const trainer = req.user
         const allClients = await TrainerClientRelation.find({ trainerId: trainer?.mongoUserId })
-        
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const tomorrow = new Date(today)

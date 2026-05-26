@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { Exercise, Workout } from "../../types/clientTypes"
 import reactDom from "react-dom"
+import { ClipBoardSolidIcon, PlusIcon, TrashIcon, ClockIcon } from "../icons/Icons"
 
 const NewWorkoutModal = ({
 	onClose,
@@ -78,8 +79,7 @@ const NewWorkoutModal = ({
 					<div className="p-6 lg:p-8">
 						{/* Header */}
 						<div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-trainer-primary/20">
-							<div className="flex items-center gap-3">
-								<span className="text-3xl">➕</span>
+							<div className="flex ">
 								<h2 className="text-3xl font-bold text-trainer-dark">אימון חדש</h2>
 							</div>
 							<button
@@ -92,6 +92,22 @@ const NewWorkoutModal = ({
 						</div>
 
 						<form className="flex flex-col gap-6" onSubmit={(e) => handleSubmit(e)}>
+							{/* Workout Name */}
+							<div>
+								<label className="block text-sm text-text-medium mb-2 text-right flex items-center gap-2">
+									<ClipBoardSolidIcon className="w-5 h-5 text-trainer-primary" />
+									שם האימון
+								</label>
+								<input
+									onChange={handleWorkoutChange}
+									name="workoutName"
+									placeholder="לדוגמה: אימון חזה וכתפיים"
+									value={workout.workoutName}
+									className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
+									type="text"
+								/>
+							</div>
+
 							{/* Exercises */}
 							{exercises.map((exercise, index) => (
 								<div
@@ -99,19 +115,16 @@ const NewWorkoutModal = ({
 									className="p-5 bg-white rounded-lg border border-trainer-primary/20 shadow-md"
 								>
 									<div className="flex justify-between items-center mb-4 pb-3 border-b border-trainer-primary/10">
-										<div className="flex items-center gap-2">
-											<span className="text-2xl">🏋️</span>
-											<h3 className="text-xl font-bold text-trainer-dark">
-												תרגיל {index + 1}
-											</h3>
-										</div>
+										<h3 className="text-xl font-bold text-trainer-dark">
+											תרגיל {index + 1}
+										</h3>
 										{exercises.length > 1 && (
 											<button
 												onClick={() => handleDeleteExercise(index)}
 												type="button"
-												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all"
+												className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all flex items-center gap-1.5"
 											>
-												🗑️ מחק
+												<TrashIcon className="w-4 h-4" /> מחק
 											</button>
 										)}
 									</div>
@@ -128,7 +141,7 @@ const NewWorkoutModal = ({
 
 										<div className="grid grid-cols-3 gap-3">
 											<div>
-												<label className="block text-sm text-text-medium mb-1 text-right">🔢 סטים</label>
+												<label className="block text-sm text-text-medium mb-1 text-right">סטים</label>
 												<input
 													onChange={(e) => handleExerciseChange(index, e)}
 													name="sets"
@@ -140,7 +153,7 @@ const NewWorkoutModal = ({
 											</div>
 
 											<div>
-												<label className="block text-sm text-text-medium mb-1 text-right">🔁 חזרות</label>
+												<label className="block text-sm text-text-medium mb-1 text-right">חזרות</label>
 												<input
 													onChange={(e) => handleExerciseChange(index, e)}
 													name="reps"
@@ -152,7 +165,10 @@ const NewWorkoutModal = ({
 											</div>
 
 											<div>
-												<label className="block text-sm text-text-medium mb-1 text-right">⏱️ מנוחה (שניות)</label>
+												<label className="block text-sm text-text-medium mb-1 text-right flex items-center gap-1 justify-end">
+													<span>מנוחה (שניות)</span>
+													<ClockIcon className="w-4 h-4" />
+												</label>
 												<input
 													onChange={(e) => handleExerciseChange(index, e)}
 													name="rest"
@@ -169,27 +185,12 @@ const NewWorkoutModal = ({
 
 							<button
 								onClick={handleAddExercise}
-								className="p-3 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2"
+								className="p-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2"
 								type="button"
 							>
-								<span>➕</span>
+								<PlusIcon className="w-5 h-5" />
 								הוסף תרגיל
 							</button>
-
-							{/* Notes */}
-							<div>
-								<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-									<span className="text-lg">📝</span>
-									הערות לאימון
-								</label>
-								<input
-									onChange={handleWorkoutChange}
-									name="notes"
-									placeholder="הערות כלליות על האימון..."
-									className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right"
-									type="text"
-								/>
-							</div>
 
 							{/* Action Buttons */}
 							<div className="flex gap-3 justify-center pt-4 border-t-2 border-trainer-primary/20">
@@ -197,14 +198,14 @@ const NewWorkoutModal = ({
 									className="px-6 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
 									type="submit"
 								>
-									✅ אישור
+									צור אימון
 								</button>
 								<button
 									onClick={onClose}
 									type="button"
 									className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold transition-all"
 								>
-									❌ ביטול
+									ביטול
 								</button>
 							</div>
 						</form>

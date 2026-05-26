@@ -10,7 +10,7 @@ import {
 } from "../../services/trainerApi"
 import type { Workout } from "../../types/clientTypes"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { EditIcon, PlusIcon } from "../../components/icons/Icons"
+import { ClockIcon, EditIcon, PlusIcon, TrashIcon } from "../../components/icons/Icons"
 
 const ClientWorkoutsPage = () => {
 	const { id } = useParams()
@@ -165,15 +165,15 @@ const ClientWorkoutsPage = () => {
 										<div className="flex gap-2">
 											<button
 												onClick={(e) => handleEditModalState(e, workout)}
-												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all"
+												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all flex items-center gap-2"
 											>
 												עריכה <EditIcon className="w-6 h-6" />
 											</button>
 											<button
 												onClick={(e) => handleDeleteWorkout(workout._id!, e)}
-												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all"
+												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all flex items-center gap-2"
 											>
-												🗑️ מחק
+												מחק <TrashIcon className="w-6 h-6" />
 											</button>
 										</div>
 									</div>
@@ -185,17 +185,16 @@ const ClientWorkoutsPage = () => {
 													key={exercise._id || index}
 													className="bg-gray-50 rounded-lg p-3 border-r-4 border-trainer-primary"
 												>
-													<h3 className="font-bold text-trainer-dark mb-2 flex items-center gap-2">
-														<span className="text-lg">🏋️</span>
+													<h3 className="font-bold text-trainer-dark mb-2">
 														{exercise.name}
 													</h3>
 													<div className="flex gap-4 text-sm text-text-medium mr-7">
-														<span>🔢 {exercise.sets} סטים</span>
-														<span>🔁 {exercise.reps} חזרות</span>
+														<span>{exercise.sets} סטים</span>
+														<span>{exercise.reps} חזרות</span>
 														{exercise.rest >= 60 ? (
-															<span>⏱️ {exercise.rest / 60} דקות מנוחה</span>
+															<span className="flex items-center gap-1"><ClockIcon className="w-4 h-4" /> {exercise.rest / 60} דקות מנוחה</span>
 														) : (
-															<span>⏱️ {exercise.rest} שניות מנוחה</span>
+															<span className="flex items-center gap-1"><ClockIcon className="w-4 h-4" /> {exercise.rest} שניות מנוחה</span>
 														)}
 													</div>
 												</div>

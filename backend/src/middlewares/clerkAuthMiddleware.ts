@@ -7,12 +7,24 @@ export const verifyClerkToken = clerkMiddleware({ secretKey: process.env.CLERK_S
 // Custom middleware to require authentication
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = getAuth(req)
+    const authHeader = req.headers.authorization
+    console.log(req.headers.authorization)
     console.log(userId)
 
-    if (!userId) {
+    // only accept bearer token
+    if (!authHeader) {
+        console.log("no bearer token")
         return res.status(401).json({
             success: false,
-            message: "Unauthorized - No valid Clerk session"
+            message: "Unauthorized"
+        })
+    }
+
+    if (!userId) {
+        console.log("failed in middleware")
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
         })
     }
 

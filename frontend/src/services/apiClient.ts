@@ -1,5 +1,5 @@
 import axios from "axios"
-import { getClerkToken } from "../utils/tokenProvider"
+import { getToken } from "@clerk/react"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/"
 
@@ -15,7 +15,7 @@ api.interceptors.request.use(
 
 		// Get fresh token from Clerk for non-auth endpoints
 		if (!isAuthEndpoint) {
-			const token = await getClerkToken()
+			const token = await getToken()
 			console.log('interceptor got token?', token)
 			if (token) {
 				config.headers["Authorization"] = `Bearer ${token}`

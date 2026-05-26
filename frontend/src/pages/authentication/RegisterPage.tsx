@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
-import { useSignUp, useAuth } from "@clerk/clerk-react"
+import { useSignUp, useAuth } from "@clerk/react"
 import { useMutation } from "@tanstack/react-query"
 import { createProfile, syncUser } from "../../services/authApi"
 import { useAuthStore } from "../../store/authStore"

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router"
 import { useAuthStore } from "../../store/authStore"
-import { useClerk } from "@clerk/clerk-react"
+import { useClerk } from "@clerk/react"
 import { CalendarIcon, CirclePlusIcon, HomeIcon, UserPlusIcon, UsersIcon, CalendarIconSolid, CirclePlusIconSolid, HomeIconSolid, UserPlusIconSolid, UsersIconSolid, LogOutIcon } from "../../components/icons/Icons"
 
 function DashboardLayout() {

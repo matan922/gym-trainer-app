@@ -10,8 +10,7 @@
 		"lint-format": "biome check --write"
 	},
 	"dependencies": {
-		"@clerk/clerk-react": "5.60.0",
-		"@clerk/react-router": "2.4.1",
+		"@clerk/react": "6.2.0",
 		"@emotion/react": "11.14.0",
 		"@emotion/styled": "11.14.1",
 		"@mui/material": "7.3.5",

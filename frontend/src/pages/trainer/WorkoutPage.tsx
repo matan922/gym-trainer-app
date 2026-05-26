@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router"
 import type { Workout } from "../../types/clientTypes"
 import EditWorkoutModal from "../../components/client/EditWorkoutModal"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { EditIcon, TrashIcon, ClockIcon } from "../../components/icons/Icons"
 
 const WorkoutPage = () => {
 	const { id, workoutId } = useParams()
@@ -64,41 +65,26 @@ const WorkoutPage = () => {
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
 					{/* Header */}
 					<div className="flex justify-between items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<div className="flex items-center gap-3">
-							<span className="text-4xl">💪</span>
-							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">פרטי אימון</h1>
-						</div>
+						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">{workout.workoutName}</h1>
 						<div className="flex gap-2">
 							<button
 								onClick={() => setIsEditOpen(true)}
-								className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
+								className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
 							>
-								✏️ עריכה
+								<EditIcon className="w-5 h-5" /> עריכה
 							</button>
 							<button
 								onClick={handleDeleteWorkout}
-								className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-md transition-all"
+								className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-md transition-all flex items-center gap-2"
 							>
-								🗑️ מחק
+								<TrashIcon className="w-5 h-5" /> מחק
 							</button>
 						</div>
 					</div>
 
-					{/* Notes */}
-					{workout && (
-						<div className="mb-6 p-4 bg-white rounded-lg border-r-4 border-trainer-primary">
-							<div className="flex items-center gap-2 mb-2">
-								<span className="text-xl">📝</span>
-								<span className="font-semibold text-text-medium">הערות</span>
-							</div>
-							<p className="text-text-dark mr-7">{workout.workoutName}</p>
-						</div>
-					)}
-
 					{/* Exercises Section */}
 					<div className="flex flex-col gap-4">
-						<div className="flex items-center gap-2 pb-3 border-b border-trainer-primary/20">
-							<span className="text-2xl">🏋️</span>
+						<div className="flex items-center gap-2 border-trainer-primary/20">
 							<h2 className="text-2xl font-bold text-trainer-dark">תרגילים</h2>
 							<span className="text-lg text-trainer-primary font-semibold">
 								({workout?.exercises?.length || 0})
@@ -111,17 +97,16 @@ const WorkoutPage = () => {
 									key={index}
 									className="p-4 bg-white rounded-lg border border-trainer-primary/20 shadow-md"
 								>
-									<h3 className="font-bold text-lg text-trainer-dark mb-3 flex items-center gap-2">
-										<span className="text-xl">🏋️</span>
+									<h3 className="font-bold text-lg text-trainer-dark mb-3">
 										{exercise.name}
 									</h3>
-									<div className="flex gap-4 text-sm text-text-medium mr-7">
-										<span>🔢 {exercise.sets} סטים</span>
-										<span>🔁 {exercise.reps} חזרות</span>
+									<div className="flex gap-4 text-sm text-text-medium">
+										<span>{exercise.sets} סטים</span>
+										<span>{exercise.reps} חזרות</span>
 										{exercise.rest >= 60 ? (
-											<span>⏱️ {exercise.rest / 60} דקות מנוחה</span>
+											<span className="flex items-center gap-1"><ClockIcon className="w-4 h-4" /> {exercise.rest / 60} דקות מנוחה</span>
 										) : (
-											<span>⏱️ {exercise.rest} שניות מנוחה</span>
+											<span className="flex items-center gap-1"><ClockIcon className="w-4 h-4" /> {exercise.rest} שניות מנוחה</span>
 										)}
 									</div>
 								</div>

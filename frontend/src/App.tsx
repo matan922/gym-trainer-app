@@ -22,9 +22,8 @@ import InviteAcceptPage from "./pages/authentication/InviteAcceptPage"
 import { useAuthStore } from "./store/authStore"
 import SessionsClientPage from "./pages/client/SessionsClientPage"
 import WorkoutsClientPage from "./pages/client/WorkoutsClientPage"
-import { useAuth } from "@clerk/clerk-react"
+import { SignIn, useAuth } from "@clerk/react"
 import { useEffect } from "react"
-import { setClerkTokenGetter } from "./utils/tokenProvider"
 import { syncUser } from "./services/authApi"
 import { useMutation } from "@tanstack/react-query"
 
@@ -36,12 +35,9 @@ function App() {
 	const setUser = useAuthStore((state) => state.setUser)
 	const { getToken, isSignedIn, isLoaded } = useAuth()
 
-	setClerkTokenGetter(getToken)
-
 	if (!isLoaded) return null
-
+	
 	// Show loading while user data is being fetched
-	console.log(user)
 	// if (isSignedIn && !user) {
 	// 	return (
 	// 		<div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -52,9 +48,10 @@ function App() {
 	// 		</div>
 	// 	)
 	// }
+
 	return (
 		<Routes>
-			<Route path="/" element={<Navigate to={isSignedIn ? "/dashboard" : "/register"} replace />} />
+			<Route path="/" element={<LoginPage />} />
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/register" element={<RegisterPage />} />
 			<Route path="/auth/verify-email" element={<VerifyEmailPage />} />
