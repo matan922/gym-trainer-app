@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
 import { validateClientInvite } from "../../services/authApi"
+import { ClockIcon, XIcon } from "../../components/icons/Icons"
 
 const InviteAcceptPage = () => {
     const [searchParams] = useSearchParams()
@@ -55,7 +56,9 @@ const InviteAcceptPage = () => {
                 <div className="text-center">
                     {status === "validating" && (
                         <>
-                            <div className="text-4xl mb-4">⏳</div>
+                            <div className="mb-4 flex justify-center">
+                                <ClockIcon className="w-16 h-16 text-blue-500" />
+                            </div>
                             <h1 className="text-2xl font-bold mb-2">מאמת הזמנה...</h1>
                         </>
                     )}
@@ -63,7 +66,9 @@ const InviteAcceptPage = () => {
 
                     {status === "error" && (
                         <>
-                            <div className="text-4xl mb-4">❌</div>
+                            <div className="mb-4 flex justify-center">
+                                <XIcon className="w-16 h-16 text-red-600" />
+                            </div>
                             <h1 className="text-2xl font-bold mb-2 text-red-600">שגיאה</h1>
                             <p className="text-gray-600 mb-4">{errorMessage}</p>
                             <button

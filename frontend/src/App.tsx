@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router"
+import { Route, Routes } from "react-router"
 import InviteClientPage from "./pages/trainer/InviteClientPage"
 import LoginPage from "./pages/authentication/LoginPage"
 import ClientDetailsPage from "./pages/trainer/ClientDetailsPage"
@@ -22,21 +22,17 @@ import InviteAcceptPage from "./pages/authentication/InviteAcceptPage"
 import { useAuthStore } from "./store/authStore"
 import SessionsClientPage from "./pages/client/SessionsClientPage"
 import WorkoutsClientPage from "./pages/client/WorkoutsClientPage"
-import { SignIn, useAuth } from "@clerk/react"
-import { useEffect } from "react"
-import { syncUser } from "./services/authApi"
-import { useMutation } from "@tanstack/react-query"
+import { useAuth } from "@clerk/react"
 
 dayjs.extend(relativeTime)
 dayjs.locale('he')
 
 function App() {
 	const user = useAuthStore((state) => state.user)
-	const setUser = useAuthStore((state) => state.setUser)
-	const { getToken, isSignedIn, isLoaded } = useAuth()
+	const { isLoaded } = useAuth()
 
 	if (!isLoaded) return null
-	
+
 	// Show loading while user data is being fetched
 	// if (isSignedIn && !user) {
 	// 	return (

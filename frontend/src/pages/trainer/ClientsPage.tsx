@@ -14,7 +14,6 @@ function ClientsPage() {
 		queryFn: () => getClients(),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	})
-
 	// Filter clients based on search query
 	const filteredClients = useMemo(() => {
 		if (!data) return []

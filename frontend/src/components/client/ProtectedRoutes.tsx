@@ -1,7 +1,4 @@
 import { Navigate } from "react-router"
-import { useAuthStore } from "../../store/authStore"
-import { useEffect, useState } from "react"
-import { refresh } from "../../services/authApi"
 import { useAuth } from '@clerk/react'
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {

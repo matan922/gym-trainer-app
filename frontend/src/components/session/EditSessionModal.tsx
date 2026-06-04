@@ -3,6 +3,7 @@ import type { Session, Workout } from "../../types/clientTypes"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { getClient } from "../../services/trainerApi"
+import { EditIcon, UserIcon, MapPinIcon, CalendarIcon, ClockIcon, BarChartIcon, CheckIcon, XIcon } from "../icons/Icons"
 
 interface EditSessionModalProps {
 	session: Session
@@ -18,7 +19,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 	const [status, setStatus] = useState<string>(session.status)
 	const [workouts, setWorkouts] = useState<Workout[]>([])
 	const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
-	const [workoutName, setWorkoutName] = useState<string>(session.workoutName || "")
+	const [workoutName] = useState<string>(session.workoutName || "")
 
 	// Fetch workouts for this client
 	useEffect(() => {
@@ -26,7 +27,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 			if (session.clientId._id) {
 				try {
 					const response = await getClient(session.clientId._id)
-					setWorkouts(response.data.workouts || [])
+					setWorkouts(response.workouts || [])
 
 					// Set initial workout if exists
 					if (session.workoutId && typeof session.workoutId === 'object') {
@@ -74,7 +75,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 						{/* Header */}
 						<div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-trainer-primary/20">
 							<div className="flex items-center gap-3">
-								<span className="text-3xl">✏️</span>
+								<EditIcon className="w-8 h-8 text-trainer-primary" />
 								<h2 className="text-3xl font-bold text-trainer-dark">עריכת אימון</h2>
 							</div>
 							<button
@@ -89,7 +90,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 						{/* Client Info */}
 						<div className="mb-6 p-4 bg-trainer-primary/10 rounded-lg border border-trainer-primary/20">
 							<div className="flex items-center gap-2 text-right">
-								<span className="text-xl">👤</span>
+								<UserIcon className="w-5 h-5 text-trainer-primary" />
 								<span className="text-sm text-text-medium">מתאמן:</span>
 								<span className="text-lg font-bold text-trainer-dark">
 									{session.clientId.firstName} {session.clientId.lastName}
@@ -101,7 +102,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 							{/* Session Type */}
 							<div>
 								<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-									<span className="text-lg">📍</span>
+									<MapPinIcon className="w-5 h-5 text-trainer-primary" />
 									סוג אימון
 								</label>
 								<select
@@ -109,8 +110,8 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 									onChange={(e) => setSessionType(e.target.value)}
 									className="w-full px-4 py-3 border border-trainer-primary/20 rounded-lg bg-white focus:ring-2 focus:ring-trainer-primary focus:border-trainer-primary outline-none transition-all text-right cursor-pointer"
 								>
-									<option value="Studio">🏋️ סטודיו</option>
-									<option value="Online">💻 אונליין</option>
+									<option value="Studio">סטודיו</option>
+									<option value="Online">אונליין</option>
 								</select>
 							</div>
 
@@ -118,7 +119,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 								<div>
 									<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-										<span className="text-lg">📅</span>
+										<CalendarIcon className="w-5 h-5 text-trainer-primary" />
 										תאריך והתחלה
 									</label>
 									<DatePicker
@@ -136,7 +137,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 
 								<div>
 									<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-										<span className="text-lg">🕐</span>
+										<ClockIcon className="w-5 h-5 text-trainer-primary" />
 										סיום
 									</label>
 									<DatePicker
@@ -157,7 +158,6 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 							{workouts.length > 0 && (
 								<div>
 									<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-										<span className="text-lg">💪</span>
 										אימון (אופציונלי)
 									</label>
 									<select
@@ -181,7 +181,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 							{/* Status */}
 							<div>
 								<label className="text-sm text-text-medium mb-2 text-right flex items-center gap-2">
-									<span className="text-lg">📊</span>
+									<BarChartIcon className="w-5 h-5 text-trainer-primary" />
 									סטטוס
 								</label>
 								<select
@@ -202,7 +202,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 									disabled={isLoading}
 									className="px-8 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									<span>✅</span>
+									<CheckIcon className="w-5 h-5" />
 									{isLoading ? "שומר..." : "שמור"}
 								</button>
 								<button
@@ -211,7 +211,7 @@ function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionMo
 									disabled={isLoading}
 									className="px-8 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									<span>❌</span>
+									<XIcon className="w-5 h-5" />
 									ביטול
 								</button>
 							</div>

@@ -20,7 +20,6 @@ const SessionsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const filter = searchParams.get('filter') || undefined
 	const { clientId } = useParams()
-	const [backButtonSwitch, setBackButtonSwitch] = useState<boolean>(false)
 
 	const queryClient = useQueryClient()
 
