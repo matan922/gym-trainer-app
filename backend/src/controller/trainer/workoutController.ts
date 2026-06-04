@@ -9,7 +9,7 @@ export const getWorkouts = async (req: Request, res: Response) => {
         const user = req.user?.mongoUserId
         const { clientId } = req.params;
 
-        const workouts = await getWorkoutsForTrainer(user!, clientId!)
+        const workouts = await getWorkoutsForTrainer(user!, clientId as string)
         return res.status(200).json(workouts)
     } catch (error) {
         if (error instanceof AppError) {
