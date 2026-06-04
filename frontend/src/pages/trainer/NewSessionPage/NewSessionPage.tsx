@@ -11,7 +11,7 @@ import { rtlCache, theme } from "./theme"
 import { useNavigate } from "react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useUser } from "@clerk/react"
-import { PlusIcon, UserIcon, CalendarIcon, ClockIcon } from "../../../components/icons/Icons"
+import { UserIcon, CalendarIcon, ClockIcon } from "../../../components/icons/Icons"
 
 const NewSessionPage = () => {
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null)

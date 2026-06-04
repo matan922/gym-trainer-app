@@ -3,7 +3,7 @@ import type { Session, Workout } from "../../types/clientTypes"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { getClient } from "../../services/trainerApi"
-import { EditIcon, UserIcon, MapPinIcon, MonitorIcon, CalendarIcon, ClockIcon, BarChartIcon, CheckIcon, XIcon } from "../icons/Icons"
+import { EditIcon, UserIcon, MapPinIcon, CalendarIcon, ClockIcon, BarChartIcon, CheckIcon, XIcon } from "../icons/Icons"
 
 interface EditSessionModalProps {
 	session: Session
