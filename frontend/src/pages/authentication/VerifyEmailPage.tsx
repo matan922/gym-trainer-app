@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, useNavigate } from "react-router"
 import { verifyEmail } from "../../services/authApi"
+import { ClockIcon, CheckIcon, XIcon } from "../../components/icons/Icons"
 
 function VerifyEmailPage() {
 	const [searchParams] = useSearchParams()
@@ -44,14 +45,18 @@ function VerifyEmailPage() {
 				<div className="text-center">
 					{status === "loading" && (
 						<>
-							<div className="text-4xl mb-4">⏳</div>
+							<div className="mb-4 flex justify-center">
+								<ClockIcon className="w-16 h-16 text-blue-500" />
+							</div>
 							<h1 className="text-2xl font-bold mb-2">מאמת אימייל...</h1>
 						</>
 					)}
 
 					{status === "success" && (
 						<>
-							<div className="text-4xl mb-4">✅</div>
+							<div className="mb-4 flex justify-center">
+								<CheckIcon className="w-16 h-16 text-green-600" />
+							</div>
 							<h1 className="text-2xl font-bold mb-2 text-green-600">הצלחה!</h1>
 							<p className="text-gray-600">{message}</p>
 						</>
@@ -59,7 +64,9 @@ function VerifyEmailPage() {
 
 					{status === "error" && (
 						<>
-							<div className="text-4xl mb-4">❌</div>
+							<div className="mb-4 flex justify-center">
+								<XIcon className="w-16 h-16 text-red-600" />
+							</div>
 							<h1 className="text-2xl font-bold mb-2 text-red-600">שגיאה</h1>
 							<p className="text-gray-600 mb-4">{message}</p>
 							<button
