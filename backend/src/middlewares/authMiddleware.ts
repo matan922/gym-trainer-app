@@ -8,7 +8,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, payload) => {
         if (err) return res.status(403).json({ message: "Invalid token" }) // REMOVED SUCCESS FROM RETURN 
-        req.user = payload as { id: string; activeProfile: 'trainer' | 'client'; iat?: number; exp?: number }
+        req.user = payload as { mongoUserId: string; activeProfile: 'trainer' | 'client'; iat?: number; exp?: number }
         next()
     })
 }
