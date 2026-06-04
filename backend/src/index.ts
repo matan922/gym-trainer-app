@@ -26,9 +26,6 @@ app.use(cors({
     credentials: true // Allow cookies to be sent
 }))
 app.use(cookieParser())
-
-const oauth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.SECRET_ID, process.env.REDIRECT)
-
 app.use('/auth', authRoutes)
 
 // trainer request routes

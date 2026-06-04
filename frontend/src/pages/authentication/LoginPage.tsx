@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react"
-import { useSignIn, useAuth, useUser } from "@clerk/react"
+import { useSignIn, useAuth } from "@clerk/react"
 import { Link, useNavigate } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { syncUser, acceptInviteAuthenticated } from "../../services/authApi"
 import { useMutation } from "@tanstack/react-query"
 
 const LoginPage = () => {
-	const { signIn, fetchStatus } = useSignIn()
+	const { signIn } = useSignIn()
 	// const { isLoaded, isSignedIn } = useUser()
 	const { isSignedIn, isLoaded } = useAuth()
 	const setUser = useAuthStore((state) => state.setUser)
 	const [error, setError] = useState<string>("")
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const [userData, setUserData] = useState({
 		email: "",
 		password: "",
@@ -65,8 +66,9 @@ const LoginPage = () => {
 		e.preventDefault()
 		setError("")
 
-		if (!isLoaded) return
+		if (!isLoaded || isSubmitting) return
 
+		setIsSubmitting(true)
 		try {
 			// 1. Sign in with Clerk
 			const { error } = await signIn.password({
@@ -77,6 +79,7 @@ const LoginPage = () => {
 
 			if (error) {
 				console.log(error)
+				setIsSubmitting(false)
 				return
 			}
 
@@ -88,6 +91,7 @@ const LoginPage = () => {
 		} catch (err: any) {
 			console.error("Error:", err)
 			setError(err.errors?.[0]?.message || "התחברות נכשלה")
+			setIsSubmitting(false)
 		}
 	}
 
@@ -149,10 +153,10 @@ const LoginPage = () => {
 
 					<button
 						type="submit"
-						disabled={isLoading}
+						disabled={isLoading || isSubmitting || syncUserMutation.isPending}
 						className="w-full text-white py-3 rounded-lg font-semibold transition duration-200 shadow-xl bg-primary-button hover:bg-primary-button-hover disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						{isLoading ? "מתחבר..." : "התחבר"}
+						{isLoading || isSubmitting || syncUserMutation.isPending ? "מתחבר..." : "התחבר"}
 					</button>
 				</form>
 

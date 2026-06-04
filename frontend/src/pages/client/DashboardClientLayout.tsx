@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router"
 import { useAuthStore } from "../../store/authStore"
 import { useClerk } from "@clerk/react"
-import { HomeIcon, HomeIconSolid, DumbbellIcon, DumbbellIconSolid, CalendarIcon, CalendarIconSolid, LogOutIcon } from "../../components/icons/Icons"
+import { HomeIcon, HomeIconSolid, CalendarIcon, CalendarIconSolid, LogOutIcon, ClipBoardIcon, ClipBoardSolidIcon } from "../../components/icons/Icons"
 
 
 function DashboardClientLayout() {
@@ -102,9 +102,9 @@ function DashboardClientLayout() {
 							}`}
 					>
 						{isActive("/workouts") ? (
-							<DumbbellIconSolid className="w-6 h-6" />
+							<ClipBoardIcon className="w-6 h-6" />
 						) : (
-							<DumbbellIcon className="w-6 h-6" />
+							<ClipBoardSolidIcon className="w-6 h-6" />
 						)}
 						<span className="flex-1 text-right">האימונים שלי</span>
 					</button>

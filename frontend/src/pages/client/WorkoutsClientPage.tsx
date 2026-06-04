@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getWorkouts } from "../../services/clientApi"
 import type { Workout } from "../../types/clientTypes"
+import { ClipBoardIcon, ClipBoardSolidIcon } from "../../components/icons/Icons"
 
 const WorkoutsClientPage = () => {
     const { data: workouts, isPending, isError, error } = useQuery<Workout[]>({
@@ -34,13 +35,10 @@ const WorkoutsClientPage = () => {
             <div className="max-w-6xl mx-auto">
 
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-client-dark mb-2">
-                        💪 האימונים שלי
+                <div className="mb-8 flex items-center gap-4">
+                    <h1 className="text-3xl lg:text-4xl font-bold text-client-dark">
+                        האימונים שלי
                     </h1>
-                    <p className="text-text-dark text-lg font-medium">
-                        כל תוכניות האימון שהמאמן שלך הכין עבורך
-                    </p>
                 </div>
 
                 {/* Workouts Grid or Empty State */}
@@ -53,7 +51,7 @@ const WorkoutsClientPage = () => {
                             >
                                 {/* Workout Header */}
                                 <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-client-primary/20">
-                                    <span className="text-3xl">🏋️</span>
+                                    <ClipBoardIcon className="w-8 h-8 text-client-primary" />
                                     <h2 className="text-xl font-bold text-client-dark flex-1 text-right">
                                         {workout.workoutName}
                                     </h2>
@@ -96,24 +94,11 @@ const WorkoutsClientPage = () => {
                     <div className="bg-surface rounded-xl shadow-xl border border-client-primary/20 p-12 text-center">
                         <div className="max-w-md mx-auto">
                             {/* Empty Icon */}
-                            <div className="text-8xl mb-6">📋</div>
-
+                            <ClipBoardSolidIcon className="w-20 h-20 text-text-light mx-auto mb-6" />
                             {/* Empty Message */}
                             <h2 className="text-2xl font-bold text-client-dark mb-3">
                                 אין תוכניות אימון עדיין
                             </h2>
-                            <p className="text-text-medium mb-6">
-                                המאמן שלך עדיין לא יצר עבורך תוכניות אימון.
-                                <br />
-                                ברגע שהוא יוסיף תוכנית, היא תופיע כאן.
-                            </p>
-
-                            {/* Motivational Message */}
-                            <div className="bg-client-primary/10 rounded-lg p-4 border border-client-primary/20">
-                                <p className="text-client-dark font-medium">
-                                    💡 בינתיים, שמור על קשר עם המאמן שלך!
-                                </p>
-                            </div>
                         </div>
                     </div>
                 )}

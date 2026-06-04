@@ -3,6 +3,7 @@ import DeleteClientButton from "../../components/client/DeleteClientButton"
 import { getClient } from "../../services/trainerApi"
 import { useQuery } from "@tanstack/react-query"
 import { CalendarSolidIcon, ClipBoardSolidIcon } from "../../components/icons/Icons"
+import BackButton from "../../components/general/BackButton"
 
 const ClientDetailsPage = () => {
 	const { id } = useParams()
@@ -27,6 +28,7 @@ const ClientDetailsPage = () => {
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					<BackButton />
 					{/* Header */}
 					<div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">

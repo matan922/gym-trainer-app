@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { CalendarIcon, UserIcon, EditIcon, ClockIcon } from "../../components/icons/Icons"
+import BackButton from "../../components/general/BackButton"
 
 
 const SessionsPage = () => {
@@ -19,6 +20,7 @@ const SessionsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const filter = searchParams.get('filter') || undefined
 	const { clientId } = useParams()
+	const [backButtonSwitch, setBackButtonSwitch] = useState<boolean>(false)
 
 	const queryClient = useQueryClient()
 
@@ -88,6 +90,7 @@ const SessionsPage = () => {
 		return <span>Error: {error.message}</span>
 	}
 
+
 	const sessions = data ?? []
 	const clientName = clientData?.client
 		? `${clientData.client.firstName} ${clientData.client.lastName}`
@@ -96,6 +99,7 @@ const SessionsPage = () => {
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					{clientId && <BackButton />}
 					{/* Header */}
 					<div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
 						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark text-center">
@@ -304,6 +308,7 @@ const SessionsPage = () => {
 					session={editingSession}
 					onClose={() => setEditingSession(null)}
 					onSave={handleSaveSession}
+					isLoading={sessionMutation.isPending}
 				/>
 			)}
 		</div>

@@ -171,11 +171,11 @@ function DashboardLayout() {
 			{/* Main Content Area - Scrollable */}
 			<div className="relative min-h-screen bg-trainer sm:h-screen sm:overflow-y-auto">
 				{/* Mobile Menu Button - Sticky */}
-				<div className="sm:hidden sticky top-4 z-30 flex justify-end p-4">
+				<div className="sm:hidden sticky top-4 z-30 flex justify-end p-4 pointer-events-none">
 					<button
 						type="button"
 						onClick={handleHamburger}
-						className="p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition"
+						className="p-3 rounded-lg bg-trainer-primary text-white shadow-lg hover:bg-trainer-dark transition pointer-events-auto"
 					>
 						<svg
 							className="w-6 h-6"

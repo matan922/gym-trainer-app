@@ -5,6 +5,7 @@ import type { Workout } from "../../types/clientTypes"
 import EditWorkoutModal from "../../components/client/EditWorkoutModal"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { EditIcon, TrashIcon, ClockIcon } from "../../components/icons/Icons"
+import BackButton from "../../components/general/BackButton"
 
 const WorkoutPage = () => {
 	const { id, workoutId } = useParams()
@@ -63,21 +64,26 @@ const WorkoutPage = () => {
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					<BackButton />
 					{/* Header */}
 					<div className="flex justify-between items-center gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">{workout.workoutName}</h1>
+						<div className="flex items-center gap-3">
+							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">{workout.workoutName}</h1>
+						</div>
 						<div className="flex gap-2">
 							<button
 								onClick={() => setIsEditOpen(true)}
-								className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
+								disabled={editWorkoutMutation.isPending || deleteWorkoutMutation.isPending}
+								className="px-4 py-2 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								<EditIcon className="w-5 h-5" /> עריכה
 							</button>
 							<button
 								onClick={handleDeleteWorkout}
-								className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-md transition-all flex items-center gap-2"
+								disabled={editWorkoutMutation.isPending || deleteWorkoutMutation.isPending}
+								className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 							>
-								<TrashIcon className="w-5 h-5" /> מחק
+								<TrashIcon className="w-5 h-5" /> {deleteWorkoutMutation.isPending ? "מוחק..." : "מחק"}
 							</button>
 						</div>
 					</div>
@@ -125,6 +131,7 @@ const WorkoutPage = () => {
 					onClose={() => setIsEditOpen(false)}
 					onWorkoutSubmit={handleEditWorkout}
 					selectedWorkout={workout}
+					isLoading={editWorkoutMutation.isPending}
 				/>
 			)}
 		</div>

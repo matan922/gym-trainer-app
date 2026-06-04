@@ -7,21 +7,21 @@ interface RegisterProps {
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     hasPendingInvite: boolean
+    isLoading: boolean
     error?: string
 }
 
-const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit, hasPendingInvite, error }: RegisterProps) => {
+const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit, hasPendingInvite, isLoading, error }: RegisterProps) => {
     const isTrainer = registerType === "trainer";
     const focusRing = isTrainer ? "focus:ring-trainer-primary" : "focus:ring-client-primary";
     const buttonBg = isTrainer ? "bg-trainer-button hover:bg-trainer-button-hover" : "bg-client-button hover:bg-client-button-hover";
-    
 
     return (
         <div className="bg-surface flex flex-col p-10 rounded-3xl shadow-2xl w-full max-w-md gap-6">
             {hasPendingInvite && (
                 <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg text-center">
                     <p className="text-teal-700 font-medium text-sm">
-                        📧 הרשמה דרך הזמנת מאמן
+                        הרשמה דרך הזמנת מאמן
                     </p>
                 </div>
             )}
@@ -187,7 +187,8 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit,
 
                 <button
                     type="submit"
-                    className={`w-full text-white py-3 rounded-lg font-semibold shadow-xl ${buttonBg} transition`}
+                    className={`w-full text-white py-3 rounded-lg font-semibold shadow-xl ${buttonBg} transition disabled:opacity-50 disabled:cursor-not-allowed`}
+                    disabled={isLoading}
                 >
                     הירשם
                 </button>

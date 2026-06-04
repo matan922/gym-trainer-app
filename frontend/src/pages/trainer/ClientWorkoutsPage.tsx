@@ -11,6 +11,7 @@ import {
 import type { Workout } from "../../types/clientTypes"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ClockIcon, EditIcon, PlusIcon, TrashIcon } from "../../components/icons/Icons"
+import BackButton from "../../components/general/BackButton"
 
 const ClientWorkoutsPage = () => {
 	const { id } = useParams()
@@ -106,9 +107,10 @@ const ClientWorkoutsPage = () => {
 		<div className="min-h-screen bg-trainer p-4 lg:p-8">
 			<div className="max-w-4xl mx-auto">
 				<div className="bg-surface rounded-xl shadow-xl border border-trainer-primary/20 p-6 lg:p-8">
+					<BackButton />
 					{/* Header */}
 					<div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-trainer-primary/20">
-						<div className="flex  items-center gap-3">
+						<div className="flex items-center gap-3">
 							<h1 className="text-3xl lg:text-4xl font-bold text-trainer-dark">אימונים</h1>
 							<span className="text-lg text-trainer-primary font-semibold">
 								({workouts.length})
@@ -128,6 +130,7 @@ const ClientWorkoutsPage = () => {
 						<NewWorkoutModal
 							onClose={() => setIsAddOpen(false)}
 							onWorkoutSubmit={handleAddWorkout}
+							isLoading={addWorkoutMutation.isPending}
 						/>
 					)}
 
@@ -136,6 +139,7 @@ const ClientWorkoutsPage = () => {
 							onClose={() => setIsEditOpen(false)}
 							onWorkoutSubmit={handleEditWorkout}
 							selectedWorkout={currWorkout.current}
+							isLoading={editWorkoutMutation.isPending}
 						/>
 					)}
 
@@ -165,15 +169,17 @@ const ClientWorkoutsPage = () => {
 										<div className="flex gap-2">
 											<button
 												onClick={(e) => handleEditModalState(e, workout)}
-												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all flex items-center gap-2"
+												disabled={editWorkoutMutation.isPending || deleteWorkoutMutation.isPending}
+												className="px-3 py-1 bg-trainer-primary text-white rounded-lg hover:bg-trainer-dark text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 											>
 												עריכה <EditIcon className="w-6 h-6" />
 											</button>
 											<button
 												onClick={(e) => handleDeleteWorkout(workout._id!, e)}
-												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all flex items-center gap-2"
+												disabled={editWorkoutMutation.isPending || deleteWorkoutMutation.isPending}
+												className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 											>
-												מחק <TrashIcon className="w-6 h-6" />
+												{deleteWorkoutMutation.isPending ? "מוחק..." : "מחק"} <TrashIcon className="w-6 h-6" />
 											</button>
 										</div>
 									</div>

@@ -24,11 +24,12 @@ const DeleteClientButton = ({ clientId, onDelete }: { clientId: string, onDelete
 
 	return (
 		<button
-			className="bg-gray-100 hover:bg-gray-300 p-2 rounded shadow"
+			className="bg-gray-100 hover:bg-gray-300 p-2 rounded shadow disabled:opacity-50 disabled:cursor-not-allowed"
 			onClick={handleClientDeletion}
+			disabled={deleteMutation.isPending}
 			type="button"
 		>
-			מחיקה
+			{deleteMutation.isPending ? "מוחק..." : "מחיקה"}
 		</button>
 	)
 }

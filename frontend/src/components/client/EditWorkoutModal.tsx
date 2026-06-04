@@ -7,10 +7,12 @@ const EditWorkoutModal = ({
 	onClose,
 	onWorkoutSubmit,
 	selectedWorkout,
+	isLoading,
 }: {
 	onClose: () => void
 	onWorkoutSubmit: (workoutData: Workout) => void
 	selectedWorkout: Workout | null
+	isLoading?: boolean
 }) => {
 	const [workout, setWorkout] = useState<Workout>({
 		_id: selectedWorkout?._id!,
@@ -187,15 +189,17 @@ const EditWorkoutModal = ({
 							{/* Action Buttons */}
 							<div className="flex gap-3 justify-center pt-4 border-t-2 border-trainer-primary/20">
 								<button
-									className="px-6 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all"
+									className="px-6 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 									type="submit"
+									disabled={isLoading}
 								>
-									שמור שינויים
+									{isLoading ? "שומר..." : "שמור שינויים"}
 								</button>
 								<button
 									onClick={onClose}
 									type="button"
-									className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold transition-all"
+									disabled={isLoading}
+									className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									ביטול
 								</button>

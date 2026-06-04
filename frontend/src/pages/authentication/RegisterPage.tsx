@@ -10,9 +10,10 @@ import type { RegisterData } from "../../types/clientTypes"
 import VerifyCodeComponent from "../../components/authentication/VerifyCodeComponent"
 
 const RegisterPage = () => {
-	const { signUp, isLoaded, setActive } = useSignUp()
+	const { signUp } = useSignUp()
 	const setUser = useAuthStore((state) => state.setUser)
 	const [isVerifying, setIsVerifying] = useState<boolean>(false)
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const [registerData, setRegisterData] = useState<RegisterData>({
 		firstName: "",
 		lastName: "",
@@ -31,14 +32,14 @@ const RegisterPage = () => {
 	const navigate = useNavigate()
 	const [searchParams] = useSearchParams()
 
-	const { isSignedIn, isLoaded: isAuthLoaded } = useAuth()
+	const { isSignedIn, isLoaded } = useAuth()
 
 	// Redirect if already signed in
 	useEffect(() => {
-		if (isAuthLoaded && isSignedIn) {
+		if (isLoaded && isSignedIn) {
 			navigate("/dashboard", { replace: true })
 		}
-	}, [isAuthLoaded, isSignedIn, navigate])
+	}, [isLoaded, isSignedIn, navigate])
 
 	// checks if there is pending invite token from a trainer
 	const pendingToken = searchParams.get('token')
@@ -112,14 +113,14 @@ const RegisterPage = () => {
 	const handleVerifyCode = async (code: string) => {
 		try {
 			setError(undefined)
-			const result = await signUp!.attemptEmailAddressVerification({ code })
+			await signUp.verifications.verifyEmailCode({ code })
 
-			if (result.status === "complete") {
+			if (signUp.status === "complete") {
 				// Clear localStorage
 				localStorage.removeItem('pendingVerification')
 
 				// Set active session
-				await setActive!({ session: result.createdSessionId })
+				await signUp.finalize()
 
 				// Create MongoDB profile
 				// Token is automatically handled by tokenProvider in axios interceptor
@@ -146,7 +147,7 @@ const RegisterPage = () => {
 		try {
 			setError(undefined)
 			setSuccessMessage(undefined)
-			await signUp!.prepareEmailAddressVerification({ strategy: "email_code" })
+			await signUp.verifications.sendEmailCode()
 			setSuccessMessage("קוד חדש נשלח למייל שלך")
 		} catch (err: any) {
 			console.error('Resend error:', err)
@@ -157,37 +158,30 @@ const RegisterPage = () => {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setError(undefined)
-		if (!isLoaded) return
+		if (!isLoaded || isSubmitting) return
 
+		setIsSubmitting(true)
 		try {
 			// 1. Sign up with Clerk
-			const result = await signUp!.create({
+			const { error } = await signUp.password({
 				emailAddress: registerData.email,
 				password: registerData.password,
 				firstName: registerData.firstName,
 				lastName: registerData.lastName,
 			})
+			if (error) {
+				console.log(JSON.stringify(error, null, 2))
+				setIsSubmitting(false)
+				return
+			}
 
-			console.log('Signup status:', result.status)
 
-			if (result.status === "missing_requirements") {
-				// 2. Email verification required
-				await signUp!.prepareEmailAddressVerification({ strategy: "email_code" })
-				// Save to localStorage
-				localStorage.setItem('pendingVerification', JSON.stringify({
-					registerData,
-					registerType
-				}))
+			// Check if email verification is needed
+			if (signUp.status === "complete") {
+				// Email already verified (test mode or no verification required)
+				await signUp.finalize()
 
-				setIsVerifying(true)
-				setError("נשלח קוד אימות למייל שלך. בדוק את תיבת הדואר הנכנס")
-
-			} else if (result.status === "complete") {
-				// 3. Email already verified (test mode or no verification required)
-				await setActive({ session: result.createdSessionId })
-
-				// 4. Create MongoDB profile with business data
-				// Token is automatically handled by tokenProvider in axios interceptor
+				// Create MongoDB profile
 				createProfileMutation.mutate({
 					firstName: registerData.firstName,
 					lastName: registerData.lastName,
@@ -200,6 +194,19 @@ const RegisterPage = () => {
 					trainerType: registerData.profileType === 'trainer' ? 'personal' : undefined,
 					inviteToken: registerData.inviteToken
 				})
+			} else {
+				// Email verification required
+				await signUp.verifications.sendEmailCode()
+
+				// Save to localStorage for page refresh persistence
+				localStorage.setItem('pendingVerification', JSON.stringify({
+					registerData,
+					registerType
+				}))
+
+				setIsVerifying(true)
+				setIsSubmitting(false)
+				setError("נשלח קוד אימות למייל שלך. בדוק את תיבת הדואר הנכנס")
 			}
 		} catch (err: any) {
 			console.error("Error:", err)
@@ -208,7 +215,7 @@ const RegisterPage = () => {
 			if (err.errors?.[0]?.code === "form_identifier_exists") {
 				try {
 					// Email exists - let user try verification
-					await signUp!.prepareEmailAddressVerification({ strategy: "email_code" })
+					await signUp.verifications.sendEmailCode()
 
 					localStorage.setItem('pendingVerification', JSON.stringify({
 						registerData,
@@ -223,6 +230,7 @@ const RegisterPage = () => {
 			} else {
 				setError(err.errors?.[0]?.message || "הרשמה נכשלה")
 			}
+			setIsSubmitting(false)
 		}
 	}
 
@@ -254,6 +262,7 @@ const RegisterPage = () => {
 					registerType={registerType}
 					onBack={handleBack}
 					hasPendingInvite={hasPendingInvite}
+					isLoading={isSubmitting || createProfileMutation.isPending || syncUserMutation.isPending}
 					error={error}
 				/>
 			)}

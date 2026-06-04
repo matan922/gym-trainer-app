@@ -8,9 +8,10 @@ interface EditSessionModalProps {
 	session: Session
 	onClose: () => void
 	onSave: (sessionId: string, updatedData: Partial<Session>) => void
+	isLoading?: boolean
 }
 
-function EditSessionModal({ session, onClose, onSave }: EditSessionModalProps) {
+function EditSessionModal({ session, onClose, onSave, isLoading }: EditSessionModalProps) {
 	const [startTime, setStartTime] = useState<Date>(new Date(session.startTime))
 	const [endTime, setEndTime] = useState<Date>(new Date(session.endTime))
 	const [sessionType, setSessionType] = useState<string>(session.sessionType)
@@ -198,15 +199,17 @@ function EditSessionModal({ session, onClose, onSave }: EditSessionModalProps) {
 							<div className="flex gap-4 justify-center pt-4 border-t-2 border-trainer-primary/20">
 								<button
 									type="submit"
-									className="px-8 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2"
+									disabled={isLoading}
+									className="px-8 py-3 rounded-lg bg-trainer-primary hover:bg-trainer-dark text-white font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									<span>✅</span>
-									שמור
+									{isLoading ? "שומר..." : "שמור"}
 								</button>
 								<button
 									onClick={onClose}
 									type="button"
-									className="px-8 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold shadow-md transition-all flex items-center gap-2"
+									disabled={isLoading}
+									className="px-8 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-text-dark font-semibold shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									<span>❌</span>
 									ביטול
