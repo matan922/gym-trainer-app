@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import TrainerClientRelation from "../../models/TrainerClientRelation.js";
-import User from "../../models/user/User";
-import Session from "../../models/Session";
+import User from "../../models/user/User.js";
+import Session from "../../models/Session.js";
 import { clerkClient } from "@clerk/express";
 
 
