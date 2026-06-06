@@ -1,5 +1,5 @@
-import Session from "../../models/Session"
-import TrainerClientRelation from "../../models/TrainerClientRelation"
+import Session from "../../models/Session.js"
+import TrainerClientRelation from "../../models/TrainerClientRelation.js"
 
 const getSpecificDate = (specificDate: string) => {
     // Specific date selected - show only that day
