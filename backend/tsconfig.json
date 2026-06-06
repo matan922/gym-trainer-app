@@ -7,7 +7,7 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "esnext",
-    "moduleResolution": "node", //bundler
+    "moduleResolution": "bundler",
     "target": "esnext",
     // For nodejs:
     // "lib": ["esnext"],
