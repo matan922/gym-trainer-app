@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import trainerProfileSchema from './Trainer';
-import clientProfileSchema from './Client';
+import trainerProfileSchema from './Trainer.js';
+import clientProfileSchema from './Client.js';
 
 const Schema = mongoose.Schema;
 
