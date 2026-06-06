@@ -1,4 +1,4 @@
-import ClientInviteToken from "../models/ClientInviteToken";
+import ClientInviteToken from "../models/ClientInviteToken.js";
 
 export const isValidProfileType = (value: any): value is 'trainer' | 'client' => {
     return value === 'trainer' || value === 'client';
