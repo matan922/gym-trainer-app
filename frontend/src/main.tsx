@@ -9,10 +9,6 @@ import { ClerkProvider } from '@clerk/react'
 const queryClient = new QueryClient()
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
-// TO DELETE
-console.log(clerkPublishableKey)
-// TO DELETE
-
 if (!clerkPublishableKey) {
 	throw new Error('Missing Publishable Key')
 }
