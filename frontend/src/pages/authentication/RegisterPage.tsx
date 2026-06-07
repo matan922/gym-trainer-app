@@ -170,7 +170,7 @@ const RegisterPage = () => {
 				lastName: registerData.lastName,
 			})
 			if (error) {
-				console.log(JSON.stringify(error, null, 2))
+				setError(error.message || "הרשמה נכשלה")
 				setIsSubmitting(false)
 				return
 			}
