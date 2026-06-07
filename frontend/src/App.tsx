@@ -31,6 +31,11 @@ function App() {
 	const user = useAuthStore((state) => state.user)
 	const { isLoaded } = useAuth()
 
+	// ------- TO DELTETE ---------
+	const API_BASE_URL = import.meta.env.VITE_API_URL
+	console.log(API_BASE_URL)
+	// ------- TO DELTETE ---------
+
 	if (!isLoaded) return null
 
 	// Show loading while user data is being fetched
