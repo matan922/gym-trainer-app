@@ -112,7 +112,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
         const inviteToken = crypto.randomBytes(32).toString('hex')
         await ClientInviteToken.create({ token: inviteToken, clientEmail: email, userTrainerId: userId, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
 
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
+        const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173'
         const { data, error } = await resend.emails.send({
             from: "הזמנת מאמן <noreply@merkaz-imunim.com>",
             to: [req.body.email],
