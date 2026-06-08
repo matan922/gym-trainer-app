@@ -7,11 +7,12 @@ interface RegisterProps {
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     hasPendingInvite: boolean
+    inviteEmail?: string
     isLoading: boolean
     error?: string
 }
 
-const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit, hasPendingInvite, isLoading, error }: RegisterProps) => {
+const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit, hasPendingInvite, inviteEmail, isLoading, error }: RegisterProps) => {
     const isTrainer = registerType === "trainer";
     const focusRing = isTrainer ? "focus:ring-trainer-primary" : "focus:ring-client-primary";
     const buttonBg = isTrainer ? "bg-trainer-button hover:bg-trainer-button-hover" : "bg-client-button hover:bg-client-button-hover";
@@ -83,6 +84,9 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit,
                         className="block text-sm font-medium text-text-medium mb-1 text-right"
                     >
                         אימייל
+                        {inviteEmail && (
+                            <span className="text-xs text-gray-500 mr-2">(נעול עבור הזמנה)</span>
+                        )}
                     </label>
                     <input
                         onChange={onInputChange}
@@ -90,7 +94,8 @@ const Register = ({ onBack, registerType, registerData, onInputChange, onSubmit,
                         id="email"
                         type="email"
                         value={registerData.email}
-                        className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition`}
+                        disabled={!!inviteEmail}
+                        className={`w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 ${focusRing} focus:border-transparent outline-none transition ${inviteEmail ? 'bg-gray-100 cursor-not-allowed text-gray-600' : ''}`}
                     />
                 </div>
 

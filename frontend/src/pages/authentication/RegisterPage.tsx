@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
 import { useSignUp, useAuth } from "@clerk/react"
 import { useMutation } from "@tanstack/react-query"
-import { createProfile, syncUser } from "../../services/authApi"
+import { createProfile, syncUser, validateClientInvite } from "../../services/authApi"
 import { useAuthStore } from "../../store/authStore"
 import RoleSelectionView from "../../components/authentication/RoleSelectionView"
 import Register from "../../components/authentication/Register"
@@ -44,12 +44,32 @@ const RegisterPage = () => {
 	// checks if there is pending invite token from a trainer
 	const pendingToken = searchParams.get('token')
 	const hasPendingInvite = Boolean(pendingToken)
+	const [inviteEmail, setInviteEmail] = useState<string>()
+
 	useEffect(() => {
 		if (!pendingToken) return // if none return and continue registration normally
 
+		// Fetch invite details to get the email
+		const fetchInviteDetails = async () => {
+			try {
+				const response = await validateClientInvite(pendingToken)
+				if (response.valid && response.clientEmail) {
+					setInviteEmail(response.clientEmail)
+					setRegisterData(prev => ({
+						...prev,
+						profileType: "client",
+						inviteToken: pendingToken,
+						email: response.clientEmail
+					}))
+				}
+			} catch (error) {
+				console.error('Failed to validate invite:', error)
+			}
+		}
+
 		// Automatically set to client registration
 		setRegisterType("client")
-		setRegisterData(prev => ({ ...prev, profileType: "client", inviteToken: pendingToken }))
+		fetchInviteDetails()
 	}, [pendingToken])
 
 	// Restore verification state from localStorage on mount
@@ -262,6 +282,7 @@ const RegisterPage = () => {
 					registerType={registerType}
 					onBack={handleBack}
 					hasPendingInvite={hasPendingInvite}
+					inviteEmail={inviteEmail}
 					isLoading={isSubmitting || createProfileMutation.isPending || syncUserMutation.isPending}
 					error={error}
 				/>

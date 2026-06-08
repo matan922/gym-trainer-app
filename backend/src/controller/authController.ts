@@ -117,7 +117,7 @@ export const sendClientInvite = async (req: Request, res: Response) => {
             from: "הזמנת מאמן <noreply@merkaz-imunim.com>",
             to: [req.body.email],
             subject: `הוזמן על ידי ${trainerName}`,
-            html: `<strong>${frontendUrl}/invite-accept?token=${inviteToken}</strong>`,
+            html: `<a href="${frontendUrl}/invite-accept?token=${inviteToken}">הירשם כאן</a>`,
         })
 
         if (error) {
